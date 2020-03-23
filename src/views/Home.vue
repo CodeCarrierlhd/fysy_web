@@ -27,6 +27,7 @@
               <span>131345421</span>
             </p>
           </div>
+          <edit-user></edit-user>
         </el-main>
       </el-container>
     </el-container>
@@ -36,6 +37,7 @@
 <script>
 import Menu from "@/components/Menu";
 import Header from "@/components/Header";
+import EditUser from "@/components/EditUser";
 export default {
   data() {
     return {
@@ -47,7 +49,8 @@ export default {
   created() {},
   components: {
     Menu,
-    Header
+    Header,
+    EditUser
   }
 };
 </script>
