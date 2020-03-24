@@ -7,9 +7,14 @@
     </p>
     <p>
       <img :src="user_img" alt />
-      <span style="margin:0 35px">{{userInfo.username}}</span>
-      <img :src="lock_img" alt style="margin-right:10px" @click="getUser" />
-      <img :src="quit_img" alt />
+      <span style="margin:0 35px">{{ userInfo.username }}</span>
+      <img
+        :src="lock_img"
+        alt
+        style="margin-right:10px"
+        @click.stop="getUser()"
+      />
+      <img :src="quit_img" alt @click="clearUser()" />
     </p>
   </div>
 </template>
@@ -30,14 +35,18 @@ export default {
   },
   mounted() {
     this.getUserName();
-    console.log(this.userInfo);
   },
   created() {
     // console.log(JSON.stringify(this.props.userInfo));
   },
   methods: {
     getUser() {
-      console.log("1");
+      this.$emit("showBlock");
+    },
+    clearUser() {
+      console.log("12");
+
+      this.$emit("loginOut");
     },
     getUserName() {
       if (this.userInfo.length < 0) {

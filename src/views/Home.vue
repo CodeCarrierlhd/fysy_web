@@ -1,19 +1,23 @@
 <template>
-  <div class="home">
+  <div class="home" @click="hideEdit">
     <el-container>
       <el-aside width="240px">
         <Menu></Menu>
       </el-aside>
       <el-container>
         <el-header height="80px">
-          <Header :userInfo="this.userInfo"></Header>
+          <Header
+            :userInfo="this.userInfo"
+            @showBlock="showBlock"
+            @loginOut="loginOut"
+          ></Header>
         </el-header>
         <el-main
           :style="{
             backgroundImage: 'url(' + require('../assets/logo/bg1.png') + ')',
             backgroundRepeat: 'no-repeat',
             backgroundPosition: 'center center',
-            backgroundSize: '100% 100%'
+            backgroundSize: '100%'
           }"
         >
           <div class="w_content">
@@ -27,10 +31,27 @@
               <span>131345421</span>
             </p>
           </div>
-          <edit-user></edit-user>
+          <transition name="slide-fade">
+            <edit-user v-if="showEdit" id="edUser"></edit-user>
+          </transition>
+          <!-- <el-dialog
+            title="提示"
+            :visible.sync="dialogVisible"
+            width="30%"
+            :before-close="handleClose"
+          >
+            <span>这是一段信息</span>
+            <span slot="footer" class="dialog-footer">
+              <el-button @click="dialogVisible = false">取 消</el-button>
+              <el-button type="primary" @click="dialogVisible = false"
+                >确 定</el-button
+              >
+            </span>
+          </el-dialog> -->
         </el-main>
       </el-container>
     </el-container>
+    <div v-if="showEdit" class="faker_div"></div>
   </div>
 </template>
 
@@ -39,12 +60,56 @@ import Menu from "@/components/Menu";
 import Header from "@/components/Header";
 import EditUser from "@/components/EditUser";
 export default {
+  name: "home",
   data() {
     return {
-      userInfo: JSON.parse(this.$route.query.userInfo)
+      userInfo: JSON.parse(this.$route.query.userInfo),
+      showEdit: false
+      // dialogVisible: false
     };
   },
-  methods: {},
+  methods: {
+    showBlock() {
+      if (!this.showEdit) {
+        this.showEdit = true;
+      } else {
+        this.showEdit = false;
+      }
+    },
+    loginOut() {
+      console.log("13");
+
+      this.$cookieStore.getCookie("name");
+      this.$cookieStore.delCookie("name");
+      this.$router.push("/login");
+      history.pushState(null, null, document.URL);
+      window.addEventListener(
+        "popstate",
+        function(e) {
+          history.pushState(null, null, document.URL);
+        },
+        false
+      );
+    },
+    // handleClose(done) {
+    //   this.$confirm("确认关闭？")
+    //     .then(_ => {
+    //       done();
+    //     })
+    //     .catch(_ => {});
+    // },
+    // parentFn(payload) {
+    //   this.dialogVisible = payload;
+    // },
+    hideEdit(event) {
+      const edUser = document.getElementById("edUser");
+      if (edUser) {
+        if (!edUser.contains(event.target)) {
+          this.showEdit = false;
+        }
+      }
+    }
+  },
   mounted() {},
   created() {},
   components: {
@@ -55,6 +120,9 @@ export default {
 };
 </script>
 <style scoped>
+.home {
+  height: 100%;
+}
 .el-header {
   height: 80px;
   background: rgba(255, 255, 255, 1);
@@ -67,14 +135,20 @@ export default {
 }
 
 .el-main {
-  height: 1000px;
+  /* height: 1080px; */
   display: flex;
   justify-content: center;
-  align-items: center;
+  /*align-items: center; */
+  padding: 0;
+  position: relative;
+  height: 100%;
 }
 
 body > .el-container {
   margin-bottom: 40px;
+}
+body .el-container {
+  height: 100%;
 }
 .w_content {
   width: 500px;
@@ -84,6 +158,7 @@ body > .el-container {
   border-radius: 7px;
   border: 1px solid rgba(12, 130, 250, 1);
   text-align: center;
+  margin: auto;
 }
 .w_content > h1 {
   font-size: 24px;
@@ -105,5 +180,24 @@ body > .el-container {
 }
 .el-submenu__title {
   color: rgba(0, 0, 255, 1) !important;
+}
+.slide-fade-enter-active {
+  transition: all 0.8s ease;
+}
+.slide-fade-leave-active {
+  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active for below version 2.1.8 */ {
+  transform: translateX(10px);
+  opacity: 0;
+}
+.faker_div {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: rgba(0, 0, 0, 0.3);
 }
 </style>

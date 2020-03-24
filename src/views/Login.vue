@@ -12,26 +12,29 @@
       <img :src="logoImg" style="width:360px" />
       <p>超体鼻假体防伪溯源系统登陆</p>
       <el-form-item prop="username">
-        <input
+        <el-input
           type="text"
           @keyup.enter="handleLogin"
           v-model="loginForm.username"
           placeholder="请输入用户名"
-        />
+          class="n_input"
+        ></el-input>
       </el-form-item>
       <el-form-item prop="password">
-        <input
+        <el-input
           @keyup.enter="handleLogin"
           :type="passwordType"
           v-model="loginForm.password"
           placeholder="请输入密码"
-        />
-        <i
-          class="el-icon-view el-input__icon"
-          :style="fontstyle"
-          slot="suffix"
-          @click="showPassword"
-        ></i>
+          class="n_input"
+        >
+          <i
+            class="el-icon-view "
+            :style="fontstyle"
+            slot="suffix"
+            @click="showPassword"
+          ></i
+        ></el-input>
       </el-form-item>
       <el-form-item prop="verifycode">
         <!-- 注意：prop与input绑定的值一定要一致，否则验证规则中的value会报undefined，因为value即为绑定的input输入值 -->
@@ -40,24 +43,23 @@
           placeholder="请输入验证码"
           class="identifyinput"
         ></el-input>-->
-        <input
-          type="text"
-          v-model="loginForm.verifycode"
-          placeholder="请输入验证码"
-          class="identifyinput"
-        />
-      </el-form-item>
-      <el-form-item>
-        <div class="identifybox">
-          <div @click="refreshCode">
-            <!-- <s-identify :identifyCode="identifyCode"></s-identify> -->
-            <img
-              src="http://192.168.16.15:8080/login/getVerifyCode"
-              alt
-              style="width:100%;height:100%;display:block"
-            />
+        <div style="display:flex;justify-content: space-between;">
+          <el-input
+            type="text"
+            v-model="loginForm.verifycode"
+            placeholder="请输入验证码"
+            class="identifyinput"
+          ></el-input>
+          <div>
+            <div @click="refreshCode">
+              <!-- <s-identify :identifyCode="identifyCode"></s-identify> -->
+              <img
+                :src="identifyCode"
+                alt
+                style="width:100%;height:100%;display:block"
+              />
+            </div>
           </div>
-          <el-button @click="refreshCode" type="text" class="textbtn">看不清，换一张</el-button>
         </div>
       </el-form-item>
       <el-form-item>
@@ -66,14 +68,18 @@
           size="small"
           @click.native.prevent="handleLogin"
           class="login-submit"
-        >登录</el-button>
+          >登录</el-button
+        >
       </el-form-item>
-      <el-checkbox v-model="checked" style="float:left;padding-left:30px">记住账号和密码</el-checkbox>
+      <el-checkbox v-model="checked" style="float:left;"
+        >记住账号和密码</el-checkbox
+      >
     </el-form>
   </div>
 </template>
 <script>
 // import SIdentify from "@/components/SecurityCode";
+// import axios from "axios";
 export default {
   name: "userlogin",
   img_url: "",
@@ -100,12 +106,14 @@ export default {
     return {
       r_img: require("@/assets/logo/bg1.png"),
       logoImg: require("@/assets/logo/log_b.png"),
+      identifyCode: "http://192.168.16.15:8080/login/getVerifyCode",
       fontstyle: {},
       loginForm: {
         username: "admin",
         password: "123456",
         verifycode: ""
       },
+      name: "",
       checked: false,
       // identifyCodes: "1234567890",
       // identifyCode: "",
@@ -155,6 +163,8 @@ export default {
             .dispatch("login", this.loginForm)
             .then(code => {
               console.log(code);
+              this.name = code;
+              this.$cookieStore.setCookie("name", this.name, 60);
               if (code === 0) {
                 const path = this.$route.query.redirect || "/";
                 this.$router.push({
@@ -178,8 +188,11 @@ export default {
     // },
     // 切换验证码
     refreshCode() {
-      this.identifyCode = "";
-      this.makeCode(this.identifyCodes, 4);
+      var timestamp = new Date().getTime();
+      this.identifyCode =
+        "http://192.168.16.15:8080/login/getVerifyCode?" + timestamp;
+
+      // this.makeCode(this.identifyCodes, 4);
     }
     // 生成四位随机验证码
     // makeCode(o, l) {
@@ -193,13 +206,6 @@ export default {
 };
 </script>
 <style scoped>
-.identifybox {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 7px;
-  width: 300px;
-  padding: 0 30px;
-}
 .iconstyle {
   color: #409eff;
 }
@@ -207,6 +213,7 @@ export default {
   margin: auto;
   text-align: center;
   /* margin-top: 20.1%; */
+  width: 300px;
 }
 .login-form p {
   font-size: 24px;
@@ -218,15 +225,25 @@ export default {
   margin-bottom: 130px;
 }
 .el-form-item__content input {
-  width: 300px;
   border-bottom: 2px solid #d8d8d8;
   font-size: 20px;
+  padding: 0 15px;
 }
 input[type="text"]:focus,
 input[type="password"]:focus {
   outline: none;
 }
 .el-button {
-  width: 300px;
+  width: 100%;
+}
+.n_input >>> .el-input__inner,
+.identifyinput >>> .el-input__inner {
+  border-top: 0 !important;
+  border-right: 0;
+  border-left: 0;
+  border-radius: 0;
+}
+.identifyinput >>> .el-input__inner {
+  width: 210px;
 }
 </style>
