@@ -21,40 +21,38 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
-      left_arrow: require("../assets/imgs/syb.png"),
-      right_arrow: require("../assets/imgs/xyb.png"),
-      user_img: require("../assets/imgs/gs.png"),
-      lock_img: require("../assets/imgs/mm.png"),
-      quit_img: require("../assets/imgs/tc.png")
-    };
+      left_arrow: require('../assets/imgs/syb.png'),
+      right_arrow: require('../assets/imgs/xyb.png'),
+      user_img: require('../assets/imgs/gs.png'),
+      lock_img: require('../assets/imgs/mm.png'),
+      quit_img: require('../assets/imgs/tc.png')
+    }
   },
   props: {
     userInfo: {}
   },
-  mounted() {
-    this.getUserName();
+  mounted () {
+    this.getUserName()
   },
-  created() {
+  created () {
     // console.log(JSON.stringify(this.props.userInfo));
   },
   methods: {
-    getUser() {
-      this.$emit("showBlock");
+    getUser () {
+      this.$emit('showBlock')
     },
-    clearUser() {
-      console.log("12");
-
-      this.$emit("loginOut");
+    clearUser () {
+      this.$emit('handleClose')
     },
-    getUserName() {
+    getUserName () {
       if (this.userInfo.length < 0) {
-        console.log("2222");
+        console.log('2222')
       }
     }
   }
-};
+}
 </script>
 <style lang="less">
 .header {

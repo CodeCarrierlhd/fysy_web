@@ -13,6 +13,7 @@
           background-color="#435E93"
           text-color="#fff"
           active-text-color="#00f"
+          :unique-opened="unique"
         >
           <el-submenu index="1">
             <template slot="title">
@@ -20,8 +21,18 @@
               <span class="m_title">设置管理</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item index="1-1">选项1</el-menu-item>
-              <el-menu-item index="1-2">选项2</el-menu-item>
+              <el-menu-item index="1-1" @click.native="menuChange('MaMa')"
+                >物料管理</el-menu-item
+              >
+              <el-menu-item index="1-2" @click.native="menuChange('AuMa')"
+                >权限管理</el-menu-item
+              >
+              <el-menu-item index="1-3" @click.native="menuChange('AcMa')"
+                >账号管理</el-menu-item
+              >
+              <el-menu-item index="1-4" @click.native="menuChange('VeMa')"
+                >生厂商管理</el-menu-item
+              >
             </el-menu-item-group>
           </el-submenu>
           <el-submenu index="2">
@@ -74,15 +85,19 @@
 export default {
   data() {
     return {
-      imgSrc: require("../assets/logo/log_w.png")
+      imgSrc: require("../assets/logo/log_w.png"),
+      unique: true
     };
   },
   methods: {
     handleOpen(key, keyPath) {
-      console.log(key, keyPath);
+      console.log("open", key, keyPath);
     },
     handleClose(key, keyPath) {
-      console.log(key, keyPath);
+      console.log("close", key, keyPath);
+    },
+    menuChange(cname) {
+      this.$emit("handleRouterChange", cname);
     }
   }
 };
@@ -104,11 +119,9 @@ export default {
     display: inline-block;
   }
 }
-// .el-menu {
-//   //   background-color: #435e93; //菜单栏选项背景色
-//   //   box-shadow: 0px 2px 2px 0px rgba(42, 66, 110, 1);
-//   border: 0;
-// }
+.el-menu {
+  border: 0 !important;
+}
 .el-submenu {
   border-bottom: 1px solid rgba(42, 66, 110, 1);
 }
@@ -137,4 +150,7 @@ export default {
 // .el-menu-item {
 //   background-color: #2a426e !important;
 // }
+.el-menu-item.is-active {
+  color: #409eff !important;
+}
 </style>

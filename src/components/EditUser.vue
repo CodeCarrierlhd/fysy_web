@@ -126,30 +126,30 @@
 // 例如：import 《组件名称》 from '《组件路径》';
 
 export default {
-  name: "userEdit",
+  name: 'userEdit',
   // import引入的组件需要注入到对象中才能使用
   components: {},
-  data() {
+  data () {
     const validateUsername = (rule, value, callback) => {
-      if (value === "") {
-        callback(new Error("请输入正确的用户名"));
+      if (value === '') {
+        callback(new Error('请输入正确的用户名'))
       } else {
-        callback();
+        callback()
       }
-    };
+    }
     // 这里存放数据
     return {
-      logoImg: require("@/assets/logo/log_b.png"),
-      identifyCode: "http://192.168.16.15:8080/login/getVerifyCode",
+      logoImg: require('@/assets/logo/log_b.png'),
+      identifyCode: 'http://192.168.16.15:8080/login/getVerifyCode',
       // pd_array: ["o_password", "n_password", "tn_password"],
       fontstyle: {},
       fontstyle1: {},
       fontstyle2: {},
       loginForm: {
-        o_password: "",
-        n_password: "",
-        tn_password: "",
-        verifycode: ""
+        o_password: '',
+        n_password: '',
+        tn_password: '',
+        verifycode: ''
       },
       checked: false,
       // identifyCodes: "1234567890",
@@ -157,21 +157,21 @@ export default {
       loginRules: {
         // 绑定在form表单中的验证规则
         username: [
-          { required: true, trigger: "blur", validator: validateUsername }
+          { required: true, trigger: 'blur', validator: validateUsername }
         ],
         password: [
-          { required: true, message: "请输入密码", trigger: "blur" },
-          { min: 6, message: "密码长度最少为6位", trigger: "blur" }
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 6, message: '密码长度最少为6位', trigger: 'blur' }
         ]
         // verifycode: [
         //   { required: true, trigger: "blur", validator: validateVerifycode }
         // ]
       },
-      o_password: "password",
-      n_password: "password",
-      tn_password: "password",
+      o_password: 'password',
+      n_password: 'password',
+      tn_password: 'password',
       d_statu: false
-    };
+    }
   },
   // 监听属性 类似于data概念
   computed: {},
@@ -179,32 +179,32 @@ export default {
   watch: {},
   // 方法集合
   methods: {
-    showPassword() {
-      this.fontstyle === ""
-        ? (this.fontstyle = "color: red")
-        : (this.fontstyle = ""); // 改变密码可见按钮颜色
-      this.o_password === ""
-        ? (this.o_password = "password")
-        : (this.o_password = "");
+    showPassword () {
+      this.fontstyle === ''
+        ? (this.fontstyle = 'color: red')
+        : (this.fontstyle = '') // 改变密码可见按钮颜色
+      this.o_password === ''
+        ? (this.o_password = 'password')
+        : (this.o_password = '')
     },
-    showPassword1() {
-      this.fontstyle1 === ""
-        ? (this.fontstyle1 = "color: red")
-        : (this.fontstyle1 = ""); // 改变密码可见按钮颜色
-      this.n_password === ""
-        ? (this.n_password = "password")
-        : (this.n_password = "");
+    showPassword1 () {
+      this.fontstyle1 === ''
+        ? (this.fontstyle1 = 'color: red')
+        : (this.fontstyle1 = '') // 改变密码可见按钮颜色
+      this.n_password === ''
+        ? (this.n_password = 'password')
+        : (this.n_password = '')
     },
-    showPassword2() {
-      this.fontstyle2 === ""
-        ? (this.fontstyle2 = "color: red")
-        : (this.fontstyle2 = ""); // 改变密码可见按钮颜色
-      this.tn_password === ""
-        ? (this.tn_password = "password")
-        : (this.tn_password = "");
+    showPassword2 () {
+      this.fontstyle2 === ''
+        ? (this.fontstyle2 = 'color: red')
+        : (this.fontstyle2 = '') // 改变密码可见按钮颜色
+      this.tn_password === ''
+        ? (this.tn_password = 'password')
+        : (this.tn_password = '')
     },
-    editUserInfo() {
-      console.log(this.loginForm);
+    editUserInfo () {
+      console.log(this.loginForm)
       // const { o_password, n_password, tn_password } = this.loginForm;
       if (this.loginForm.n_password !== this.loginForm.tn_password) {
         // this.d_statu = true;
@@ -234,26 +234,26 @@ export default {
       //   }
       // });
     },
-    refreshCode() {
-      var timestamp = new Date().getTime();
+    refreshCode () {
+      var timestamp = new Date().getTime()
       this.identifyCode =
-        "http://192.168.16.15:8080/login/getVerifyCode?" + timestamp;
+        'http://192.168.16.15:8080/login/getVerifyCode?' + timestamp
 
       // this.makeCode(this.identifyCodes, 4);
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created () {},
   // 生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {},
-  beforeCreate() {}, // 生命周期 - 创建之前
-  beforeMount() {}, // 生命周期 - 挂载之前
-  beforeUpdate() {}, // 生命周期 - 更新之前
-  updated() {}, // 生命周期 - 更新之后
-  beforeDestroy() {}, // 生命周期 - 销毁之前
-  destroyed() {}, // 生命周期 - 销毁完成
-  activated() {} // 如果页面有keep-alive缓存功能，这个函数会触发
-};
+  mounted () {},
+  beforeCreate () {}, // 生命周期 - 创建之前
+  beforeMount () {}, // 生命周期 - 挂载之前
+  beforeUpdate () {}, // 生命周期 - 更新之前
+  updated () {}, // 生命周期 - 更新之后
+  beforeDestroy () {}, // 生命周期 - 销毁之前
+  destroyed () {}, // 生命周期 - 销毁完成
+  activated () {} // 如果页面有keep-alive缓存功能，这个函数会触发
+}
 </script>
 <style scoped>
 .editUser {

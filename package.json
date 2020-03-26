@@ -56,7 +56,8 @@
       ],
       "semi": 0,
       "no-tabs": "off",
-      "space-before-function-paren": 0
+      "space-before-function-paren": 0,
+      "no-extra-boolean-cast": 2
     }
   },
   "browserslist": [

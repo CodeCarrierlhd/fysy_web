@@ -162,7 +162,6 @@ export default {
           this.$store
             .dispatch("login", this.loginForm)
             .then(code => {
-              console.log(code);
               this.name = code;
               this.$cookieStore.setCookie("name", this.name, 60);
               if (code === 0) {

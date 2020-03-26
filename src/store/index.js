@@ -18,7 +18,6 @@ export default new Vuex.Store({
     login({ commit }, user) {
       return us.login(user).then(res => {
         const { code, token } = res.data;
-        console.log(token);
         if (code === 0) {
           commit("setLoginState", true);
           localStorage.setItem("token", token);
