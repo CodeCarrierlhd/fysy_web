@@ -1,4 +1,4 @@
-<!-- 物理管理 -->
+<!-- 拥有table基本功能的组件 -->
 <template>
   <div style="width: 100%;">
     <el-table
@@ -196,6 +196,11 @@
 // 例如：import 《组件名称》 from '《组件路径》';
 import pagination from "../components/Pagenation";
 export default {
+  props: {
+    tableData: {
+      required: true
+    }
+  },
   // import引入的组件需要注入到对象中才能使用
   components: {
     pagination
@@ -203,17 +208,6 @@ export default {
   data() {
     // 这里存放数据
     return {
-      tableData: [
-        {
-          p_number: "232323232323232323",
-          type: "鼻假体",
-          p_model: "DY10-204K",
-          p_specification: "1个",
-          p_manufacturer: "上海东月医疗保健用品有限公司",
-          p_date: "2019-12-28",
-          p_statu: "上市"
-        }
-      ],
       tableDataSelections: [], // 选中的表格数据
       search: "",
       // 类别
