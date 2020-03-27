@@ -259,21 +259,22 @@ export default {
   watch: {},
   // 方法集合
   methods: {
-    mockTableData1() {
-      for (let i = 0; i < 30; i++) {
-        this.tableData.push({
-          p_number: Math.floor(Math.random() * 10000 + 1),
-          type: i % 2 === 0 ? "鼻假体" : "下巴假体",
-          p_model: "DY10-204K" + i,
-          p_specification: i + "个",
-          p_manufacturer:
-            i % 2 === 0 ? "上海东月医疗保健用品有限公司" : "上海东月医疗",
-          p_date: "2019-12-" + i,
-          p_statu: i % 2 === 0 ? "上市" : "已下市"
-        });
-      }
-      this.formatData();
-    },
+    // mockTableData1() {
+    //   for (let i = 0; i < 30; i++) {
+    //     this.tableData.push({
+    //       p_number: Math.floor(Math.random() * 10000 + 1),
+    //       type: i % 2 === 0 ? "鼻假体" : "下巴假体",
+    //       p_model: "DY10-204K" + i,
+    //       p_specification: i + "个",
+    //       p_manufacturer:
+    //         i % 2 === 0 ? "上海东月医疗保健用品有限公司" : "上海东月医疗",
+    //       p_date: "2019-12-" + i,
+    //       p_statu: i % 2 === 0 ? "上市" : "已下市"
+    //     });
+    //   }
+    //   this.formatData();
+    // },
+    // 数据初始化
     formatData() {
       this.tableData.forEach(item => {
         for (const key in item) {
@@ -325,6 +326,7 @@ export default {
         // }, 20);
       }
     },
+    // z这个是物料管理的上市状态处理方法
     getStatu() {
       this.tableData.map(item => {
         if (item.p_statu.value === "上市") {
@@ -335,10 +337,12 @@ export default {
         return item;
       });
     },
+    // 这个是处理筛选方法
     filterHandler(value, row, column) {
       const property = column.property;
       return row[property].value === value;
     },
+    // 这个是下拉框选中值之后 隐藏select样式 方法
     changeCell(value, item, index, type) {
       this.$nextTick(() => {
         this.tableData[index].type.edit = false;
@@ -368,8 +372,8 @@ export default {
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    this.mockTableData1();
-
+    // this.mockTableData1();
+    this.formatData();
     this.getDataList();
     // this.addData();
   },
