@@ -24,14 +24,14 @@
               <el-menu-item index="1-1" @click.native="menuChange('MaMa')"
                 >物料管理</el-menu-item
               >
-              <el-menu-item index="1-2" @click.native="menuChange('AuMa')"
-                >权限管理</el-menu-item
+              <el-menu-item index="1-2" @click.native="menuChange('VeMa')"
+                >生厂商管理</el-menu-item
               >
               <el-menu-item index="1-3" @click.native="menuChange('AcMa')"
                 >账号管理</el-menu-item
               >
-              <el-menu-item index="1-4" @click.native="menuChange('VeMa')"
-                >生厂商管理</el-menu-item
+              <el-menu-item index="1-4" @click.native="menuChange('AuMa')"
+                >权限管理</el-menu-item
               >
             </el-menu-item-group>
           </el-submenu>

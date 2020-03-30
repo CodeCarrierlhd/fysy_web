@@ -8,10 +8,12 @@
     "lint": "eslint --ext .js,.vue src --fix"
   },
   "dependencies": {
+    "area-data": "^5.0.6",
     "core-js": "^3.6.4",
     "element-ui": "^2.4.5",
     "eslint-plugin-html": "^6.0.0",
     "vue": "^2.6.11",
+    "vue-area-linkage": "^5.1.0",
     "vue-router": "^3.1.5",
     "vuex": "^3.1.2"
   },
