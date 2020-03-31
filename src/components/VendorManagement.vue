@@ -1,4 +1,4 @@
-<!-- 物理管理 -->
+<!-- 生产商管理 -->
 <template>
   <div style="width: 100%;">
     <el-table
@@ -6,6 +6,7 @@
       border
       @selection-change="selectionChangeHandle"
       @cell-dblclick="celledit"
+      @filter-change="statuChange"
       style="width: 95%;margin:40px 60px;"
     >
       <el-table-column class-name="t_header">
@@ -54,7 +55,7 @@
           label="省份"
           edit="false"
           align="center"
-          width="200"
+          width="180"
           :filter-multiple="false"
           :column-key="'v_provice'"
           :filters="proviceGroup"
@@ -72,7 +73,7 @@
                 }
               "
             >
-              <el-option :key="''" :label="'全部'" :value="''"> </el-option>
+              <!-- <el-option :key="''" :label="'全部'" :value="''"> </el-option> -->
               <el-option
                 v-for="item in provinces"
                 :key="item.code"
@@ -90,7 +91,7 @@
           label="城市"
           edit="false"
           align="center"
-          width="200"
+          width="180"
           :filter-multiple="false"
           :column-key="'v_city'"
           :filters="cityGroup"
@@ -101,7 +102,6 @@
               v-model="scope.row.v_city.value"
               v-if="scope.row.v_city.edit"
               placeholder="请选择"
-              :loading="loadingCity"
               @change="
                 value => {
                   scope.row.v_city.edit = false;
@@ -109,7 +109,7 @@
                 }
               "
             >
-              <el-option :key="''" :label="'全部'" :value="''"> </el-option>
+              <!-- <el-option :key="''" :label="'全部'" :value="''"> </el-option> -->
               <el-option
                 v-for="item in cities"
                 :key="item.code"
@@ -126,7 +126,7 @@
           prop="v_name"
           label="生产商名称"
           edit="false"
-          width="120"
+          width="200"
           align="center"
         >
           <template slot-scope="scope">
@@ -144,7 +144,7 @@
           prop="v_address"
           label="详细地址"
           edit="false"
-          width="90"
+          width="200"
           align="center"
         >
           <template slot-scope="scope">
@@ -180,7 +180,7 @@
           prop="v_phone"
           label="电话"
           edit="false"
-          width="90"
+          width="200"
           align="center"
         >
           <template slot-scope="scope">
@@ -192,6 +192,22 @@
             >
             </el-input>
             <span v-else>{{ scope.row.v_phone.value }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="操作">
+          <template slot-scope="scope">
+            <el-button
+              v-if="saveStatu"
+              size="mini"
+              @click="handleEdit(scope.$index, scope.row)"
+              >保存</el-button
+            >
+            <el-button
+              v-if="!saveStatu"
+              size="mini"
+              @click="handleDelete(scope.$index, scope.row)"
+              >删除</el-button
+            >
           </template>
         </el-table-column>
       </el-table-column>
@@ -222,14 +238,15 @@ export default {
     // 这里存放数据
     return {
       tableData: [
-        // {
-        //   v_number: "",
-        //   v_name: "",
-        //   v_address: "",
-        //   v_concat: "",
-        //   v_phone: "",
-        //   v_provice: ""
-        // }
+        {
+          v_number: "12",
+          v_name: "222",
+          v_address: "223232",
+          v_concat: "21321321",
+          v_phone: "3213213212321",
+          v_provice: "天津市",
+          v_city: "天津"
+        }
       ],
       tableDataSelections: [], // 选中的表格数据
       search: "",
@@ -240,13 +257,36 @@ export default {
       cities: [],
       proviceGroup: [],
       cityGroup: [],
-      loadingCity: false
+      getFilter: "",
+      saveStatu: false
     };
   },
   // 监听属性 类似于data概念
   computed: {},
   // 监控data中的数据变化
-  watch: {},
+  watch: {
+    getFilter(val) {
+      this.cityGroup = [];
+      const proviceArr = [];
+      for (let index = 0; index < this.tableData.length; index++) {
+        if (this.tableData[index].v_provice.value === val) {
+          proviceArr.push(this.tableData[index]);
+        }
+      }
+      this.total = proviceArr.length;
+      for (let i = 0; i < this.provinces.length; i++) {
+        if (this.provinces[i].name === val) {
+          this.cities = this.provinces[i].cities;
+        }
+      }
+      for (let j = 0; j < this.cities.length; j++) {
+        this.cityGroup.push({
+          text: this.cities[j].name,
+          value: this.cities[j].name
+        });
+      }
+    }
+  },
   // 方法集合
   methods: {
     mockTableData1() {
@@ -266,21 +306,41 @@ export default {
     formatData() {
       this.tableData.forEach(item => {
         for (const key in item) {
-          item[key] = {
-            value: item[key],
-            edit: false
-          };
+          if (key === "v_provice") {
+            item[key] = {
+              value: item[key],
+              edit: false,
+              mark: "provice"
+            };
+          } else if (key === "v_city") {
+            item[key] = {
+              value: item[key],
+              edit: false,
+              mark: "city"
+            };
+          } else {
+            item[key] = {
+              value: item[key],
+              edit: false
+            };
+          }
         }
       });
     },
     // 表格新增行
     addRow() {
       this.currentPage = Math.ceil(this.total / this.limit);
+      this.saveStatu = true;
       this.tableData.push({
         v_number: { value: "", edit: true },
         v_name: { value: "", edit: true },
-        v_address: { value: "", edit: true }
+        v_address: { value: "", edit: true },
+        v_concat: { value: "", edit: true },
+        v_phone: { value: "", edit: true },
+        v_provice: { value: "", edit: true },
+        v_city: { value: "", edit: true }
       });
+      this.getDataList();
     },
     // 多选
     selectionChangeHandle(val) {
@@ -295,6 +355,7 @@ export default {
           for (let y = 0; y < this.tableData.length; y++) {
             if (this.tableData[y] === selections[i]) {
               this.tableData.splice(y, 1);
+              this.getDataList();
               break;
             }
           }
@@ -304,55 +365,43 @@ export default {
     // 单元格双击事件
     celledit(row, column, cell, event) {
       if (row[column.property]) {
+        this.saveStatu = true;
         row[column.property].edit = true;
       }
     },
 
     filterHandler(value, row, column) {
-      // if (value !== "") {
-      //   // this.loadingCity = true;
-      //   for (var item of this.provinces) {
-      //     if (item.name === value) {
-      //       console.log(item.cities);
-      //       for (let index = 0; index < item.cities.length; index++) {
-      //         this.cityGroup.push({
-      //           text: item.cities[index].name,
-      //           value: item.cities[index].name
-      //         });
-      //       }
-      //       // this.v_city = item.cities[0].name;
-      //       // this.loadingCity = false;
-      //       break;
-      //     } else {
-      //       continue;
-      //     }
-      //   }
-      // } else {
-      //   this.cities = [];
-      //   this.v_city = "";
-      // }
-      // console.log(this.cities);
-      console.log(column);
-
+      this.getFilter = value;
       const property = column.property;
       return row[property].value === value;
     },
 
     changeCell(value, item, index, type) {
-      // this.$nextTick(() => {
-      //   this.tableData[index].type.edit = false;
-      // });
+      this.cityGroup = [];
+      if (type === "v_provice") {
+        for (let i = 0; i < this.provinces.length; i++) {
+          if (this.provinces[i].name === value) {
+            this.cities = this.provinces[i].cities;
+            this.tableData[index].v_city.value = this.provinces[
+              i
+            ].cities[0].name;
+          }
+        }
+      } else {
+        for (let i = 0; i < this.provinces.length; i++) {
+          if (this.provinces[i].name === item.v_provice.value) {
+            this.cities = this.provinces[i].cities;
+            for (let j = 0; j < this.cities.length; j++) {
+              this.cityGroup.push({
+                text: this.cities[j].name,
+                value: this.cities[j].name
+              });
+            }
+          }
+        }
+      }
     },
     getDataList() {
-      // let json = {
-      //   limit: this.limit,
-      //   page: this.currentPage
-      // };
-      // // 调用后端接口，这里是封装过的
-      // invokeApi(json).then(res => {
-      //   this.dataList = res.list;
-      //   this.total = res.total;
-      // });
       this.total = this.tableData.length;
     },
     handleCurrentChange(val) {
@@ -363,6 +412,38 @@ export default {
       this.limit = val;
       this.currentPage = 1;
       this.getDataList();
+    },
+    statuChange(filters) {
+      if (filters.v_provice) {
+        if (filters.v_provice.length === 0) {
+          this.getDataList();
+          this.cityGroup = [];
+          this.cities = [];
+          this.total = this.tableData.length;
+        }
+      } else {
+        console.log(2);
+      }
+    },
+    handleDelete(index, row) {
+      console.log(index, row);
+      this.tableData.splice(index, 1);
+      this.getDataList();
+    },
+    handleEdit(index, row, column) {
+      console.log(row);
+
+      this.saveStatu = false;
+      // for (let index = 0; index < row.length; index++) {
+      //   console.log(row[index]);
+      // }
+      row.v_provice.edit = false;
+      row.v_city.edit = false;
+      row.v_number.edit = false;
+      row.v_name.edit = false;
+      row.v_address.edit = false;
+      row.v_concat.edit = false;
+      row.v_phone.edit = false;
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
@@ -377,7 +458,8 @@ export default {
     for (let index = 0; index < this.provinces.length; index++) {
       this.proviceGroup.push({
         text: this.provinces[index].name,
-        value: this.provinces[index].name
+        value: this.provinces[index].name,
+        type: "provice"
       });
     }
   },
@@ -395,7 +477,7 @@ export default {
   /* display: flex !important;
   justify-content: space-between; */
   /* padding: 25px 20px; */
-  max-height: 50px !important;
+  max-height: 110px !important;
 }
 .t_header > .cell {
   display: flex !important;
@@ -404,5 +486,8 @@ export default {
 .el-table-filter {
   max-height: 400px;
   overflow: auto;
+}
+.el-table__row {
+  height: 60px !important;
 }
 </style>

@@ -2,9 +2,9 @@
 <template>
   <div class="pagination">
     <el-pagination
-      @size-change="handleSizeChange"
+      background
       @current-change="handleCurrentChange"
-      layout="total, sizes, prev, pager, next, jumper"
+      layout="prev, pager, next, jumper"
       :current-page.sync="currentPage"
       :page-size="limit"
       :total="total"
@@ -64,12 +64,12 @@ export default {
     // 当前页变化
     handleCurrentChange(val) {
       this.$emit("handleCurrentChange", val);
-    },
-    // size变化
-    handleSizeChange(val) {
-      this.currentPage = 1;
-      this.$emit("handleSizeChange", val);
     }
+    // size变化
+    // handleSizeChange(val) {
+    //   this.currentPage = 1;
+    //   this.$emit("handleSizeChange", val);
+    // }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created() {},
