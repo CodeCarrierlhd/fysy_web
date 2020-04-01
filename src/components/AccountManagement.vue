@@ -358,6 +358,7 @@ export default {
   // 方法集合
   methods: {
     mockTableData1() {
+      this.tableData = [];
       for (let i = 0; i < 30; i++) {
         this.tableData.push({
           u_account: Math.floor(Math.random() * 10000 + 1),
@@ -370,29 +371,15 @@ export default {
           u_type: i % 2 === 0 ? "全国管理员" : "省级管理员"
         });
       }
-      this.formatData();
+      this.formatData(this.tableData);
     },
-    formatData() {
-      this.tableData.forEach(item => {
+    formatData(item) {
+      item.forEach(item => {
         for (const key in item) {
-          if (key === "u_provice") {
-            item[key] = {
-              value: item[key],
-              edit: false,
-              mark: "provice"
-            };
-          } else if (key === "u_city") {
-            item[key] = {
-              value: item[key],
-              edit: false,
-              mark: "city"
-            };
-          } else {
-            item[key] = {
-              value: item[key],
-              edit: false
-            };
-          }
+          item[key] = {
+            value: item[key],
+            edit: false
+          };
         }
       });
     },
@@ -491,19 +478,19 @@ export default {
       this.getDataList();
     },
     statuChange(filters) {
-      console.log(filters);
       if (filters.u_provice) {
         if (filters.u_provice.length === 0) {
           this.getDataList();
           this.cityGroup = [];
           this.cities = [];
-          this.total = this.tableData.length;
         } else {
-          this.getCheckData(filters.u_provice[0]);
+          this.getCheckData(filters.u_provice[0], "u_provice");
         }
       } else if (filters.u_type) {
         if (filters.u_type.length === 0) {
-          this.total = this.tableData.length;
+          this.getDataList();
+        } else {
+          this.getCheckData(filters.u_type[0], "u_type");
         }
       } else {
         console.log(filters);
@@ -533,17 +520,47 @@ export default {
     changePassword(index, row) {
       console.log(row);
     },
-    getCheckData(type) {
-      console.log(type);
-      // console.log(this.tableData[0].type.value);
-      // // const nowData = [];
-      // for (let index = 0; index < this.tableData.length; index++) {
-      //   if (this.tableData[index].type.value === value[0]) {
-      //     console.log(this.tableData[index].type.value);
-      //   }
-      //   // console.log(nowData);
-      //   // this.tableData = nowData;
-      // }
+    getCheckData(value, type) {
+      console.log(value, type);
+      const nowData = [];
+      if (type === "u_type") {
+        for (let index = 0; index < this.tableData.length; index++) {
+          if (this.tableData[index].u_type.value === value) {
+            nowData.push(this.tableData[index]);
+          }
+        }
+      } else if (type === "u_provice") {
+        for (let index = 0; index < this.tableData.length; index++) {
+          if (this.tableData[index].u_provice.value === value) {
+            nowData.push(this.tableData[index]);
+          }
+        }
+      } else {
+        for (let index = 0; index < this.tableData.length; index++) {
+          if (this.tableData[index].u_city.value === value) {
+            nowData.push(this.tableData[index]);
+          }
+        }
+      }
+      // console.log(this.tableData);
+      // this.tableData = nowData;
+      // this.formatData(this.tableData);
+      // this.$nextTick(() => {
+      //   this.$set(this, "tableData", nowData);
+      //   console.log(this.tableData);
+      // });
+
+      // this.$nextTick(() => {
+      // this.$set(this.tableData, 0, JSON.stringify(nowData));
+      // console.log(this.tableData);
+      //   console.log(nowData);
+
+      //   this.tableData = nowData;
+      //   this.formatData();
+
+      //   this.getDataList();
+      // });
+      // this.$set(this.tableData, nowData);
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）

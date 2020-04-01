@@ -21,7 +21,8 @@ import {
   Select,
   Option,
   DatePicker,
-  Pagination
+  Pagination,
+  Tag
 } from "element-ui";
 
 Vue.use(Button);
@@ -46,3 +47,4 @@ Vue.use(Select);
 Vue.use(Option);
 Vue.use(DatePicker);
 Vue.use(Pagination);
+Vue.use(Tag);
