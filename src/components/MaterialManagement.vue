@@ -1,12 +1,14 @@
-<!-- 物理管理 -->
+<!-- 物料管理 -->
 <template>
   <div style="width: 100%;">
     <el-table
+      ref="filterTable"
       :data="tableData.slice((currentPage - 1) * limit, currentPage * limit)"
-      border
+      @filter-change="fnFilterChangeInit"
       @selection-change="selectionChangeHandle"
       @cell-dblclick="celledit"
       style="width: 95%;margin:40px 60px;"
+      border
     >
       <el-table-column class-name="t_header">
         <template
@@ -49,48 +51,51 @@
           </template>
         </el-table-column>
         <el-table-column
-          prop="type"
+          prop="p_type"
           label="产品类别"
           edit="false"
           align="center"
+          width="160"
           :filter-multiple="false"
-          :column-key="'type'"
-          :filters="filterStatus"
-          :filter-method="filterHandler"
+          :filters="p_typeGroup"
+          :filter-method="filterTag"
+          column-key="p_type"
+          filter-placement="bottom-end"
         >
           <template slot-scope="scope">
             <el-select
-              v-model="scope.row.type.value"
-              v-if="scope.row.type.edit"
+              v-model="scope.row.p_type.value"
+              v-if="scope.row.p_type.edit"
               placeholder="请选择"
               @change="
                 value => {
-                  changeCell(value, scope.row, scope.$index, 'type');
+                  scope.row.p_type.edit = false;
+                  changeCell(value, scope.row, scope.$index, 'p_type');
                 }
               "
             >
               <el-option
-                v-for="item in typeGroups"
+                v-for="item in productGroups"
                 :key="item.value"
                 :label="item.label"
                 :value="item.label"
               >
               </el-option>
             </el-select>
-            <span v-else>{{ scope.row.type.value }}</span>
+            <span v-else>{{ scope.row.p_type.value }}</span>
           </template>
         </el-table-column>
         <el-table-column
           prop="p_model"
           label="产品型号"
+          width="100"
           edit="false"
-          width="120"
           align="center"
         >
           <template slot-scope="scope">
             <el-input
               v-if="scope.row.p_model.edit"
-              ref="p_model"
+              ref="'p_model'"
               v-model="scope.row.p_model.value"
               @blur="scope.row.p_model.edit = false"
             >
@@ -98,58 +103,62 @@
             <span v-else>{{ scope.row.p_model.value }}</span>
           </template>
         </el-table-column>
+
         <el-table-column
-          prop="p_specification"
-          label="规格"
-          edit="false"
-          width="90"
+          prop="p_size"
+          label="规格 "
           align="center"
+          width="160"
+          edit="false"
         >
           <template slot-scope="scope">
             <el-input
-              v-if="scope.row.p_specification.edit"
-              ref="p_specification"
-              v-model="scope.row.p_specification.value"
-              @blur="scope.row.p_specification.edit = false"
+              v-if="scope.row.p_size.edit"
+              ref="p_size"
+              v-model="scope.row.p_size.value"
+              @blur="scope.row.p_size.edit = false"
             >
             </el-input>
-            <span v-else>{{ scope.row.p_specification.value }}</span>
+            <span v-else>{{ scope.row.p_size.value }}</span>
           </template>
         </el-table-column>
+
         <el-table-column
-          prop="p_manufacturer"
+          prop="p_vendor"
           label="生产商"
           edit="false"
           align="center"
-          width="450"
+          width="260"
           :filter-multiple="false"
-          :column-key="'p_manufacturer'"
-          :filters="manufacturers"
-          :filter-method="filterHandler"
+          :filters="p_vendorGroup"
+          :filter-method="filterTag"
+          column-key="p_vendor"
+          filter-placement="bottom-end"
         >
           <template slot-scope="scope">
             <el-select
-              v-model="scope.row.p_manufacturer.value"
-              v-if="scope.row.p_manufacturer.edit"
+              v-model="scope.row.p_vendor.value"
+              v-if="scope.row.p_vendor.edit"
               placeholder="请选择"
               @change="
                 value => {
-                  scope.row.p_manufacturer.edit = false;
-                  changeCell(value, scope.row, scope.$index, 'p_manufacturer');
+                  scope.row.p_vendor.edit = false;
+                  changeCell(value, scope.row, scope.$index, 'p_vendor');
                 }
               "
             >
               <el-option
-                v-for="item in manufacturerGroups"
+                v-for="item in vendorGroups"
                 :key="item.value"
                 :label="item.label"
                 :value="item.label"
               >
               </el-option>
             </el-select>
-            <span v-else>{{ scope.row.p_manufacturer.value }}</span>
+            <span v-else>{{ scope.row.p_vendor.value }}</span>
           </template>
         </el-table-column>
+
         <el-table-column
           prop="p_statu"
           align="center"
@@ -158,13 +167,18 @@
           :filter-multiple="false"
           :column-key="'p_statu'"
           :filters="status"
-          :filter-method="filterHandler"
+          :filter-method="filterTag"
         >
           <template slot-scope="scope">
             <el-checkbox v-model="scope.row.isCheck"></el-checkbox>
           </template>
         </el-table-column>
-        <el-table-column prop="p_date" label="上市日期" align="center">
+        <el-table-column
+          prop="p_date"
+          label="上市日期"
+          align="center"
+          width="180"
+        >
           <template slot-scope="scope">
             <el-date-picker
               v-if="scope.row.p_date.edit"
@@ -176,6 +190,21 @@
             >
             </el-date-picker>
             <span v-else>{{ scope.row.p_date.value }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="操作" width="180">
+          <template slot-scope="scope">
+            <el-button
+              v-if="scope.row.isSet"
+              size="mini"
+              @click="handleSave(scope.$index, scope.row)"
+              >保存</el-button
+            >
+            <el-button
+              size="mini"
+              @click="handleDelete(scope.$index, scope.row)"
+              >删除</el-button
+            >
           </template>
         </el-table-column>
       </el-table-column>
@@ -195,68 +224,58 @@
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
 import pagination from "../components/Pagenation";
+
 export default {
   // import引入的组件需要注入到对象中才能使用
-  components: {
-    pagination
-  },
+  components: { pagination },
   data() {
     // 这里存放数据
     return {
-      tableData: [
+      tableData: [],
+      options: {
+        tag: undefined
+      },
+      search: "",
+      productGroups: [
         {
-          p_number: "232323232323232323",
-          type: "鼻假体",
-          p_model: "DY10-204K",
-          p_specification: "1个",
-          p_manufacturer: "上海东月医疗保健用品有限公司",
-          p_date: "2019-12-28",
-          p_statu: "上市"
+          value: "鼻假体",
+          label: "鼻假体"
+        },
+        {
+          value: "下巴假体",
+          label: "下巴假体"
         }
       ],
-      tableDataSelections: [], // 选中的表格数据
-      search: "",
-      // 类别
-      filterStatus: [
+      p_typeGroup: [
         { text: "鼻假体", value: "鼻假体" },
         { text: "下巴假体", value: "下巴假体" }
+      ],
+      p_vendorGroup: [
+        { text: "上海东月医疗", value: "上海东月医疗" },
+        {
+          text: "上海东月医疗保健用品有限公司",
+          value: "上海东月医疗保健用品有限公司"
+        }
+      ],
+      vendorGroups: [
+        {
+          value: "上海东月医疗",
+          label: "上海东月医疗"
+        },
+        {
+          value: "上海东月医疗保健用品有限公司",
+          label: "上海东月医疗保健用品有限公司"
+        }
       ],
       // 状态
       status: [
         { text: "上市", value: "上市" },
         { text: "已下市", value: "已下市" }
       ],
-      // 厂商
-      manufacturers: [
-        {
-          text: "上海东月医疗保健用品有限公司",
-          value: "上海东月医疗保健用品有限公司"
-        },
-        { text: "上海医疗保健用品", value: "上海医疗保健用品" }
-      ],
-      typeGroups: [
-        {
-          value: "1",
-          label: "鼻假体"
-        },
-        {
-          value: "2",
-          label: "下巴假体"
-        }
-      ],
-      manufacturerGroups: [
-        {
-          value: "3",
-          label: "上海东月医疗保健用品有限公司"
-        },
-        {
-          value: "4",
-          label: "上海医疗保健用品"
-        }
-      ],
       currentPage: 1,
       limit: 10,
-      total: 0
+      total: 0,
+      isCheck: true
     };
   },
   // 监听属性 类似于data概念
@@ -265,48 +284,121 @@ export default {
   watch: {},
   // 方法集合
   methods: {
-    mockTableData1() {
+    init(options) {
+      console.log(options);
+      const newData = [];
+      // 筛选时 应请求一次数据接口拿到表单数据将以前的数据清空再进行条件筛选
+      this.tableData = [];
+      this.makeData();
+      if (this.options.tag) {
+        this.tableData.filter(item => {
+          if (item.p_type.value === this.options.tag) {
+            newData.push(item);
+          } else if (item.p_vendor.value === this.options.tag) {
+            newData.push(item);
+          } else if (item.p_statu.value === this.options.tag) {
+            newData.push(item);
+          }
+        });
+        this.tableData = newData;
+        this.getStatu();
+        this.getDataList();
+        // this.currentPage = Math.ceil(this.total / this.limit);
+      }
+    },
+    makeData() {
       for (let i = 0; i < 30; i++) {
         this.tableData.push({
+          p_model: "a" + i,
+          p_size: "DY10-204K" + i,
           p_number: Math.floor(Math.random() * 10000 + 1),
-          type: i % 2 === 0 ? "鼻假体" : "下巴假体",
-          p_model: "DY10-204K" + i,
-          p_specification: i + "个",
-          p_manufacturer:
-            i % 2 === 0 ? "上海东月医疗保健用品有限公司" : "上海东月医疗",
-          p_date: "2019-12-" + i,
-          p_statu: i % 2 === 0 ? "上市" : "已下市"
+          p_type: i % 2 === 0 ? "鼻假体" : "下巴假体",
+          p_vendor:
+            i % 3 === 0 ? "上海东月医疗" : "上海东月医疗保健用品有限公司",
+          p_date: "2019-12=" + i,
+          p_statu: i % 2 === 0 ? "上市" : "已下市",
+          isSet: false
         });
       }
       this.formatData();
+      this.getDataList();
     },
     formatData() {
       this.tableData.forEach(item => {
         for (const key in item) {
-          item[key] = {
-            value: item[key],
-            edit: false
-          };
+          if (key !== "isSet") {
+            item[key] = {
+              value: item[key],
+              edit: false
+            };
+          }
         }
       });
     },
-    // 表格新增行
-    addRow() {
-      this.currentPage = Math.ceil(this.total / this.limit);
-      this.tableData.push({
-        p_number: { value: "", edit: true },
-        type: { value: "", edit: true },
-        p_model: { value: "", edit: true },
-        p_specification: { value: "", edit: true },
-        p_manufacturer: { value: "", edit: true },
-        p_date: { value: "", edit: true },
-        p_statu: { value: "", edit: true }
-      });
-    },
-    // 多选
     selectionChangeHandle(val) {
       console.log(val);
       this.tableDataSelections = val;
+    },
+    // table column 的方法，改写这个方法
+    filterTag(value, row, column) {
+      return true;
+    },
+    // table 的方法
+    // filter 的格式  obj { column-key: Array }
+    // Array[0] 筛选的值
+    fnFilterChangeInit(filter) {
+      console.log(filter);
+      // do something
+      if (filter.p_type) {
+        this.options.tag =
+          filter.p_type[0] === undefined ? "" : filter.p_type[0];
+      } else if (filter.p_vendor) {
+        console.log(filter.p_vendor[0]);
+        this.options.tag =
+          filter.p_vendor[0] === undefined ? "" : filter.p_vendor[0];
+      } else if (filter.p_statu) {
+        console.log(filter.p_statu);
+        this.options.tag =
+          filter.p_statu[0] === undefined ? "" : filter.p_statu[0];
+      }
+      this.init(this.options);
+    },
+    // 单元格双击事件
+    celledit(row, column, cell, event) {
+      if (row[column.property]) {
+        this.saveStatu = true;
+        row[column.property].edit = true;
+      }
+    },
+    changeCell(value, item, index, type) {
+      console.log(value, item, index, type);
+    },
+    getDataList() {
+      this.total = this.tableData.length;
+    },
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      // this.getDataList();
+    },
+    handleSizeChange(val) {
+      this.limit = val;
+      this.currentPage = 1;
+      // this.getDataList();
+    },
+    // 表格新增行
+    addRow() {
+      this.tableData.push({
+        p_number: { value: "", edit: true },
+        p_model: { value: "", edit: true },
+        p_size: { value: "", edit: true },
+        p_statu: { value: "", edit: true },
+        p_vendor: { value: "", edit: true },
+        p_date: { value: "", edit: true },
+        p_type: { value: "", edit: true },
+        isSet: true
+      });
+
+      this.getDataList();
     },
     // 删除选中数据（单纯实现前端删除）
     batchDelete(selections) {
@@ -316,20 +408,23 @@ export default {
           for (let y = 0; y < this.tableData.length; y++) {
             if (this.tableData[y] === selections[i]) {
               this.tableData.splice(y, 1);
+              this.getDataList();
               break;
             }
           }
         }
       }
     },
-    // 单元格双击事件
-    celledit(row, column, cell, event) {
-      if (row[column.property]) {
-        row[column.property].edit = true;
-        // setTimeout(() => {
-        //   this.$refs[column.property].focus();
-        // }, 20);
-      }
+    pwdChange(row, index) {
+      console.log(row, index);
+    },
+    // 保存提交
+    handleSave(index, row) {
+      console.log(index, row);
+      return (row.isSet = !row.isSet);
+    },
+    changePassword(index, row) {
+      this.centerDialogVisible++;
     },
     getStatu() {
       this.tableData.map(item => {
@@ -340,44 +435,11 @@ export default {
         }
         return item;
       });
-    },
-    filterHandler(value, row, column) {
-      const property = column.property;
-      return row[property].value === value;
-    },
-    changeCell(value, item, index, type) {
-      this.$nextTick(() => {
-        this.tableData[index].type.edit = false;
-      });
-    },
-    getDataList() {
-      // let json = {
-      //   limit: this.limit,
-      //   page: this.currentPage
-      // };
-      // // 调用后端接口，这里是封装过的
-      // invokeApi(json).then(res => {
-      //   this.dataList = res.list;
-      //   this.total = res.total;
-      // });
-      this.total = this.tableData.length;
-    },
-    handleCurrentChange(val) {
-      this.currentPage = val;
-      this.getDataList();
-    },
-    handleSizeChange(val) {
-      this.limit = val;
-      this.currentPage = 1;
-      this.getDataList();
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    this.mockTableData1();
-
-    this.getDataList();
-    // this.addData();
+    this.makeData();
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
@@ -397,10 +459,17 @@ export default {
   /* display: flex !important;
   justify-content: space-between; */
   /* padding: 25px 20px; */
-  max-height: 50px !important;
+  max-height: 110px !important;
 }
 .t_header > .cell {
   display: flex !important;
   justify-content: space-between;
+}
+.el-table-filter {
+  max-height: 400px;
+  overflow: auto;
+}
+.el-table__row {
+  height: 60px !important;
 }
 </style>

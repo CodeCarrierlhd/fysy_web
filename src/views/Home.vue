@@ -17,7 +17,12 @@
           <transition name="slide-fade">
             <edit-user v-if="showEdit" id="edUser"></edit-user>
           </transition>
-          <my-dialog :centerDialogVisible="centerDialogVisible"></my-dialog>
+          <my-dialog
+            :centerDialogVisible="centerDialogVisible"
+            :headerText="headerText"
+            :textName="textName"
+            :changePwd="changePwd"
+          ></my-dialog>
         </el-main>
       </el-container>
     </el-container>
@@ -36,7 +41,10 @@ export default {
     return {
       userInfo: JSON.parse(this.$route.query.userInfo),
       showEdit: false,
-      centerDialogVisible: 0
+      centerDialogVisible: 0,
+      headerText: "退出登录",
+      textName: "确定退出登录!",
+      changePwd: false
     };
   },
   methods: {
