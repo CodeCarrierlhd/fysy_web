@@ -22,7 +22,9 @@ import {
   Option,
   DatePicker,
   Pagination,
-  Tag
+  Tag,
+  CascaderPanel,
+  Icon
 } from "element-ui";
 
 Vue.use(Button);
@@ -48,3 +50,5 @@ Vue.use(Option);
 Vue.use(DatePicker);
 Vue.use(Pagination);
 Vue.use(Tag);
+Vue.use(CascaderPanel);
+Vue.use(Icon);
