@@ -7,6 +7,7 @@
       @filter-change="fnFilterChangeInit"
       @selection-change="selectionChangeHandle"
       @cell-dblclick="celledit"
+      :row-key="getRowKey"
       style="width: 95%;margin:40px 60px;"
       border
     >
@@ -22,16 +23,19 @@
             placeholder="输入关键字搜索"
           />
           <div>
-            <el-button @click="addRow()">新增</el-button>
-            <el-button @click="batchDelete(tableDataSelections)"
-              >删除</el-button
+            <el-button @click="addRow()" type="primary"
+              ><i class="el-icon-plus"></i> 新增</el-button
+            >
+            <el-button @click="batchDelete(tableDataSelections)" type="primary"
+              ><i class="el-icon-delete"></i>删除</el-button
             >
           </div>
         </template>
         <el-table-column
           type="selection"
-          width="55"
+          width="100"
           align="center"
+          :reserve-selection="true"
         ></el-table-column>
         <el-table-column
           prop="v_number"
@@ -315,7 +319,8 @@ export default {
           u_city: this.provinces[i].cities[0].name,
           v_phone: Math.floor(Math.random() * 100888888880 + 1),
           v_concat: "cc" + i,
-          isSet: false
+          isSet: false,
+          p_id: i
         });
       }
       this.formatData();
@@ -467,6 +472,9 @@ export default {
     handleSave(index, row) {
       console.log(index, row);
       return (row.isSet = !row.isSet);
+    },
+    getRowKey(row) {
+      return row.p_id;
     }
     // rowClassName({ row, rowIndex }) {
     //   // 把每一行的索引放进row
@@ -512,7 +520,7 @@ export default {
   max-height: 400px;
   overflow: auto;
 }
-.el-table__row {
+/* .el-table__row {
   height: 60px !important;
-}
+} */
 </style>

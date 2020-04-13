@@ -7,6 +7,7 @@
       @filter-change="fnFilterChangeInit"
       @selection-change="selectionChangeHandle"
       @cell-dblclick="celledit"
+      :row-key="getRowKey"
       style="width: 95%;margin:40px 60px;"
       border
     >
@@ -22,16 +23,19 @@
             placeholder="输入关键字搜索"
           />
           <div>
-            <el-button @click="addRow()">新增</el-button>
-            <el-button @click="batchDelete(tableDataSelections)"
-              >删除</el-button
+            <el-button @click="addRow()" type="primary"
+              ><i class="el-icon-plus"></i> 新增</el-button
+            >
+            <el-button @click="batchDelete(tableDataSelections)" type="primary"
+              ><i class="el-icon-delete"></i>删除</el-button
             >
           </div>
         </template>
         <el-table-column
           type="selection"
-          width="55"
+          width="100"
           align="center"
+          :reserve-selection="true"
         ></el-table-column>
         <el-table-column
           prop="p_number"
@@ -435,6 +439,9 @@ export default {
         }
         return item;
       });
+    },
+    getRowKey(row) {
+      return row.p_id;
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
@@ -454,6 +461,11 @@ export default {
   activated() {} // 如果页面有keep-alive缓存功能，这个函数会触发
 };
 </script>
+<style>
+.el-table__header .el-table-column--selection .cell .el-checkbox:after {
+  content: "全选";
+}
+</style>
 <style scope>
 .cell {
   /* display: flex !important;
@@ -469,7 +481,7 @@ export default {
   max-height: 400px;
   overflow: auto;
 }
-.el-table__row {
+/* .el-table__row {
   height: 60px !important;
-}
+} */
 </style>

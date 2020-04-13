@@ -7,6 +7,13 @@ import AcMa from "../components/AccountManagement.vue";
 import AuMa from "../components/AuthorityManagement.vue";
 import MaMa from "../components/MaterialManagement.vue";
 import VeMa from "../components/VendorManagement.vue";
+import ActiveCode from "../components/ActiveCode.vue";
+import SecurityCode from "../components/SecurityCode.vue";
+import ShMa from "../components/ShippingManagement.vue";
+import ProductStorage from "../components/ProductStorage.vue";
+import ProductBack from "../components/ProductBack.vue";
+import InMa from "../components/InventoryManagement.vue";
+import GetProduct from "../components/GetProduct.vue";
 
 Vue.use(VueRouter);
 
@@ -45,6 +52,41 @@ const routes = [
         path: "/VeMa",
         name: "VendorManagement",
         component: VeMa
+      },
+      {
+        path: "/ActiveCode",
+        name: "ActiveCode",
+        component: ActiveCode
+      },
+      {
+        path: "/SecurityCode",
+        name: "SecurityCode",
+        component: SecurityCode
+      },
+      {
+        path: "/ShMa",
+        name: "ShippingManagement",
+        component: ShMa
+      },
+      {
+        path: "/ProductStorage",
+        name: "ProductStorage",
+        component: ProductStorage
+      },
+      {
+        path: "/ProductBack",
+        name: "ProductBack",
+        component: ProductBack
+      },
+      {
+        path: "/InMa",
+        name: "InventoryManagement",
+        component: InMa
+      },
+      {
+        path: "/GetProduct",
+        name: "GetProduct",
+        component: GetProduct
       }
     ]
   },

@@ -24,7 +24,16 @@ import {
   Pagination,
   Tag,
   CascaderPanel,
-  Icon
+  Icon,
+  Card,
+  Progress,
+  Tabs,
+  TabPane,
+  Alert,
+  Message,
+  Notification,
+  Steps,
+  Step
 } from "element-ui";
 
 Vue.use(Button);
@@ -52,3 +61,12 @@ Vue.use(Pagination);
 Vue.use(Tag);
 Vue.use(CascaderPanel);
 Vue.use(Icon);
+Vue.use(Card);
+Vue.use(Progress);
+Vue.use(Tabs);
+Vue.use(TabPane);
+Vue.use(Alert);
+Vue.use(Steps);
+Vue.use(Step);
+Vue.prototype.$message = Message;
+Vue.prototype.$notify = Notification;

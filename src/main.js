@@ -9,6 +9,7 @@ import "./plugins/element.js";
 import "./commont/reset.css";
 import interceptor from "./interceptor";
 import { setCookie, getCookie, delCookie } from "./commont/js/cookie";
+
 Vue.prototype.$cookieStore = { setCookie, getCookie, delCookie };
 Vue.config.productionTip = false;
 interceptor();

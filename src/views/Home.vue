@@ -106,6 +106,7 @@ export default {
   /*align-items: center; */
   padding: 0;
   height: 100%;
+  background-color: #eeeeee;
 }
 body > .el-container {
   margin-bottom: 40px;

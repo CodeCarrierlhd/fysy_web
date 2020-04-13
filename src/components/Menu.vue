@@ -41,8 +41,14 @@
               <span class="m_title">标签管理</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item index="2-1">选项1</el-menu-item>
-              <el-menu-item index="2-2">选项2</el-menu-item>
+              <el-menu-item index="2-1" @click.native="menuChange('ActiveCode')"
+                >激活码管理</el-menu-item
+              >
+              <el-menu-item
+                index="2-2"
+                @click.native="menuChange('SecurityCode')"
+                >防伪码管理</el-menu-item
+              >
             </el-menu-item-group>
           </el-submenu>
           <el-submenu index="3">
@@ -51,8 +57,22 @@
               <span class="m_title">仓库管理</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item index="3-1">选项1</el-menu-item>
-              <el-menu-item index="3-2">选项2</el-menu-item>
+              <el-menu-item
+                index="3-1"
+                @click.native="menuChange('ProductStorage')"
+                >产品入库</el-menu-item
+              >
+              <el-menu-item index="3-2" @click.native="menuChange('ShMa')"
+                >发货管理</el-menu-item
+              >
+              <el-menu-item
+                index="3-3"
+                @click.native="menuChange('ProductBack')"
+                >退货管理</el-menu-item
+              >
+              <el-menu-item index="3-4" @click.native="menuChange('InMa')"
+                >库存管理</el-menu-item
+              >
             </el-menu-item-group>
           </el-submenu>
           <el-submenu index="4">
@@ -61,8 +81,9 @@
               <span class="m_title">信息管理</span>
             </template>
             <el-menu-item-group>
-              <el-menu-item index="4-1">选项1</el-menu-item>
-              <el-menu-item index="4-2">选项2</el-menu-item>
+              <el-menu-item index="4-1" @click.native="menuChange('GetProduct')"
+                >产品追踪</el-menu-item
+              >
             </el-menu-item-group>
           </el-submenu>
           <el-submenu index="5">
