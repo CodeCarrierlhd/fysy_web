@@ -180,11 +180,20 @@
       center
       width="620px"
     >
-      <el-steps direction="vertical" :active="1">
-        <el-step title="已发出" icon="el-icon-truck"></el-step>
-        <el-step title="已签收" icon="el-icon-circle-check"></el-step>
-        <el-step title="已激活" icon="el-icon-unlock"></el-step>
-        <el-step title="已使用" icon="el-icon-user"></el-step>
+      <el-steps direction="vertical">
+        <el-step
+          v-for="(item, index) in stepGroups"
+          :title="item.stepName"
+          :icon="item.iconType"
+          :key="index"
+        >
+          <template slot="description">
+            <div>
+              <p>{{ item.stepContent }}</p>
+              <p>{{ item.stepTime }}</p>
+            </div>
+          </template>
+        </el-step>
       </el-steps>
       <div style="text-align: center;">
         <el-button @click="saveImg" type="primary" plain>确定</el-button>
@@ -219,7 +228,33 @@ export default {
         { label: "已激活", name: "backProduct" }
       ],
       activeName: "wait",
-      dialogVisible: false
+      dialogVisible: false,
+      stepGroups: [
+        {
+          stepName: "已发出",
+          iconType: "el-icon-truck",
+          stepContent: "激活单位：上海美莱医疗美容整形医院",
+          stepTime: "2020.02.03 10:00:31"
+        },
+        {
+          stepName: "已签收",
+          iconType: "el-icon-circle-check",
+          stepContent: "签收单位：上海美莱医疗美容整形医院",
+          stepTime: "2020.02.03 10:00:31"
+        },
+        {
+          stepName: "已激活",
+          iconType: "el-icon-unlock",
+          stepContent: "激活单位：上海美莱美容整形医院",
+          stepTime: "2020.02.03 10:00:31"
+        },
+        {
+          stepName: "已使用",
+          iconType: "el-icon-user",
+          stepContent: "使用单位：上海美莱美",
+          stepTime: "2020.02.03 10:00:31"
+        }
+      ]
     };
   },
   // 监听属性 类似于data概念
@@ -318,6 +353,9 @@ export default {
 };
 </script>
 <style scoped>
+.el-step {
+  padding: 8px 100px;
+}
 .container {
   margin: 40px 60px;
   width: 95%;

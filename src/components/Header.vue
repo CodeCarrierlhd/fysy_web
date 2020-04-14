@@ -21,7 +21,7 @@
 
 <script>
 export default {
-  data () {
+  data() {
     return {
       left_arrow: require('../assets/imgs/syb.png'),
       right_arrow: require('../assets/imgs/xyb.png'),
@@ -33,20 +33,20 @@ export default {
   props: {
     userInfo: {}
   },
-  mounted () {
+  mounted() {
     this.getUserName()
   },
-  created () {
+  created() {
     // console.log(JSON.stringify(this.props.userInfo));
   },
   methods: {
-    getUser () {
+    getUser() {
       this.$emit('showBlock')
     },
-    clearUser () {
+    clearUser() {
       this.$emit('handleClose')
     },
-    getUserName () {
+    getUserName() {
       if (this.userInfo.length < 0) {
         console.log('2222')
       }

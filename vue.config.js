@@ -1,47 +1,36 @@
+var proEnv = require('./config/pro.env') // 生产环境
+var devEnv = require('./config/dev.env') // 本地环境
+const env = process.env.NODE_ENV
+
+let target = ''
+// 默认是本地环境
+if (env === 'production') {
+  // 生产环境
+  target = proEnv.hosturl
+} else {
+  // 本地环境
+  target = devEnv.hosturl
+}
+// 生成代理配置对象
+
 module.exports = {
   devServer: {
-    open: process.platform === "darwin",
-    host: "0.0.0.0",
+    // open: process.platform === "darwin",
+    host: '0.0.0.0',
     https: false,
+    port: 8080,
     hotOnly: false,
+    disableHostCheck: true,
     proxy: {
-      api: {
-        target: "http://192.168.16.15:8080",
+      '/api': {
+        target: target, // 对应自己的接口
         changeOrigin: true,
+        ws: true,
         pathRewrite: {
-          "^/api": "/api"
+          '^/api': ''
         }
       }
-    }, // 设置代理
-    before: app => {
-      const bodyParser = require("body-parser");
-      app.use(bodyParser.json()); //通过bodyParser获取req.body）
-      // 保护接口的中间件
-      function auth(req, res, next) {
-        if (req.header.token !== null) {
-          next();
-        } else {
-          res.sendStatus(401);
-        }
-      }
-      app.post("/api/login", (req, res) => {
-        const { username, password } = req.body.params;
-        if (username === "admin" && password === "123456") {
-          res.json({
-            code: 0,
-            token: "ss"
-          });
-        } else {
-          res.json({
-            code: "1",
-            message: "错误"
-          });
-        }
-      });
-    }
-  },
-  // 第三方插件配置
-  pluginOptions: {
-    // ...
+    },
+    before: app => {}
   }
-};
+}

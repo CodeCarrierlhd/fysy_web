@@ -36,17 +36,17 @@
           ></i
         ></el-input>
       </el-form-item>
-      <el-form-item prop="verifycode">
+      <el-form-item prop="verifyCode">
         <!-- 注意：prop与input绑定的值一定要一致，否则验证规则中的value会报undefined，因为value即为绑定的input输入值 -->
         <!-- <el-input
-          v-model="loginForm.verifycode"
+          v-model="loginForm.verifyCode"
           placeholder="请输入验证码"
           class="identifyinput"
         ></el-input>-->
         <div style="display:flex;justify-content: space-between;">
           <el-input
             type="text"
-            v-model="loginForm.verifycode"
+            v-model="loginForm.verifyCode"
             placeholder="请输入验证码"
             class="identifyinput"
           ></el-input>
@@ -71,7 +71,7 @@
           >登录</el-button
         >
       </el-form-item>
-      <el-checkbox v-model="checked" style="float:left;"
+      <el-checkbox v-model="checked" style="float:left;" @change="remeberUser"
         >记住账号和密码</el-checkbox
       >
     </el-form>
@@ -80,63 +80,66 @@
 <script>
 // import SIdentify from "@/components/SecurityCode";
 // import axios from "axios";
+import us from '../services/users'
 export default {
-  name: "userlogin",
-  img_url: "",
+  name: 'userlogin',
+  img_url: '',
   data() {
     // 用户名自定义验证规则
     const validateUsername = (rule, value, callback) => {
-      if (value === "") {
-        callback(new Error("请输入正确的用户名"));
+      if (value === '') {
+        callback(new Error('请输入正确的用户名'))
       } else {
-        callback();
+        callback()
       }
-    };
+    }
     // 验证码自定义验证规则
-    // const validateVerifycode = (rule, value, callback) => {
+    // const validateverifyCode = (rule, value, callback) => {
     //   if (value === "") {
     //     callback(new Error("请输入验证码"));
     //   } else if (value !== this.identifyCode) {
-    //     console.log("validateVerifycode:", value, this.identifyCode);
+    //     console.log("validateverifyCode:", value, this.identifyCode);
     //     callback(new Error("验证码不正确!"));
     //   } else {
     //     callback();
     //   }
     // };
     return {
-      r_img: require("@/assets/logo/bg1.png"),
-      logoImg: require("@/assets/logo/log_b.png"),
-      identifyCode: "http://192.168.16.15:8080/login/getVerifyCode",
+      r_img: require('@/assets/logo/bg1.png'),
+      logoImg: require('@/assets/logo/log_b.png'),
+      identifyCode: '',
       fontstyle: {},
       loginForm: {
-        username: "admin",
-        password: "123456",
-        verifycode: ""
+        username: '',
+        password: '',
+        verifyCode: ''
       },
-      name: "",
+      name: '',
       checked: false,
       // identifyCodes: "1234567890",
       // identifyCode: "",
       loginRules: {
         // 绑定在form表单中的验证规则
         username: [
-          { required: true, trigger: "blur", validator: validateUsername }
+          { required: true, trigger: 'blur', validator: validateUsername }
         ],
         password: [
-          { required: true, message: "请输入密码", trigger: "blur" },
-          { min: 6, message: "密码长度最少为6位", trigger: "blur" }
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 6, message: '密码长度最少为6位', trigger: 'blur' }
         ]
-        // verifycode: [
-        //   { required: true, trigger: "blur", validator: validateVerifycode }
+        // verifyCode: [
+        //   { required: true, trigger: "blur", validator: validateverifyCode }
         // ]
       },
-      passwordType: "password"
-    };
+      passwordType: 'password'
+    }
   },
   // components: {
   //   SIdentify
   // },
-  created() {},
+  created() {
+    this.getIdentifyCode()
+  },
   mounted() {
     // 验证码初始化
     // this.identifyCode = "";
@@ -147,39 +150,34 @@ export default {
   methods: {
     // 通过改变input的type使密码可见
     showPassword() {
-      this.fontstyle === ""
-        ? (this.fontstyle = "color: red")
-        : (this.fontstyle = ""); // 改变密码可见按钮颜色
-      this.passwordType === ""
-        ? (this.passwordType = "password")
-        : (this.passwordType = "");
+      this.fontstyle === ''
+        ? (this.fontstyle = 'color: red')
+        : (this.fontstyle = '') // 改变密码可见按钮颜色
+      this.passwordType === ''
+        ? (this.passwordType = 'password')
+        : (this.passwordType = '')
     },
     // 点击登入按钮
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           // 通过store 中的login 方法进行登陆验证
-          this.$store
-            .dispatch("login", this.loginForm)
-            .then(code => {
-              this.name = code;
-              this.$cookieStore.setCookie("name", this.name, 60);
-              if (code === 0) {
-                const path = this.$route.query.redirect || "/";
+          us.login(this.loginForm)
+            .then(res => {
+              // this.name = code;
+              // this.$cookieStore.setCookie("name", this.name, 60);
+              if (res.data.code === 200) {
+                const path = this.$route.query.redirect || '/'
                 this.$router.push({
-                  path,
-                  query: {
-                    // 注意需要提前把对象当作字符串传递过去 在接收页面转为对象 这样页面刷新就不会将对象转成了字符串
-                    userInfo: JSON.stringify(this.loginForm)
-                  }
-                });
+                  path
+                })
               }
             })
             .catch(error => {
-              console.log(error.message);
-            });
+              console.log(error.message)
+            })
         }
-      });
+      })
     },
     // 生成随机数
     // randomNum(min, max) {
@@ -187,12 +185,13 @@ export default {
     // },
     // 切换验证码
     refreshCode() {
-      var timestamp = new Date().getTime();
-      this.identifyCode =
-        "http://192.168.16.15:8080/login/getVerifyCode?" + timestamp;
-
+      this.getIdentifyCode()
       // this.makeCode(this.identifyCodes, 4);
-    }
+    },
+    getIdentifyCode() {
+      var timestamp = new Date().getTime()
+      this.identifyCode = us.identifyCode() + '?' + timestamp
+    },
     // 生成四位随机验证码
     // makeCode(o, l) {
     //   for (let i = 0; i < l; i++) {
@@ -201,8 +200,15 @@ export default {
     //     ];
     //   }
     // }
+    remeberUser() {
+      if (this.checked) {
+        localStorage.setItem('user', this.loginForm)
+      } else {
+        localStorage.removeItem('user')
+      }
+    }
   }
-};
+}
 </script>
 <style scoped>
 .iconstyle {
@@ -228,8 +234,8 @@ export default {
   font-size: 20px;
   padding: 0 15px;
 }
-input[type="text"]:focus,
-input[type="password"]:focus {
+input[type='text']:focus,
+input[type='password']:focus {
   outline: none;
 }
 .el-button {

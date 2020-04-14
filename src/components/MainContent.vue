@@ -13,11 +13,11 @@
       <h1>欢迎登陆超体鼻假体防伪溯源系统</h1>
       <p>
         <span>上次登陆时间：</span>
-        <span>2018.12.13 12:11:23</span>
+        <span>{{ timer }}</span>
       </p>
       <p>
         <span>上次登陆IP：</span>
-        <span>131345421</span>
+        <span>{{ ipAddress }}</span>
       </p>
     </div>
   </div>
@@ -26,6 +26,7 @@
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
+import us from '../services/users'
 
 export default {
   // props: {
@@ -37,16 +38,54 @@ export default {
   components: {},
   data() {
     // 这里存放数据
-    return {};
+    return {
+      ipAddress: '',
+      timer: ''
+    }
   },
   // 监听属性 类似于data概念
   computed: {},
   // 监控data中的数据变化
   watch: {},
   // 方法集合
-  methods: {},
+  methods: {
+    initData() {
+      us.getUserInfo().then(res => {
+        this.timer = this.formatTime(
+          res.data.object.loginLog.lastLoginTime.time,
+          'Y/M/D h:m:s'
+        )
+        this.ipAddress = res.data.object.loginLog.ipAddress
+      })
+    },
+    formatTime(number, format) {
+      var formateArr = ['Y', 'M', 'D', 'h', 'm', 's']
+      var returnArr = []
+
+      var date = new Date(number * 1000)
+      returnArr.push(date.getFullYear())
+      returnArr.push(this.formatNumber(date.getMonth() + 1))
+      returnArr.push(this.formatNumber(date.getDate()))
+
+      returnArr.push(this.formatNumber(date.getHours()))
+      returnArr.push(this.formatNumber(date.getMinutes()))
+      returnArr.push(this.formatNumber(date.getSeconds()))
+
+      for (var i in returnArr) {
+        format = format.replace(formateArr[i], returnArr[i])
+      }
+      return format
+    },
+
+    formatNumber(n) {
+      n = n.toString()
+      return n[1] ? n : '0' + n
+    }
+  },
   // 生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+    this.initData()
+  },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, // 生命周期 - 创建之前
@@ -56,7 +95,7 @@ export default {
   beforeDestroy() {}, // 生命周期 - 销毁之前
   destroyed() {}, // 生命周期 - 销毁完成
   activated() {} // 如果页面有keep-alive缓存功能，这个函数会触发
-};
+}
 </script>
 <style lang="less">
 .mainContent {

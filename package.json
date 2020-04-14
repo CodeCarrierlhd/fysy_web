@@ -5,15 +5,20 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "eslint --ext .js,.vue src --fix"
+    "lint": "eslint --ext .js,.vue src --fix",
+    "dev": "vue-cli-service serve --open",
+    "prod": "vue-cli-service build --mode=production"
   },
   "dependencies": {
     "area-data": "^5.0.6",
     "core-js": "^3.6.4",
     "element-ui": "^2.4.5",
     "eslint-plugin-html": "^6.0.0",
+    "qs": "^6.9.3",
     "vue": "^2.6.11",
     "vue-area-linkage": "^5.1.0",
+    "vue-axios": "^2.1.5",
+    "vue-cookies": "^1.7.0",
     "vue-router": "^3.1.5",
     "vuex": "^3.1.2"
   },
@@ -56,6 +61,7 @@
         0,
         "single"
       ],
+      "singleQuote": 0,
       "semi": 0,
       "no-tabs": "off",
       "space-before-function-paren": 0,

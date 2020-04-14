@@ -2,7 +2,10 @@
   <div class="home" @click="hideEdit">
     <el-container>
       <el-aside width="240px">
-        <Menu @handleRouterChange="handleRouterChange"></Menu>
+        <Menu
+          @handleRouterChange="handleRouterChange"
+          :rightLists="rightLists"
+        ></Menu>
       </el-aside>
       <el-container>
         <el-header height="80px">
@@ -31,50 +34,62 @@
 </template>
 
 <script>
-import Menu from "@/components/Menu";
-import Header from "@/components/Header";
-import MyDialog from "../components/Dialog";
-import EditUser from "@/components/EditUser";
+import Menu from '@/components/Menu'
+import Header from '@/components/Header'
+import MyDialog from '../components/Dialog'
+import EditUser from '@/components/EditUser'
+import us from '../services/users'
 export default {
-  name: "home",
+  name: 'home',
   data() {
     return {
-      userInfo: JSON.parse(this.$route.query.userInfo),
+      userInfo: '',
       showEdit: false,
       centerDialogVisible: 0,
-      headerText: "退出登录",
-      textName: "确定退出登录!",
-      changePwd: false
-    };
+      headerText: '退出登录',
+      textName: '确定退出登录!',
+      changePwd: false,
+      rightLists: []
+    }
   },
   methods: {
     showBlock() {
       if (!this.showEdit) {
-        this.showEdit = true;
+        this.showEdit = true
       } else {
-        this.showEdit = false;
+        this.showEdit = false
       }
     },
     handleClose() {
-      this.centerDialogVisible++;
+      this.centerDialogVisible++
     },
     dialogClose() {
-      this.centerDialogVisible++;
+      this.centerDialogVisible++
     },
     hideEdit(event) {
-      const edUser = document.getElementById("edUser");
+      const edUser = document.getElementById('edUser')
       if (edUser) {
         if (!edUser.contains(event.target)) {
-          this.showEdit = false;
+          this.showEdit = false
         }
       }
     },
     handleRouterChange(routerPath) {
-      this.$router.push({ path: "/" + routerPath });
+      this.$router.push({ path: '/' + routerPath })
+    },
+    getInfo() {
+      us.getUserInfo().then(res => {
+        console.log(res)
+
+        this.userInfo = res.data.object.userDetail
+        this.rightLists = res.data.object.userDetail.rightList
+      })
     }
   },
   mounted() {},
-  created() {},
+  created() {
+    this.getInfo()
+  },
   watch: {},
   components: {
     Menu,
@@ -82,7 +97,7 @@ export default {
     MyDialog,
     EditUser
   }
-};
+}
 </script>
 <style scoped>
 .home {

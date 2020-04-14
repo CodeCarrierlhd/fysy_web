@@ -1,21 +1,32 @@
-import Vue from "vue";
-import "../node_modules/vue-area-linkage/dist/index.css";
-import VueAreaLinkage from "vue-area-linkage";
-import "./plugins/axios";
-import App from "./App.vue";
-import router from "./router";
-import store from "./store";
-import "./plugins/element.js";
-import "./commont/reset.css";
-import interceptor from "./interceptor";
-import { setCookie, getCookie, delCookie } from "./commont/js/cookie";
+import Vue from 'vue'
+import '../node_modules/vue-area-linkage/dist/index.css'
+import VueAreaLinkage from 'vue-area-linkage'
+import './plugins/axios'
+import App from './App.vue'
+import router from './router'
+import store from './store'
+import './plugins/element.js'
+import './commont/reset.css'
+import axios from 'axios'
+import VueCookies from 'vue-cookies'
 
-Vue.prototype.$cookieStore = { setCookie, getCookie, delCookie };
-Vue.config.productionTip = false;
-interceptor();
-Vue.use(VueAreaLinkage);
+import interceptor from './interceptor'
+import { setCookie, getCookie, delCookie } from './commont/js/cookie'
+
+// axios.defaults.timeout = 5000; // 请求超时
+axios.defaults.baseURL = '/api/'
+axios.defaults.headers.post['Content-Type'] =
+  'application/x-www-form-urlencoded;charset=UTF-8'
+
+Vue.prototype.$cookieStore = { setCookie, getCookie, delCookie }
+
+Vue.config.productionTip = false
+interceptor()
+Vue.use(VueAreaLinkage)
+Vue.use(VueCookies)
+
 new Vue({
   router,
   store,
   render: h => h(App)
-}).$mount("#app");
+}).$mount('#app')

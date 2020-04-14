@@ -104,24 +104,46 @@
 
 <script>
 export default {
+  props: {
+    rightLists: {
+      type: Array,
+      required: true
+    }
+  },
   data() {
     return {
-      imgSrc: require("../assets/logo/log_w.png"),
-      unique: true
-    };
+      imgSrc: require('../assets/logo/log_w.png'),
+      unique: true,
+      rightList: this.rightLists
+    }
   },
   methods: {
     handleOpen(key, keyPath) {
-      console.log("open", key, keyPath);
+      console.log('open', key, keyPath)
     },
     handleClose(key, keyPath) {
-      console.log("close", key, keyPath);
+      console.log('close', key, keyPath)
     },
     menuChange(cname) {
-      this.$emit("handleRouterChange", cname);
+      this.$emit('handleRouterChange', cname)
+    },
+    initData() {
+      const parArr = []
+
+      for (let i = 0; i < this.rightLists.length; i++) {
+        if (this.props.rightLists[i].rightParentId === 0) {
+          parArr.push(this.props.rightLists[i])
+        }
+      }
+      console.log(parArr)
     }
-  }
-};
+  },
+  computed: {},
+  created() {
+    console.log(this.rightList)
+  },
+  mounted() {}
+}
 </script>
 <style lang="less">
 .logoImg {

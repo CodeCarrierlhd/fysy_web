@@ -1,9 +1,9 @@
-import Vue from "vue";
-import Vuex from "vuex";
+import Vue from 'vue'
+import Vuex from 'vuex'
 
-import us from "../services/users";
+import us from '../services/users'
 
-Vue.use(Vuex);
+Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
@@ -11,20 +11,19 @@ export default new Vuex.Store({
   },
   mutations: {
     setLoginState(state, statu) {
-      state.isLogin = statu;
+      state.isLogin = statu
     }
   },
   actions: {
     login({ commit }, user) {
       return us.login(user).then(res => {
-        const { code, token } = res.data;
-        if (code === 0) {
-          commit("setLoginState", true);
-          localStorage.setItem("token", token);
+        if (res.data.code === 200) {
+          return res.data.code
+        } else {
+          return '登陆失败'
         }
-        return code;
-      });
+      })
     }
   },
   modules: {}
-});
+})
