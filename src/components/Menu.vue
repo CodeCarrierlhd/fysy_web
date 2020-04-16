@@ -7,6 +7,7 @@
           <img :src="imgSrc" />
         </div>
         <el-menu
+          v-if="rightLists.length > 0"
           class="el-menu-vertical-demo"
           @open="handleOpen"
           @close="handleClose"
@@ -15,7 +16,26 @@
           active-text-color="#00f"
           :unique-opened="unique"
         >
-          <el-submenu index="1">
+          <el-submenu
+            v-for="item in menuList"
+            :index="item.mark"
+            :key="item.mark"
+          >
+            <template slot="title">
+              <i :class="item.iconClass"></i>
+              <span class="m_title">{{ item.rightName }}</span>
+            </template>
+            <el-menu-item-group>
+              <el-menu-item
+                v-for="sonMenu in item.childList"
+                :index="sonMenu.sonMark"
+                :key="sonMenu.sonMark"
+                @click.native="menuChange(sonMenu)"
+                >{{ sonMenu.rightName }}</el-menu-item
+              >
+            </el-menu-item-group>
+          </el-submenu>
+          <!-- <el-submenu index="1">
             <template slot="title">
               <i class="el-icon-setting"></i>
               <span class="m_title">设置管理</span>
@@ -95,7 +115,7 @@
               <el-menu-item index="5-1">选项1</el-menu-item>
               <el-menu-item index="5-2">选项2</el-menu-item>
             </el-menu-item-group>
-          </el-submenu>
+          </el-submenu> -->
         </el-menu>
       </el-col>
     </el-row>
@@ -107,14 +127,30 @@ export default {
   props: {
     rightLists: {
       type: Array,
-      required: true
+      required: true,
+      menuList: []
     }
   },
   data() {
     return {
       imgSrc: require('../assets/logo/log_w.png'),
       unique: true,
-      rightList: this.rightLists
+      r_list: [],
+      iconList: [
+        'el-icon-setting',
+        'el-icon-postcard',
+        'el-icon-house',
+        'el-icon-coin',
+        'el-icon-s-data'
+      ]
+    }
+  },
+  watch: {
+    rightLists() {
+      this.r_list = this.rightLists
+      // console.log(this.r_list)
+
+      this.initData(this.r_list)
     }
   },
   methods: {
@@ -124,24 +160,49 @@ export default {
     handleClose(key, keyPath) {
       console.log('close', key, keyPath)
     },
-    menuChange(cname) {
-      this.$emit('handleRouterChange', cname)
+    menuChange(sonmenu) {
+      this.$emit('handleRouterChange', sonmenu)
     },
-    initData() {
-      const parArr = []
-
-      for (let i = 0; i < this.rightLists.length; i++) {
-        if (this.props.rightLists[i].rightParentId === 0) {
-          parArr.push(this.props.rightLists[i])
+    initData(dataArr) {
+      const arr = dataArr
+      const bigArr = []
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].rightParentId === 0) {
+          bigArr.push(arr[i])
         }
       }
-      console.log(parArr)
+      bigArr.forEach((item, index) => {
+        item.childList = []
+        item.iconClass = this.iconList[index]
+        item.mark = index + ''
+      })
+      for (let j = 0; j < arr.length; j++) {
+        for (let m = 0; m < bigArr.length; m++) {
+          if (arr[j].rightParentId === bigArr[m].rightId) {
+            bigArr[m].childList.push(arr[j])
+          }
+        }
+      }
+      for (let k = 1; k <= bigArr.length; k++) {
+        bigArr[k - 1].childList.forEach((item, index) => {
+          item.sonMark = k + '' + index
+          item.sonRight = []
+        })
+      }
+      for (let c = 0; c < arr.length; c++) {
+        for (let a = 0; a < bigArr.length; a++) {
+          for (let b = 0; b < bigArr[a].childList.length; b++) {
+            if (arr[c].rightParentId === bigArr[a].childList[b].rightId) {
+              bigArr[a].childList[b].sonRight.push(arr[c])
+            }
+          }
+        }
+      }
+      this.menuList = bigArr
     }
   },
   computed: {},
-  created() {
-    console.log(this.rightList)
-  },
+  created() {},
   mounted() {}
 }
 </script>

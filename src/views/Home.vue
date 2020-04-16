@@ -74,15 +74,20 @@ export default {
         }
       }
     },
-    handleRouterChange(routerPath) {
-      this.$router.push({ path: '/' + routerPath })
+    handleRouterChange(sonmenu) {
+      this.$router.push({
+        path: '/' + sonmenu.uri,
+        query: {
+          btnRight: JSON.stringify(sonmenu.sonRight)
+        }
+      })
     },
     getInfo() {
       us.getUserInfo().then(res => {
-        console.log(res)
-
-        this.userInfo = res.data.object.userDetail
-        this.rightLists = res.data.object.userDetail.rightList
+        this.$nextTick(() => {
+          this.userInfo = res.data.object.userDetail
+          this.rightLists = res.data.object.userDetail.rightList
+        })
       })
     }
   },

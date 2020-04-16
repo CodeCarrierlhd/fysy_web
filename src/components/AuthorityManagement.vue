@@ -8,7 +8,7 @@
         style="margin:40px 60px;"
         @cell-click="hideInfo"
       >
-        <el-table-column class-name="t_header">
+        <el-table-column class-rightName="t_header">
           <template slot="header" header-align="center">
             <el-input
               v-model="search"
@@ -23,9 +23,9 @@
           </template>
           <el-table-column type="index" width="50" align="center" label="序号">
           </el-table-column>
-          <el-table-column prop="u_type" label="角色类型" align="center">
+          <el-table-column prop="roleType" label="角色类型" align="center">
             <template slot-scope="scope">
-              <span class="roleType">{{ scope.row.u_type }}</span>
+              <span class="roleType">{{ scope.row.roleType }}</span>
             </template>
           </el-table-column>
           <el-table-column label="权限设置" align="center" prop="u_power">
@@ -76,7 +76,7 @@
                   <el-checkbox
                     v-model="first.allChecked"
                     @change="firstChanged(firIndex, first.id)"
-                    >{{ first.name }}</el-checkbox
+                    >{{ first.rightName }}</el-checkbox
                   >
                 </div>
                 <div v-show="first.childShow" class="checkboxGroups">
@@ -87,9 +87,9 @@
                         secondChanged(firIndex, secIndex, second.id, first.id)
                       "
                       :key="second.id"
-                      :title="second.name"
+                      :title="second.rightName"
                       :label="second.id"
-                      >{{ second.name }}</el-checkbox
+                      >{{ second.rightName }}</el-checkbox
                     >
                     <div
                       class="thirdContent"
@@ -109,9 +109,9 @@
                             )
                           "
                           :key="third.id"
-                          :title="third.name"
+                          :title="third.rightName"
                           :label="third.id"
-                          >{{ third.name }}</el-checkbox
+                          >{{ third.rightName }}</el-checkbox
                         >
                       </template>
                     </div>
@@ -126,7 +126,7 @@
           <el-button @click="dialogVisibleClassify = false">取 消</el-button>
           <el-button
             type="primary"
-            @click="funName ? initTableData() : editData()"
+            @click="funrightName ? initTableData() : editData()"
             >确 定</el-button
           >
         </span>
@@ -140,13 +140,13 @@
         @handleSizeChange="handleSizeChange"
       />
     </div>
-    <transition name="slide-fade">
+    <transition rightName="slide-fade">
       <div class="contentRight" v-show="powerInfo">
-        <h1 class="powerHeader">{{ this.roleName }}权限</h1>
+        <h1 class="powerHeader">{{ this.rolerightName }}权限</h1>
         <div v-for="(first, index) in info" :key="index" class="powerContent">
           <div style="display:flex">
             <span class="circle"></span>
-            <p class="menuName">{{ first.name }}</p>
+            <p class="menurightName">{{ first.rightName }}</p>
           </div>
 
           <ul style="display:flex;margin-left:19px">
@@ -155,7 +155,7 @@
               :key="index"
               class="powerKey"
             >
-              <span>{{ second.name }}</span>
+              <span>{{ second.rightName }}</span>
             </li>
           </ul>
         </div>
@@ -167,7 +167,7 @@
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
-import pagination from "../components/Pagenation";
+import pagination from '../components/Pagenation'
 
 export default {
   // import引入的组件需要注入到对象中才能使用
@@ -176,195 +176,195 @@ export default {
     // 这里存放数据
     return {
       tableData: [
-        {
-          u_type: "超级管理员",
-          rightList: [
-            {
-              id: "1",
-              name: "设置管理",
-              status: 2,
-              nodes: [
-                {
-                  id: "11",
-                  name: "物料管理",
-                  status: 2,
-                  nodes: [
-                    {
-                      id: "111",
-                      name: "查询",
-                      status: 2
-                    },
-                    {
-                      id: "112",
-                      name: "新增",
-                      status: 2
-                    },
-                    {
-                      id: "113",
-                      name: "编辑",
-                      status: 2
-                    },
-                    {
-                      id: "114",
-                      name: "删除",
-                      status: 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          u_type: "普通管理员",
-          rightList: [
-            {
-              id: "1",
-              name: "设置管理",
-              status: 1,
-              nodes: [
-                {
-                  id: "11",
-                  name: "物料管理",
-                  status: 1,
-                  nodes: [
-                    {
-                      id: "111",
-                      name: "查询",
-                      status: 2
-                    },
-                    {
-                      id: "112",
-                      name: "新增",
-                      status: 2
-                    },
-                    {
-                      id: "113",
-                      name: "编辑",
-                      status: 0
-                    },
-                    {
-                      id: "114",
-                      name: "删除",
-                      status: 0
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          u_type: "普通用户",
-          rightList: [
-            {
-              id: "1",
-              name: "设置管理",
-              status: 1,
-              nodes: [
-                {
-                  id: "11",
-                  name: "物料管理",
-                  status: 1,
-                  nodes: [
-                    {
-                      id: "111",
-                      name: "查询",
-                      status: 2
-                    },
-                    {
-                      id: "112",
-                      name: "新增",
-                      status: 0
-                    },
-                    {
-                      id: "113",
-                      name: "编辑",
-                      status: 0
-                    },
-                    {
-                      id: "114",
-                      name: "删除",
-                      status: 0
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        },
-        {
-          u_type: "游客",
-          rightList: [
-            {
-              id: "1",
-              name: "设置管理",
-              status: 0,
-              nodes: [
-                {
-                  id: "11",
-                  name: "物料管理",
-                  status: 0,
-                  nodes: [
-                    {
-                      id: "111",
-                      name: "查询",
-                      status: 0
-                    },
-                    {
-                      id: "112",
-                      name: "新增",
-                      status: 0
-                    },
-                    {
-                      id: "113",
-                      name: "编辑",
-                      status: 0
-                    },
-                    {
-                      id: "114",
-                      name: "删除",
-                      status: 0
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
+        // {
+        //   roleType: '超级管理员',
+        //   rightList: [
+        //     {
+        //       id: '1',
+        //       rightName: '设置管理',
+        //       status: 2,
+        //       nodes: [
+        //         {
+        //           id: '11',
+        //           rightName: '物料管理',
+        //           status: 2,
+        //           nodes: [
+        //             {
+        //               id: '111',
+        //               rightName: '查询',
+        //               status: 2
+        //             },
+        //             {
+        //               id: '112',
+        //               rightName: '新增',
+        //               status: 2
+        //             },
+        //             {
+        //               id: '113',
+        //               rightName: '编辑',
+        //               status: 2
+        //             },
+        //             {
+        //               id: '114',
+        //               rightName: '删除',
+        //               status: 2
+        //             }
+        //           ]
+        //         }
+        //       ]
+        //     }
+        //   ]
+        // },
+        // {
+        //   roleType: '普通管理员',
+        //   rightList: [
+        //     {
+        //       id: '1',
+        //       rightName: '设置管理',
+        //       status: 1,
+        //       nodes: [
+        //         {
+        //           id: '11',
+        //           rightName: '物料管理',
+        //           status: 1,
+        //           nodes: [
+        //             {
+        //               id: '111',
+        //               rightName: '查询',
+        //               status: 2
+        //             },
+        //             {
+        //               id: '112',
+        //               rightName: '新增',
+        //               status: 2
+        //             },
+        //             {
+        //               id: '113',
+        //               rightName: '编辑',
+        //               status: 0
+        //             },
+        //             {
+        //               id: '114',
+        //               rightName: '删除',
+        //               status: 0
+        //             }
+        //           ]
+        //         }
+        //       ]
+        //     }
+        //   ]
+        // },
+        // {
+        //   roleType: '普通用户',
+        //   rightList: [
+        //     {
+        //       id: '1',
+        //       rightName: '设置管理',
+        //       status: 1,
+        //       nodes: [
+        //         {
+        //           id: '11',
+        //           rightName: '物料管理',
+        //           status: 1,
+        //           nodes: [
+        //             {
+        //               id: '111',
+        //               rightName: '查询',
+        //               status: 2
+        //             },
+        //             {
+        //               id: '112',
+        //               rightName: '新增',
+        //               status: 0
+        //             },
+        //             {
+        //               id: '113',
+        //               rightName: '编辑',
+        //               status: 0
+        //             },
+        //             {
+        //               id: '114',
+        //               rightName: '删除',
+        //               status: 0
+        //             }
+        //           ]
+        //         }
+        //       ]
+        //     }
+        //   ]
+        // },
+        // {
+        //   roleType: '游客',
+        //   rightList: [
+        //     {
+        //       id: '1',
+        //       rightName: '设置管理',
+        //       status: 0,
+        //       nodes: [
+        //         {
+        //           id: '11',
+        //           rightName: '物料管理',
+        //           status: 0,
+        //           nodes: [
+        //             {
+        //               id: '111',
+        //               rightName: '查询',
+        //               status: 0
+        //             },
+        //             {
+        //               id: '112',
+        //               rightName: '新增',
+        //               status: 0
+        //             },
+        //             {
+        //               id: '113',
+        //               rightName: '编辑',
+        //               status: 0
+        //             },
+        //             {
+        //               id: '114',
+        //               rightName: '删除',
+        //               status: 0
+        //             }
+        //           ]
+        //         }
+        //       ]
+        //     }
+        //   ]
+        // }
       ],
       roleOptions: [
         {
-          value: "超级管理员",
-          label: "超级管理员"
+          value: '超级管理员',
+          label: '超级管理员'
         },
         {
-          value: "普通管理员",
-          label: "普通管理员"
+          value: '普通管理员',
+          label: '普通管理员'
         },
         {
-          value: "普通用户",
-          label: "普通用户"
+          value: '普通用户',
+          label: '普通用户'
         },
         {
-          value: "游客",
-          label: "游客"
+          value: '游客',
+          label: '游客'
         }
       ],
-      roleValue: "",
-      search: "",
+      roleValue: '',
+      search: '',
       currentPage: 1,
       limit: 10,
       total: 0,
       dialogVisibleClassify: false, // 弹窗是否显示
       options: [],
-      showTitle: "新增用户角色",
+      showTitle: '新增用户角色',
       menuList: [],
-      funName: true,
-      roleName: "",
+      funrightName: true,
+      rolerightName: '',
       info: [],
       powerInfo: false
-    };
+    }
   },
   // 监听属性 类似于data概念
   computed: {},
@@ -373,17 +373,17 @@ export default {
   // 方法集合
   methods: {
     initTableData() {
-      this.dialogVisibleClassify = false;
+      this.dialogVisibleClassify = false
       for (let i = 0; i < this.menuList.length; i++) {
         if (this.menuList[i].allChecked) {
-          this.options.push(this.menuList[i].id);
+          this.options.push(this.menuList[i].id)
         } else {
           for (let j = 0; j < this.menuList[i].nodes.length; j++) {
             if (this.menuList[i].nodes[j].mychecked) {
               this.options.push(
                 this.menuList[i].nodes[j].id,
                 this.menuList[i].id
-              );
+              )
             } else {
               for (let m = 0; m < this.menuList[i].nodes[j].nodes.length; m++) {
                 if (this.menuList[i].nodes[j].nodes[m].onechecked) {
@@ -391,7 +391,7 @@ export default {
                     this.menuList[i].nodes[j].nodes[m].id,
                     this.menuList[i].nodes[j].id,
                     this.menuList[i].id
-                  );
+                  )
                 } else {
                 }
               }
@@ -400,36 +400,39 @@ export default {
         }
       }
       // console.log(Array.from(new Set(this.options))
-      this.options = this.unique(this.options);
+      this.options = this.unique(this.options)
       // console.log(this.options, this.roleValue);
-      this.tableData.push({ u_type: this.roleValue, rightList: this.menuList });
+      this.tableData.push({
+        roleType: this.roleValue,
+        rightList: this.menuList
+      })
     },
     initStatu() {
-      this.roleValue = "";
+      this.roleValue = ''
       const result = [
         {
-          id: "1",
-          name: "设置管理",
+          id: '1',
+          rightName: '设置管理',
           nodes: [
             {
-              id: "11",
-              name: "物料管理",
+              id: '11',
+              rightName: '物料管理',
               nodes: [
                 {
-                  id: "111",
-                  name: "查询"
+                  id: '111',
+                  rightName: '查询'
                 },
                 {
-                  id: "112",
-                  name: "新增"
+                  id: '112',
+                  rightName: '新增'
                 },
                 {
-                  id: "113",
-                  name: "编辑"
+                  id: '113',
+                  rightName: '编辑'
                 },
                 {
-                  id: "114",
-                  name: "删除"
+                  id: '114',
+                  rightName: '删除'
                 }
               ]
             }
@@ -715,246 +718,264 @@ export default {
         //     }
         //   ]
         // }
-      ];
+      ]
       for (let i = 0; i < result.length; i++) {
-        result[i].allChecked = false;
-        result[i].childShow = false;
+        result[i].allChecked = false
+        result[i].childShow = false
         for (let j = 0; j < result[i].nodes.length; j++) {
-          result[i].nodes[j].mychecked = false;
+          result[i].nodes[j].mychecked = false
           for (let m = 0; m < result[i].nodes[j].nodes.length; m++) {
-            result[i].nodes[j].nodes[m].onechecked = false;
+            result[i].nodes[j].nodes[m].onechecked = false
           }
         }
       }
-      this.menuList = result;
+      this.menuList = result
     },
     showBlock(index) {
       if (this.menuList[index].childShow) {
-        this.$set(this.menuList[index], "childShow", false);
+        this.$set(this.menuList[index], 'childShow', false)
         // this.menuList[index].childShow = false;
       } else {
-        this.$set(this.menuList[index], "childShow", true);
+        this.$set(this.menuList[index], 'childShow', true)
         // this.menuList[index].childShow = true;
       }
     },
     handleFilterClassify() {
-      this.options = [];
-      this.dialogVisibleClassify = true;
-      this.initStatu();
+      this.options = []
+      this.dialogVisibleClassify = true
+      this.initStatu()
     },
     unique(arr) {
-      return Array.from(new Set(arr));
+      return Array.from(new Set(arr))
     },
     editRole(row, index) {
-      console.log(row, index);
-      this.funName = false;
-      this.menuList = [];
-      this.dialogVisibleClassify = true;
-      this.showTitle = "编辑用户角色";
-      this.roleValue = row.u_type;
+      console.log(row, index)
+      this.getRightList(row.roleId)
+      this.funrightName = false
+      this.menuList = []
+      this.dialogVisibleClassify = true
+      this.showTitle = '编辑用户角色'
+      this.roleValue = row.roleType
       for (let i = 0; i < row.rightList.length; i++) {
-        const arr = row.rightList[i];
+        const arr = row.rightList[i]
         if (arr.status === 2) {
-          this.$set(arr, "allChecked", true);
+          this.$set(arr, 'allChecked', true)
           // arr.allChecked = true;
           for (let j = 0; j < arr.nodes.length; j++) {
-            this.$set(arr.nodes[j], "mychecked", true);
+            this.$set(arr.nodes[j], 'mychecked', true)
             // arr.nodes[j].mychecked = true;
             for (let m = 0; m < arr.nodes[j].nodes.length; m++) {
-              this.$set(arr.nodes[j].nodes[m], "onechecked", true);
+              this.$set(arr.nodes[j].nodes[m], 'onechecked', true)
               // arr.nodes[j].nodes[m].onechecked = true;
             }
           }
         } else if (arr.status === 1) {
-          this.$set(arr, "allChecked", false);
+          this.$set(arr, 'allChecked', false)
           // arr.allChecked = false;
           for (let j = 0; j < arr.nodes.length; j++) {
             if (arr.nodes[j].status === 2) {
               for (let m = 0; m < arr.nodes[j].nodes.length; m++) {
-                this.$set(arr.nodes[j].nodes[m], "onechecked", true);
+                this.$set(arr.nodes[j].nodes[m], 'onechecked', true)
                 // arr.nodes[j].nodes[m].onechecked = true;
               }
             } else if (arr.nodes[j].status === 1) {
               for (let m = 0; m < arr.nodes[j].nodes.length; m++) {
                 if (arr.nodes[j].nodes[m].status === 2) {
-                  this.$set(arr.nodes[j].nodes[m], "onechecked", true);
+                  this.$set(arr.nodes[j].nodes[m], 'onechecked', true)
                   // arr.nodes[j].nodes[m].onechecked = true;
                 } else {
-                  this.$set(arr.nodes[j].nodes[m], "onechecked", false);
+                  this.$set(arr.nodes[j].nodes[m], 'onechecked', false)
                   // arr.nodes[j].nodes[m].onechecked = false;
                 }
               }
             } else {
-              this.$set(arr, "allChecked", false);
+              this.$set(arr, 'allChecked', false)
               // arr.allChecked = false;
               for (let i = 0; i < arr.nodes.length; i++) {
-                this.$set(arr.nodes[i], "mychecked", false);
+                this.$set(arr.nodes[i], 'mychecked', false)
                 // arr.nodes[i].mychecked = false;
                 for (let j = 0; j < arr.nodes[i].nodes.length; j++) {
-                  this.$set(arr.nodes[i].nodes[j], "onechecked", false);
+                  this.$set(arr.nodes[i].nodes[j], 'onechecked', false)
                   // arr.nodes[i].nodes[j].onechecked = false;
                 }
               }
             }
           }
         }
-        this.$set(arr, "childShow", false);
-        this.menuList.push(arr);
+        this.$set(arr, 'childShow', false)
+        this.menuList.push(arr)
       }
-      this.tableData[index].rightList = this.menuList;
-      this.tableData[index].u_type = this.roleValue;
+      this.tableData[index].rightList = this.menuList
+      this.tableData[index].roleType = this.roleValue
     },
     editData() {
-      this.funName = true;
-      this.dialogVisibleClassify = false;
-      console.log(this.tableData);
+      this.funrightName = true
+      this.dialogVisibleClassify = false
+      console.log(this.tableData)
     },
     getDataList() {
-      this.total = this.tableData.length;
+      this.total = this.tableData.length
     },
     handleCurrentChange(val) {
-      this.currentPage = val;
+      this.currentPage = val
       // this.getDataList();
     },
     handleSizeChange(val) {
-      this.limit = val;
-      this.currentPage = 1;
+      this.limit = val
+      this.currentPage = 1
       // this.getDataList();
     },
     firstChanged(index, id) {
-      const arr = this.menuList[index].nodes;
+      const arr = this.menuList[index].nodes
       // console.log(arr);
 
       if (this.menuList[index].allChecked) {
-        this.$set(this.menuList[index], "status", 2);
+        this.$set(this.menuList[index], 'status', 2)
         // this.menuList[index].status = 2;
         for (let i = 0; i < arr.length; i++) {
-          this.$set(arr[i], "mychecked", true);
+          this.$set(arr[i], 'mychecked', true)
           // arr[i].mychecked = true;
-          const arr1 = arr[i].nodes;
+          const arr1 = arr[i].nodes
           for (let j = 0; j < arr1.length; j++) {
-            this.$set(arr1[j], "onechecked", true);
+            this.$set(arr1[j], 'onechecked', true)
             // arr1[j].onechecked = true;
           }
         }
       } else {
-        this.$set(this.menuList[index], "status", 0);
+        this.$set(this.menuList[index], 'status', 0)
         for (let i = 0; i < arr.length; i++) {
-          this.$set(arr[i], "mychecked", false);
+          this.$set(arr[i], 'mychecked', false)
           // arr[i].mychecked = false;
-          const arr1 = arr[i].nodes;
+          const arr1 = arr[i].nodes
           for (let j = 0; j < arr1.length; j++) {
-            this.$set(arr1[j], "onechecked", false);
+            this.$set(arr1[j], 'onechecked', false)
             // arr1[j].onechecked = false;
           }
         }
       }
-      console.log(this.menuList);
+      console.log(this.menuList)
     },
     secondChanged(fatherIndex, ownerIndex, ownerId, fatherId) {
-      const arr = this.menuList[fatherIndex].nodes[ownerIndex];
-      let checkCount = 0;
-      const len = this.menuList[fatherIndex].nodes.length;
+      const arr = this.menuList[fatherIndex].nodes[ownerIndex]
+      let checkCount = 0
+      const len = this.menuList[fatherIndex].nodes.length
       for (let n = 0; n < this.menuList[fatherIndex].nodes.length; n++) {
         if (this.menuList[fatherIndex].nodes[n].mychecked) {
-          checkCount++;
+          checkCount++
         }
       }
       if (checkCount === len) {
-        this.menuList[fatherIndex].status = 2;
-        this.menuList[fatherIndex].allChecked = true;
+        this.menuList[fatherIndex].status = 2
+        this.menuList[fatherIndex].allChecked = true
       } else if (checkCount > 0) {
-        this.menuList[fatherIndex].status = 1;
-        this.menuList[fatherIndex].allChecked = false;
+        this.menuList[fatherIndex].status = 1
+        this.menuList[fatherIndex].allChecked = false
       } else {
-        this.menuList[fatherIndex].status = 0;
-        this.menuList[fatherIndex].allChecked = false;
+        this.menuList[fatherIndex].status = 0
+        this.menuList[fatherIndex].allChecked = false
       }
       if (arr.mychecked) {
-        arr.status = 2;
+        arr.status = 2
         for (let i = 0; i < arr.nodes.length; i++) {
-          arr.nodes[i].onechecked = true;
+          arr.nodes[i].onechecked = true
         }
       } else {
         for (let i = 0; i < arr.nodes.length; i++) {
-          arr.nodes[i].onechecked = false;
+          arr.nodes[i].onechecked = false
         }
       }
-      console.log(this.menuList);
+      console.log(this.menuList)
     },
     thirdChanged(grandfatherIndex, fatherIndex, id, fatherId, grandfatherId) {
-      const arr = this.menuList[grandfatherIndex].nodes[fatherIndex].nodes;
-      let checkCount = 0;
-      let grandCount = 0;
-      const len = arr.length;
-      const gArr = this.menuList[grandfatherIndex].nodes;
+      const arr = this.menuList[grandfatherIndex].nodes[fatherIndex].nodes
+      let checkCount = 0
+      let grandCount = 0
+      const len = arr.length
+      const gArr = this.menuList[grandfatherIndex].nodes
       for (let n = 0; n < arr.length; n++) {
         if (arr[n].onechecked) {
-          arr[n].status = 2;
-          checkCount++;
+          arr[n].status = 2
+          checkCount++
         } else {
-          arr[n].status = 0;
+          arr[n].status = 0
         }
       }
       if (checkCount === len) {
-        this.menuList[grandfatherIndex].nodes[fatherIndex].status = 2;
-        this.menuList[grandfatherIndex].status = 2;
-        this.menuList[grandfatherIndex].nodes[fatherIndex].mychecked = true;
+        this.menuList[grandfatherIndex].nodes[fatherIndex].status = 2
+        this.menuList[grandfatherIndex].status = 2
+        this.menuList[grandfatherIndex].nodes[fatherIndex].mychecked = true
       } else if (checkCount > 0) {
-        this.menuList[grandfatherIndex].nodes[fatherIndex].status = 1;
-        this.menuList[grandfatherIndex].status = 1;
-        this.menuList[grandfatherIndex].nodes[fatherIndex].mychecked = false;
+        this.menuList[grandfatherIndex].nodes[fatherIndex].status = 1
+        this.menuList[grandfatherIndex].status = 1
+        this.menuList[grandfatherIndex].nodes[fatherIndex].mychecked = false
       } else {
-        this.menuList[grandfatherIndex].nodes[fatherIndex].status = 0;
-        this.menuList[grandfatherIndex].status = 0;
-        this.menuList[grandfatherIndex].nodes[fatherIndex].mychecked = false;
+        this.menuList[grandfatherIndex].nodes[fatherIndex].status = 0
+        this.menuList[grandfatherIndex].status = 0
+        this.menuList[grandfatherIndex].nodes[fatherIndex].mychecked = false
       }
 
       for (let j = 0; j < gArr.length; j++) {
         if (gArr[j].mychecked) {
-          grandCount++;
+          grandCount++
         }
       }
       if (grandCount === this.menuList[grandfatherIndex].nodes.length) {
         // this.menuList[grandfatherIndex].status = 2;
-        this.menuList[grandfatherIndex].allChecked = true;
+        this.menuList[grandfatherIndex].allChecked = true
       } else if (grandCount > 0) {
         // this.menuList[grandfatherIndex].status = 1;
-        this.menuList[grandfatherIndex].allChecked = false;
+        this.menuList[grandfatherIndex].allChecked = false
       } else {
         // this.menuList[grandfatherIndex].status = 0;
-        this.menuList[grandfatherIndex].allChecked = false;
+        this.menuList[grandfatherIndex].allChecked = false
       }
-      console.log(this.menuList);
+      console.log(this.menuList)
     },
     hideInfo(row, column, cell, event) {
-      if (column.property === "u_type") {
-        this.roleName = row.u_type;
-        const arr = row.rightList;
+      if (column.property === 'roleType') {
+        this.rolerightName = row.roleType
+        const arr = row.rightList
 
         for (let i = 0; i < arr.length; i++) {
           for (let j = 0; j < arr[i].nodes.length; j++) {
             for (let m = 0; m < arr[i].nodes[j].nodes.length; m++) {
               if (arr[i].nodes[j].nodes[m].status === 0) {
-                arr[i].nodes[j].nodes[m].name = "";
+                arr[i].nodes[j].nodes[m].rightName = ''
               }
             }
           }
         }
-        this.info = arr[0].nodes;
-        this.powerInfo = true;
+        this.info = arr[0].nodes
+        this.powerInfo = true
       } else {
-        this.powerInfo = false;
+        this.powerInfo = false
       }
+    },
+    initData() {
+      this.rightList('', 'role/listData').then(res => {
+        this.tableData = []
+        for (let i = 0; i < res.data.object.length; i++) {
+          this.tableData.push({
+            roleId: res.data.object[i].roleId,
+            roleType: res.data.object[i].roleType
+          })
+        }
+      })
+    },
+    getRightList(id) {
+      this.rightList(id, 'right/listData').then(res => {
+        console.log(res)
+      })
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    console.log(this.tableData);
+    console.log(this.tableData)
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
-    this.getDataList();
+    this.getDataList()
+    this.initData()
   },
   beforeCreate() {}, // 生命周期 - 创建之前
   beforeMount() {}, // 生命周期 - 挂载之前
@@ -963,7 +984,7 @@ export default {
   beforeDestroy() {}, // 生命周期 - 销毁之前
   destroyed() {}, // 生命周期 - 销毁完成
   activated() {} // 如果页面有keep-alive缓存功能，这个函数会触发
-};
+}
 </script>
 <style scoped>
 .t_header > .cell {
@@ -1031,7 +1052,7 @@ export default {
   border: 1px solid rgba(190, 187, 186, 1);
   border-radius: 14px;
 }
-.menuName {
+.menurightName {
   height: 16px;
   font-size: 16px;
   font-family: SourceHanSansSC-Medium, SourceHanSansSC;

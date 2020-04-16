@@ -8,22 +8,37 @@ import store from './store'
 import './plugins/element.js'
 import './commont/reset.css'
 import axios from 'axios'
-import VueCookies from 'vue-cookies'
 
+import { encryptString, decodeString } from '@/utils/encrypt'
+import {
+  listData,
+  searchData,
+  dataChange,
+  delItem,
+  valueData,
+  resetPassword,
+  rightList
+} from '@/utils/comon'
 import interceptor from './interceptor'
-import { setCookie, getCookie, delCookie } from './commont/js/cookie'
 
 // axios.defaults.timeout = 5000; // 请求超时
 axios.defaults.baseURL = '/api/'
 axios.defaults.headers.post['Content-Type'] =
-  'application/x-www-form-urlencoded;charset=UTF-8'
+  'application/x-www-form-urlencoded'
 
-Vue.prototype.$cookieStore = { setCookie, getCookie, delCookie }
+Vue.prototype.encryptString = encryptString
+Vue.prototype.decodeString = decodeString
+Vue.prototype.listData = listData
+Vue.prototype.searchData = searchData
+Vue.prototype.dataChange = dataChange
+Vue.prototype.delItem = delItem
+Vue.prototype.valueData = valueData
+Vue.prototype.resetPassword = resetPassword
+Vue.prototype.rightList = rightList
 
 Vue.config.productionTip = false
 interceptor()
 Vue.use(VueAreaLinkage)
-Vue.use(VueCookies)
 
 new Vue({
   router,

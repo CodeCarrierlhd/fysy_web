@@ -71,7 +71,7 @@
           >登录</el-button
         >
       </el-form-item>
-      <el-checkbox v-model="checked" style="float:left;" @change="remeberUser"
+      <el-checkbox v-model="checked" style="float:left;" @change="delPawd"
         >记住账号和密码</el-checkbox
       >
     </el-form>
@@ -139,6 +139,7 @@ export default {
   // },
   created() {
     this.getIdentifyCode()
+    this.getRemeberUser()
   },
   mounted() {
     // 验证码初始化
@@ -167,6 +168,12 @@ export default {
               // this.name = code;
               // this.$cookieStore.setCookie("name", this.name, 60);
               if (res.data.code === 200) {
+                if (this.checked) {
+                  const str =
+                    this.loginForm.username + '&' + this.loginForm.password
+                  const enc = this.encryptString(str)
+                  localStorage.setItem('ak47', enc)
+                }
                 const path = this.$route.query.redirect || '/'
                 this.$router.push({
                   path
@@ -200,11 +207,22 @@ export default {
     //     ];
     //   }
     // }
-    remeberUser() {
-      if (this.checked) {
-        localStorage.setItem('user', this.loginForm)
-      } else {
-        localStorage.removeItem('user')
+
+    getRemeberUser() {
+      const userinfo = localStorage.getItem('ak47')
+      if (userinfo) {
+        const dec = this.decodeString(userinfo)
+        const pwdarr = dec.split('&')
+        this.$nextTick(() => {
+          this.loginForm.username = pwdarr[0]
+          this.loginForm.password = pwdarr[1]
+          this.checked = true
+        })
+      }
+    },
+    delPawd() {
+      if (!this.checked) {
+        localStorage.removeItem('ak47')
       }
     }
   }
