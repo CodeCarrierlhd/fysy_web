@@ -1,23 +1,35 @@
 <!-- 激活码管理 -->
 <template>
   <div class="container">
-    <div style="display:flex;justify-content: space-between;margin-bottom:45px">
-      <el-card class="box-card" v-for="(item, index) in dataArr" :key="index">
+    <div
+      style="display:flex;justify-content: space-between;margin-bottom:45px"
+      v-if="s_show"
+    >
+      <el-card class="box-card">
         <div class="header">
-          <img :src="item.img" />
+          <img :src="imgs.a_img" />
           <p style="margin-right:0">
-            <span>{{ item.sumArr[0] }}</span
-            ><span>/</span><span>{{ item.sumArr[1] }}</span>
+            <span>{{ dataArr.useCarton }}</span
+            ><span>/</span><span>{{ dataArr.unUseCarton }}</span>
           </p>
         </div>
         <p class="sumFont">
-          <span>{{ item.cardName }}</span
-          ><span>{{ item.percentage }}%</span>
+          <span>外箱码库存量</span><span>{{ c_number }}%</span>
         </p>
-        <el-progress
-          :percentage="item.percentage"
-          :show-text="false"
-        ></el-progress>
+        <el-progress :percentage="c_number" :show-text="false"></el-progress>
+      </el-card>
+      <el-card class="box-card">
+        <div class="header">
+          <img :src="imgs.c_img" />
+          <p style="margin-right:0">
+            <span>{{ dataArr.useActiviate }}</span
+            ><span>/</span><span>{{ dataArr.unUseActiviate }}</span>
+          </p>
+        </div>
+        <p class="sumFont">
+          <span>激活码库存量</span><span>{{ a_number }}%</span>
+        </p>
+        <el-progress :percentage="a_number" :show-text="false"></el-progress>
       </el-card>
     </div>
     <div class="sumForm">
@@ -46,13 +58,18 @@
                 style="display:flex;justify-content: space-between;"
                 header-align="center"
               >
-                <el-input
-                  v-model="search"
-                  style="width:600px;border-radius:4px;"
-                  placeholder="搜索"
-                />
+                <div style="display:flex;width:80%;">
+                  <el-input
+                    v-model="search"
+                    style="border-radius:4px;width:50%;height: 90%;margin-right:10px"
+                    placeholder="输入关键字搜索"
+                  />
+                  <el-button @click="searchEnterFun()" type="primary"
+                    >搜索</el-button
+                  >
+                </div>
                 <div>
-                  <el-button @click="importData()" type="primary"
+                  <el-button @click="importData()" type="primary" v-if="i_show"
                     >导入</el-button
                   >
                   <el-button @click="updateData()" type="primary"
@@ -67,11 +84,15 @@
                 width="150"
               >
               </el-table-column>
-              <el-table-column prop="a_code" label="激活码" align="center">
+              <el-table-column prop="code" label="激活码" align="center">
               </el-table-column>
-              <el-table-column prop="a_date" label="生成日期" align="center">
+              <el-table-column
+                prop="createTime"
+                label="生成日期"
+                align="center"
+              >
               </el-table-column>
-              <el-table-column prop="a_status" label="状态" align="center">
+              <el-table-column prop="status" label="状态" align="center">
               </el-table-column>
             </el-table-column>
           </el-table>
@@ -94,7 +115,7 @@
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
-import pagination from "../components/Pagenation";
+import pagination from '../components/Pagenation'
 
 export default {
   // import引入的组件需要注入到对象中才能使用
@@ -103,32 +124,28 @@ export default {
   data() {
     // 这里存放数据
     return {
-      dataArr: [
-        {
-          sumArr: ["600", "1000"],
-          img: require("../assets/imgs/active_left.png"),
-          percentage: 60,
-          cardName: "外箱码库存量"
-        },
-        {
-          sumArr: ["200", "1000"],
-          img: require("../assets/imgs/active_right.png"),
-          percentage: 20,
-          cardName: "激活码库存量"
-        }
-      ],
-      activeName: "allProduct",
+      activeName: '-1',
       tableData: [],
       currentPage: 1,
       limit: 5,
       total: 0,
-      search: "",
+      search: '',
+      nowPage: '-1',
+      s_show: false,
+      i_show: false,
       tabNames: [
-        { label: "全部", name: "allProduct" },
-        { label: "库存", name: "havenProduct" },
-        { label: "未使用", name: "havenUsed" }
-      ]
-    };
+        { label: '全部', name: '-1' },
+        { label: '库存', name: '0' },
+        { label: '已使用', name: '1' }
+      ],
+      imgs: {
+        c_img: require('../assets/imgs/active_left.png'),
+        a_img: require('../assets/imgs/active_right.png')
+      },
+      dataArr: [],
+      c_number: 0,
+      a_number: 0
+    }
   },
   // 监听属性 类似于data概念
   computed: {},
@@ -137,54 +154,105 @@ export default {
   // 方法集合
   methods: {
     initData() {
-      for (let i = 0; i < 30; i++) {
-        this.tableData.push({
-          a_code: i + "MKNY23MKNY",
-          a_date: "2020.03." + i + "  13:56:34",
-          a_status: i % 2 === 0 ? "未使用" : "已使用"
-        });
-      }
+      this.tableData = []
+      this.codeData(
+        this.currentPage,
+        this.limit,
+        'serveCode/activateCode/listData',
+        this.search,
+        this.nowPage,
+        ''
+      ).then(res => {
+        for (let i = 0; i < res.data.object.list.length; i++) {
+          this.tableData.push({
+            code: res.data.object.list[i].code,
+            createTime: res.data.object.list[i].createTime,
+            status: res.data.object.list[i].status
+          })
+        }
+        this.getDataList(res.data.object.total)
+      })
+    },
+    initSums() {
+      this.getSums('/serveCode/activateCode/useCondition').then(res => {
+        console.log(res)
+        this.dataArr = res.data.object
+        if (
+          (this.dataArr.useCarton / this.dataArr.unUseCarton).toFixed(2) * 100
+        ) {
+          this.c_number =
+            (this.dataArr.useCarton / this.dataArr.unUseCarton).toFixed(2) * 100
+        }
+        if (
+          (this.dataArr.useActiviate / this.dataArr.unUseActiviate).toFixed(2) *
+          100
+        ) {
+          this.a_number =
+            (this.dataArr.useActiviate / this.dataArr.unUseActiviate).toFixed(
+              2
+            ) * 100
+        }
+      })
     },
     handleClick(tab, event) {
-      const arr = [];
-      if (tab.index === "1") {
-        // 这里需要请求后台接口拿数据
-        for (let i = 0; i < this.tableData.length; i++) {
-          if (this.tableData[i].a_status === "已使用") {
-            arr.push(this.tableData[i]);
-          }
-        }
-      } else if (tab.index === "2") {
-        // 这里需要请求后台接口拿数据
-        for (let i = 0; i < this.tableData.length; i++) {
-          if (this.tableData[i].a_status === "未使用") {
-            arr.push(this.tableData[i]);
-          }
-        }
+      if (tab.index === '1') {
+        this.nowPage = '0'
+      } else if (tab.index === '2') {
+        this.nowPage = '1'
+      } else {
+        this.nowPage = '-1'
       }
-      this.tableData = arr;
+      console.log(this.nowPage)
+      this.initData()
     },
-    getDataList() {
-      this.total = this.tableData.length;
+    getDataList(total) {
+      this.total = total
     },
     handleCurrentChange(val) {
-      this.currentPage = val;
-      // this.getDataList();
+      this.currentPage = val
     },
     handleSizeChange(val) {
-      this.limit = val;
-      this.currentPage = 1;
-      // this.getDataList();
+      this.limit = val
+      this.currentPage = 1
+    },
+    initBtn() {
+      const btnArr = JSON.parse(this.$route.query.btnRight)
+      btnArr.forEach(item => {
+        if (item.rightName === '统计') {
+          this.s_show = true
+        } else if (item.rightName === '导入') {
+          this.i_show = true
+        }
+      })
+    },
+    searchEnterFun() {
+      this.codeData(
+        this.currentPage,
+        this.limit,
+        'serveCode/activateCode/listData',
+        this.search,
+        this.nowPage,
+        ''
+      ).then(res => {
+        for (let i = 0; i < res.data.object.list.length; i++) {
+          this.tableData.push({
+            code: res.data.object.list[i].code,
+            createTime: res.data.object.list[i].createTime,
+            status: res.data.object.list[i].status
+          })
+        }
+        this.getDataList(res.data.object.total)
+      })
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    this.initData();
+    this.initData()
+    this.initSums()
+    this.initBtn()
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {
-    this.getDataList();
-  },
+  mounted() {},
   beforeCreate() {}, // 生命周期 - 创建之前
   beforeMount() {}, // 生命周期 - 挂载之前
   beforeUpdate() {}, // 生命周期 - 更新之前
@@ -192,7 +260,7 @@ export default {
   beforeDestroy() {}, // 生命周期 - 销毁之前
   destroyed() {}, // 生命周期 - 销毁完成
   activated() {} // 如果页面有keep-alive缓存功能，这个函数会触发
-};
+}
 </script>
 <style>
 .el-tabs__item {

@@ -14,20 +14,34 @@
         :label="item.label"
       >
         <div class="btn_header">
-          <div>
-            <el-input
+          <div style="display:flex;">
+            <!-- <el-input
               v-model="search"
               style="width:300px;border-radius:4px;padding-right:15px"
               placeholder="输入关键字搜索"
-            />
-            <el-button @click="exportData()" type="primary" size="medium"
+            /> -->
+            <div style="display:flex;margin-right:10px">
+              <el-input
+                v-model="search"
+                style="border-radius:4px;width:400px;margin-right:10px"
+                placeholder="输入关键字搜索"
+              />
+              <el-button @click="searchEnterFun()" type="primary"
+                >搜索</el-button
+              >
+            </div>
+            <el-button
+              @click="exportData()"
+              type="primary"
+              size="medium"
+              v-if="e_show"
               >导出</el-button
             >
             <el-button @click="refreshData()" type="primary" size="medium"
               >刷新</el-button
             >
           </div>
-          <div class="">
+          <div v-if="i_show">
             <el-button
               @click="makeSure"
               :type="defaultColr"
@@ -61,54 +75,54 @@
               :reserve-selection="true"
             ></el-table-column>
             <el-table-column
-              prop="p_type"
+              prop="materialType"
               label="产品类别"
               align="center"
               width="100"
             >
             </el-table-column>
             <el-table-column
-              prop="p_number"
+              prop="materialCode"
               label="产品编号"
               align="center"
               width="200"
             >
             </el-table-column>
             <el-table-column
-              prop="p_model"
+              prop="materialModel"
               label="产品型号"
               align="center"
               width="150"
               :filter-multiple="false"
-              :filters="p_modelGroup"
+              :filters="materialModelGroup"
               :filter-method="filterTag"
-              column-key="p_model"
+              column-key="materialModel"
               filter-placement="bottom-end"
             >
             </el-table-column>
             <el-table-column
-              prop="order_number"
+              prop="productNo"
               label="序列号 "
               align="center"
               width="200"
             >
             </el-table-column>
             <el-table-column
-              prop="batch_number"
+              prop="batchNo"
               label="产品批号 "
               align="center"
               width="200"
             >
             </el-table-column>
             <el-table-column
-              prop="numbers"
+              prop="spec"
               label="规格 "
               align="center"
               width="80"
             >
             </el-table-column>
             <el-table-column
-              prop="d_date"
+              prop="produceDate"
               label="生产日期 "
               align="center"
               width="100"
@@ -116,41 +130,41 @@
             </el-table-column>
 
             <el-table-column
-              prop="e_date"
+              prop="expiryDate"
               label="失效日期"
               align="center"
               width="100"
             >
             </el-table-column>
             <el-table-column
-              prop="b_code"
+              prop="cartonCode"
               label="箱码"
               align="center"
               width="200"
             >
             </el-table-column>
             <el-table-column
-              prop="e_code"
+              prop="activateCode"
               label="激活码"
               align="center"
               width="200"
             ></el-table-column>
             <el-table-column
-              prop="g_name"
+              prop="opUser"
               label="退货人"
               align="center"
               width="200"
               v-if="mark"
             ></el-table-column>
             <el-table-column
-              prop="u_acount"
+              prop="opUser"
               label="操作账户"
               align="center"
               width="100"
               v-else
             ></el-table-column>
             <el-table-column
-              prop="g_reason"
+              prop="returnReason"
               label="退货原因"
               align="center"
               width="200"
@@ -158,21 +172,21 @@
             ></el-table-column>
 
             <el-table-column
-              prop="r_acount"
+              prop="receiver"
               label="接收账户"
               align="center"
               width="100"
               v-else
             ></el-table-column>
             <el-table-column
-              prop="u_date"
+              prop="opTime"
               label="操作时间"
               align="center"
               width="100"
             >
             </el-table-column>
             <el-table-column
-              prop="vendor"
+              prop="producer"
               label="生产厂家"
               align="center"
               width="150"
@@ -201,7 +215,7 @@
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
-import pagination from "../components/Pagenation";
+import pagination from '../components/Pagenation'
 
 export default {
   // import引入的组件需要注入到对象中才能使用
@@ -212,23 +226,23 @@ export default {
       currentPage: 1,
       limit: 9,
       total: 0,
-      p_modelGroup: [
-        { text: "DY10-204K", value: "DY10-204K" },
-        { text: "DY10-204", value: "DY10-204" }
-      ],
+      materialModelGroup: [],
       tableData: [],
-      search: "",
+      search: '',
       tabNames: [
-        { label: "待入仓", name: "wait" },
-        { label: "退货受理", name: "backProduct" }
+        { label: '待入仓', name: 'wait' },
+        { label: '退货受理', name: 'backProduct' }
       ],
-      activeName: "wait",
+      activeName: 'wait',
       showBtns: false,
       tableDataSelections: [],
-      defaultColr: "info",
+      defaultColr: 'info',
       btnStatu: true,
-      mark: false
-    };
+      mark: false,
+      i_show: false,
+      e_show: false,
+      key_index: '0'
+    }
   },
   // 监听属性 类似于data概念
   computed: {},
@@ -237,108 +251,145 @@ export default {
   // 方法集合
   methods: {
     initData() {
-      this.tableData = [];
-      for (let i = 0; i < 30; i++) {
-        this.tableData.push({
-          p_type: i % 3 === 0 ? "鼻假体" : "下巴假体",
-          p_number: "23232323232323" + i,
-          p_model: i % 2 === 0 ? "DY10-204K" : "DY10-204",
-          batch_number: "232323232" + i,
-          order_number: "2323232323232" + i,
-          numbers: i + "个",
-          d_date: "2019.12." + i,
-          e_date: "2019.1." + i,
-          b_code: "232323236667" + i,
-          e_code: "54645482215" + i,
-          vendor: i % 2 === 0 ? "上海东月医疗" : "南京新创",
-          u_acount: "李" + i,
-          r_acount: "王" + i,
-          u_date: "2019.3." + i,
-          g_name: "赵" + i,
-          g_reason: "没" + i,
-          p_id: i
-        });
-      }
-      this.getDataList();
+      this.codeData(
+        this.currentPage,
+        this.limit,
+        '/stock/listData',
+        this.search,
+        this.key_index,
+        '',
+        ''
+      ).then(res => {
+        this.tableData = res.data.object.list
+        this.getDataList(res.data.object.total)
+      })
     },
-    selectionChangeHandle(selection, row) {
-      console.log(selection);
+    getType() {
+      this.getSums('/material/listAboutSelf').then(res => {
+        for (let i = 0; i < res.data.object.length; i++) {
+          this.materialModelGroup.push({
+            text: res.data.object[i].materialModel,
+            value: res.data.object[i].id
+          })
+        }
+      })
+    },
+    selectionChangeHandle(selection) {
+      console.log(selection)
 
-      this.tableDataSelections = selection;
+      this.tableDataSelections = []
+      for (let i = 0; i < selection.length; i++) {
+        this.tableDataSelections.push(selection[i].opId)
+      }
       if (selection.length > 0) {
-        this.defaultColr = "primary";
-        this.btnStatu = false;
+        this.defaultColr = 'primary'
+        this.btnStatu = false
       } else {
-        this.defaultColr = "info";
-        this.btnStatu = true;
+        this.defaultColr = 'info'
+        this.btnStatu = true
       }
     },
     // table column 的方法，改写这个方法
     filterTag(value, row, column) {
-      return true;
+      return true
     },
-    getDataList() {
-      this.total = this.tableData.length;
+    getDataList(total) {
+      this.total = total
     },
     handleCurrentChange(val) {
-      this.currentPage = val;
+      this.currentPage = val
     },
     handleSizeChange(val) {
-      this.limit = val;
-      this.currentPage = 1;
+      this.limit = val
+      this.currentPage = 1
     },
     handleClick(tab, event) {
-      console.log(tab.index === "1");
-      if (tab.index === "1") {
-        this.initData();
-        this.mark = true;
+      if (tab.index === '1') {
+        this.key_index = '1'
+        this.mark = true
       } else {
-        this.mark = false;
+        this.key_index = '0'
+        this.mark = false
       }
+      this.initData()
     },
     fnFilterChangeInit(filter) {
-      console.log(filter);
-      const arr = [];
-      for (let i = 0; i < this.tableData.length; i++) {
-        if (this.tableData[i].p_model === filter.p_model[0]) {
-          arr.push(this.tableData[i]);
-        }
-      }
-      this.tableData = arr;
-      this.getDataList();
+      console.log(filter.materialModel[0])
+      this.codeData(
+        this.currentPage,
+        this.limit,
+        '/stock/listData',
+        this.search,
+        this.key_index,
+        '',
+        filter.materialModel[0]
+      ).then(res => {
+        this.tableData = res.data.object.list
+        this.getDataList(res.data.object.total)
+      })
     },
     getRowKey(row) {
-      return row.p_id;
+      return row.opId
     },
     makeSure() {
       this.$notify({
-        title: "已入库",
-        message: "产品入库成功",
-        position: "top-right",
+        title: '已入库',
+        message: '产品入库成功',
+        position: 'top-right',
         duration: 2000
-      });
-      for (let i = 0; i < this.tableData.length; i++) {
-        for (let j = 0; j < this.tableDataSelections.length; j++) {
-          if (this.tableData[i].p_id === this.tableDataSelections[j].p_id) {
-            this.tableData.splice(i, 1);
-            this.getDataList();
-          }
-        }
+      })
+      const ids = this.tableDataSelections.join(',')
+      let opStatu = ''
+      if (this.key_index === '0') {
+        opStatu = '3'
+      } else {
+        opStatu = '4'
       }
-      this.$refs.filterTable.clearSelection();
+      this.productDone(ids, opStatu, '/stock/sureOrReject').then(res => {
+        console.log(res)
+        this.initData()
+      })
+      // this.$refs.filterTable.clearSelection()
     },
     refusedProduct() {
       this.$notify({
-        title: "已拒绝",
-        message: "产品入库失败",
-        position: "top-right",
+        title: '已拒绝',
+        message: '产品入库失败',
+        position: 'top-right',
         duration: 2000
-      });
+      })
+      const ids = this.tableDataSelections.join(',')
+      let opStatu = ''
+      if (this.key_index === '0') {
+        opStatu = '2'
+      } else {
+        opStatu = '5'
+      }
+      this.productDone(ids, opStatu, '/stock/sureOrReject').then(res => {
+        this.initData()
+      })
+    },
+    initBtn() {
+      const btnArr = JSON.parse(this.$route.query.btnRight)
+      console.log(btnArr)
+
+      btnArr.forEach(item => {
+        if (item.rightName === '入仓') {
+          this.i_show = true
+        } else if (item.rightName === '导出') {
+          this.e_show = true
+        }
+      })
+    },
+    searchEnterFun() {
+      this.initData()
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    this.initData();
+    this.initData()
+    this.initBtn()
+    this.getType()
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
@@ -349,7 +400,7 @@ export default {
   beforeDestroy() {}, // 生命周期 - 销毁之前
   destroyed() {}, // 生命周期 - 销毁完成
   activated() {} // 如果页面有keep-alive缓存功能，这个函数会触发
-};
+}
 </script>
 <style scoped>
 .container {

@@ -37,6 +37,9 @@ export default {
     },
     changePwd: {
       type: Boolean
+    },
+    id: {
+      type: Number
     }
   },
   // import引入的组件需要注入到对象中才能使用
@@ -45,38 +48,49 @@ export default {
     // 这里存放数据
     return {
       show: false
-    };
+    }
   },
   // 监控data中的数据变化
   watch: {
     centerDialogVisible: {
       handler(newName, oldName) {
-        this.show = true;
+        this.show = true
       }
     }
   },
   // 方法集合
   methods: {
     loginOut() {
-      if (!this.changePwd) {
-        this.$cookieStore.getCookie("name");
-        this.$cookieStore.delCookie("name");
-        this.$router.push("/login");
-        history.pushState(null, null, document.URL);
-        window.addEventListener(
-          "popstate",
-          function(e) {
-            history.pushState(null, null, document.URL);
-          },
-          false
-        );
-      } else {
-        console.log(5555);
-      }
+      this.getSums('/user/logout').then(res => {
+        console.log(res)
+        if (res.data.code === 200) {
+          this.$router.push({
+            path: '/'
+          })
+        }
+      })
+      // if (!this.changePwd) {
+      //   this.$cookieStore.getCookie('name')
+      //   this.$cookieStore.delCookie('name')
+      //   this.$router.push('/login')
+      //   history.pushState(null, null, document.URL)
+      //   window.addEventListener(
+      //     'popstate',
+      //     function(e) {
+      //       history.pushState(null, null, document.URL)
+      //     },
+      //     false
+      //   )
+      // } else {
+      //   this.resetPassword(this.id, 'user/resetPwd').then(res => {
+      //     console.log(res)
+      //   })
+      //   this.show = false
+      // }
     },
     rebackStatu() {
-      this.show = false;
-      this.$emit("dialogClose");
+      this.show = false
+      this.$emit('dialogClose')
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
@@ -90,6 +104,6 @@ export default {
   beforeDestroy() {}, // 生命周期 - 销毁之前
   destroyed() {}, // 生命周期 - 销毁完成
   activated() {} // 如果页面有keep-alive缓存功能，这个函数会触发
-};
+}
 </script>
 <style scoped></style>

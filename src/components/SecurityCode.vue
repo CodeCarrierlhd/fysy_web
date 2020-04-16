@@ -1,23 +1,35 @@
 <!-- 激活码管理 -->
 <template>
   <div class="container">
-    <div style="display:flex;justify-content: space-between;margin-bottom:45px">
-      <el-card class="box-card" v-for="(item, index) in dataArr" :key="index">
+    <div
+      style="display:flex;justify-content: space-between;margin-bottom:45px"
+      v-if="s_show"
+    >
+      <el-card class="box-card">
         <div class="header">
-          <img :src="item.img" />
+          <img :src="imgs.a_img" />
           <p style="margin-right:0">
-            <span>{{ item.sumArr[0] }}</span
-            ><span>/</span><span>{{ item.sumArr[1] }}</span>
+            <span>{{ dataArr.useOuterFwCode }}</span
+            ><span>/</span><span>{{ dataArr.unUseOuterFwCode }}</span>
           </p>
         </div>
         <p class="sumFont">
-          <span>{{ item.cardName }}</span
-          ><span>{{ item.percentage }}%</span>
+          <span>外盒防伪码库存量</span><span>{{ c_number }}%</span>
         </p>
-        <el-progress
-          :percentage="item.percentage"
-          :show-text="false"
-        ></el-progress>
+        <el-progress :percentage="c_number" :show-text="false"></el-progress>
+      </el-card>
+      <el-card class="box-card">
+        <div class="header">
+          <img :src="imgs.c_img" />
+          <p style="margin-right:0">
+            <span>{{ dataArr.useCardFwCode }}</span
+            ><span>/</span><span>{{ dataArr.unUseCardFwCode }}</span>
+          </p>
+        </div>
+        <p class="sumFont">
+          <span>卡片防伪码库存量</span><span>{{ a_number }}%</span>
+        </p>
+        <el-progress :percentage="a_number" :show-text="false"></el-progress>
       </el-card>
     </div>
     <div class="sumForm">
@@ -47,13 +59,18 @@
                 style="display:flex;justify-content: space-between;"
                 header-align="center"
               >
-                <el-input
-                  v-model="search"
-                  style="width:600px;border-radius:4px;"
-                  placeholder="搜索"
-                />
+                <div v-if="s_show" style="display:flex;width:80%;">
+                  <el-input
+                    v-model="search"
+                    style="border-radius:4px;width:50%;height: 90%;margin-right:10px"
+                    placeholder="输入关键字搜索"
+                  />
+                  <el-button @click="searchEnterFun()" type="primary"
+                    >搜索</el-button
+                  >
+                </div>
                 <div>
-                  <el-button @click="importData()" type="primary"
+                  <el-button @click="importData()" type="primary" v-if="i_show"
                     >导入</el-button
                   >
                   <el-button @click="updateData()" type="primary"
@@ -68,27 +85,27 @@
                 width="150"
               >
               </el-table-column>
-              <el-table-column prop="a_code" label="防伪码" align="center">
+              <el-table-column prop="code" label="防伪码" align="center">
               </el-table-column>
               <el-table-column
-                prop="code_type"
+                prop="codeType"
                 label="类型"
                 align="center"
                 width="160"
                 :filter-multiple="false"
-                :filters="code_typeGroup"
+                :filters="codeTypeGroup"
                 :filter-method="filterTag"
-                column-key="code_type"
+                column-key="codeType"
                 filter-placement="bottom-end"
               >
               </el-table-column>
-              <el-table-column prop="a_date" :label="dateName" align="center">
-              </el-table-column>
               <el-table-column
-                prop="a_status"
-                :label="statusName"
+                prop="createTime"
+                :label="dateName"
                 align="center"
               >
+              </el-table-column>
+              <el-table-column prop="status" :label="statusName" align="center">
               </el-table-column>
             </el-table-column>
           </el-table>
@@ -111,7 +128,7 @@
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
-import pagination from "../components/Pagenation";
+import pagination from '../components/Pagenation'
 
 export default {
   // import引入的组件需要注入到对象中才能使用
@@ -120,47 +137,34 @@ export default {
   data() {
     // 这里存放数据
     return {
-      dataArr: [
-        {
-          sumArr: ["600", "1000"],
-          img: require("../assets/imgs/active_left.png"),
-          percentage: 60,
-          cardName: "外盒防伪码库存量"
-        },
-        {
-          sumArr: ["200", "1000"],
-          img: require("../assets/imgs/active_right.png"),
-          percentage: 20,
-          cardName: "卡片防伪码库存量"
-        }
-      ],
-      activeName: "unUsed",
+      dataArr: [],
+      activeName: 'unUsed',
       tableData: [],
       currentPage: 1,
       limit: 5,
       total: 0,
-      search: "",
+      search: '',
       tabNames: [
-        { label: "未使用", name: "unUsed" },
-        { label: "使用", name: "havenUsed" }
+        { label: '未使用', name: 'unUsed' },
+        { label: '使用', name: 'havenUsed' }
       ],
-      code_typeGroup: [
-        { text: "外盒码", value: "外盒码" },
-        { text: "卡片码", value: "卡片码" }
+      codeTypeGroup: [
+        { text: '外盒防伪码', value: '外盒码' },
+        { text: '卡片防伪码', value: '卡片码' }
       ],
-      roleGroups: [
-        {
-          value: "外盒码",
-          label: "外盒码"
-        },
-        {
-          value: "卡片码",
-          label: "卡片码"
-        }
-      ],
-      dateName: "生成日期",
-      statusName: "状态"
-    };
+      dateName: '生成日期',
+      statusName: '状态',
+      s_show: false,
+      i_show: false,
+      nowPage: '0',
+      typeNumber: '4',
+      imgs: {
+        c_img: require('../assets/imgs/kpm.png'),
+        a_img: require('../assets/imgs/whm.png')
+      },
+      c_number: 0,
+      a_number: 0
+    }
   },
   // 监听属性 类似于data概念
   computed: {},
@@ -168,78 +172,150 @@ export default {
   watch: {},
   // 方法集合
   methods: {
-    initData(index) {
-      this.tableData = [];
-      if (index === "1") {
-        for (let i = 0; i < 30; i++) {
+    initData() {
+      this.tableData = []
+      this.codeData(
+        this.currentPage,
+        this.limit,
+        '/serveCode/fwCode/listData',
+        this.search,
+        this.nowPage,
+        this.typeNumber
+      ).then(res => {
+        console.log(res)
+
+        for (let i = 0; i < res.data.object.list.length; i++) {
           this.tableData.push({
-            a_code: i + "MKNY23MKNY",
-            a_date: "2020.03." + i + "  13:56:34",
-            a_status: i + 2,
-            code_type: i % 3 === 0 ? "外盒码" : "卡片码"
-          });
+            code: res.data.object.list[i].code,
+            createTime: res.data.object.list[i].createTime,
+            codeType: res.data.object.list[i].codeType,
+            status: res.data.object.list[i].status
+          })
         }
-      } else {
-        for (let i = 0; i < 30; i++) {
-          this.tableData.push({
-            a_code: i + "MKNY23MKNY",
-            a_date: "2020.03." + i + "  13:56:34",
-            a_status: "未查询",
-            code_type: i % 3 === 0 ? "外盒码" : "卡片码"
-          });
+        this.getDataList(res.data.object.total)
+      })
+    },
+    initSums() {
+      this.getSums('/serveCode/fwCode/useCondition').then(res => {
+        console.log(res)
+        this.dataArr = res.data.object
+        if (
+          (this.dataArr.useOuterFwCode / this.dataArr.unUseOuterFwCode).toFixed(
+            2
+          ) * 100
+        ) {
+          this.c_number =
+            (
+              this.dataArr.useOuterFwCode / this.dataArr.unUseOuterFwCode
+            ).toFixed(2) * 100
         }
-      }
-      this.getDataList();
+        if (
+          (this.dataArr.useCardFwCode / this.dataArr.unUseCardFwCode).toFixed(
+            2
+          ) * 100
+        ) {
+          this.a_number =
+            (this.dataArr.useCardFwCode / this.dataArr.unUseCardFwCode).toFixed(
+              2
+            ) * 100
+        }
+      })
     },
     handleClick(tab, event) {
-      if (tab.index === "1") {
+      if (tab.index === '1') {
         // 这里需要请求后台接口拿数据
-        this.dateName = "最近查询日期";
-        this.statusName = "已查询次数";
-        this.initData(tab.index);
+        this.dateName = '最近查询日期'
+        this.statusName = '已查询次数'
+        this.nowPage = '1'
+        this.codeData(
+          this.currentPage,
+          this.limit,
+          '/serveCode/fwCode/listData',
+          this.search,
+          this.nowPage,
+          this.typeNumber
+        ).then(res => {
+          console.log(res)
+
+          for (let i = 0; i < res.data.object.list.length; i++) {
+            this.tableData.push({
+              code: res.data.object.list[i].code,
+              createTime: res.data.object.list[i].createTime,
+              codeType: res.data.object.list[i].codeType,
+              status: res.data.object.list[i].queryCount
+            })
+          }
+          this.getDataList(res.data.object.total)
+        })
       } else {
-        this.dateName = "生成日期";
-        this.statusName = "状态";
+        this.dateName = '生成日期'
+        this.statusName = '状态'
+        this.nowPage = '0'
+        this.initData()
       }
     },
-    getDataList() {
-      this.total = this.tableData.length;
+    getDataList(toatl) {
+      this.total = toatl
     },
     handleCurrentChange(val) {
-      this.currentPage = val;
+      this.currentPage = val
       // this.getDataList();
     },
     handleSizeChange(val) {
-      this.limit = val;
-      this.currentPage = 1;
+      this.limit = val
+      this.currentPage = 1
       // this.getDataList();
     },
     filterTag(value, row, column) {
-      return true;
+      return true
     },
     fnFilterChangeInit(filter) {
-      console.log(filter);
-      const arr = [];
-      if (filter.code_type[0] === "外盒码") {
-        for (let i = 0; i < this.tableData.length; i++) {
-          if (this.tableData[i].code_type === "外盒码") {
-            arr.push(this.tableData[i]);
-          }
-        }
+      console.log(filter)
+      if (filter.codeType[0] === '外盒码') {
+        this.typeNumber = '2'
+      } else if (filter.codeType[0] === '卡片码') {
+        this.typeNumber = '3'
       } else {
-        for (let i = 0; i < this.tableData.length; i++) {
-          if (this.tableData[i].code_type === "卡片码") {
-            arr.push(this.tableData[i]);
-          }
-        }
+        this.typeNumber = '4'
       }
-      this.tableData = arr;
-      this.getDataList();
+      this.initData()
+    },
+    initBtn() {
+      const btnArr = JSON.parse(this.$route.query.btnRight)
+      console.log(btnArr)
+
+      btnArr.forEach(item => {
+        if (item.rightName === '统计') {
+          this.s_show = true
+        } else if (item.rightName === '导入') {
+          this.i_show = true
+        }
+      })
+    },
+    searchEnterFun() {
+      this.codeData(
+        this.currentPage,
+        this.limit,
+        '/serveCode/fwCode/listData',
+        this.search,
+        this.nowPage
+      ).then(res => {
+        for (let i = 0; i < res.data.object.list.length; i++) {
+          this.tableData.push({
+            code: res.data.object.list[i].code,
+            createTime: res.data.object.list[i].createTime,
+            status: res.data.object.list[i].status
+          })
+        }
+        this.getDataList(res.data.object.total)
+      })
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    this.initData();
+    this.initData()
+    this.initBtn()
+    this.initSums()
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
@@ -250,7 +326,7 @@ export default {
   beforeDestroy() {}, // 生命周期 - 销毁之前
   destroyed() {}, // 生命周期 - 销毁完成
   activated() {} // 如果页面有keep-alive缓存功能，这个函数会触发
-};
+}
 </script>
 <style>
 .el-tabs__item {

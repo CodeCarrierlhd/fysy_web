@@ -1,4 +1,4 @@
-<!-- 退货管理 -->
+<!-- 发货管理 -->
 <template>
   <div class="container">
     <el-tabs
@@ -14,21 +14,31 @@
         :label="item.label"
       >
         <div class="btn_header">
-          <div>
-            <el-input
-              v-model="search"
-              style="width:300px;border-radius:4px;padding-right:15px"
-              placeholder="输入关键字搜索"
-            />
-            <el-button @click="exportData()" type="primary" size="medium"
+          <div style="display:flex">
+            <div style="display:flex;margin-right:10px">
+              <el-input
+                v-model="search"
+                style="border-radius:4px;width:400px;margin-right:10px"
+                placeholder="输入关键字搜索"
+              />
+              <el-button @click="searchEnterFun()" type="primary"
+                >搜索</el-button
+              >
+            </div>
+            <el-button
+              @click="exportData()"
+              type="primary"
+              size="medium"
+              v-if="e_show"
               >导出</el-button
-            >
-            <el-button @click="refreshData()" type="primary" size="medium"
-              >刷新</el-button
             >
           </div>
           <div v-if="add_show">
-            <el-button @click="addData" v-if="btnShow" type="primary"
+            <el-button
+              @click="addData"
+              v-if="btnShow"
+              type="primary"
+              v-show="s_show"
               ><i class="el-icon-plus"></i> 新增</el-button
             >
             <div v-else>
@@ -61,68 +71,64 @@
           :data="
             tableData.slice((currentPage - 1) * limit, currentPage * limit)
           "
-          @filter-change="fnFilterChangeInit"
           @selection-change="selectionChangeHandle"
+          @filter-change="fnFilterChangeInit"
           :row-key="getRowKey"
-          style="width: 100%; padding:10px 60px"
+          max-height="660"
+          style="width: 96%; margin:10px 60px"
           border
         >
           <el-table-column class-name="t_header">
             <el-table-column
               type="selection"
-              width="100"
+              width="150"
               align="center"
               :reserve-selection="true"
             ></el-table-column>
             <el-table-column
-              prop="p_type"
+              prop="materialType"
               label="产品类别"
               align="center"
               width="100"
             >
             </el-table-column>
             <el-table-column
-              prop="p_number"
+              prop="materialCode"
               label="产品编号"
               align="center"
               width="200"
             >
             </el-table-column>
             <el-table-column
-              prop="p_model"
+              prop="materialModel"
               label="产品型号"
               align="center"
               width="150"
-              :filter-multiple="false"
-              :filters="p_modelGroup"
-              :filter-method="filterTag"
-              column-key="p_model"
-              filter-placement="bottom-end"
             >
             </el-table-column>
             <el-table-column
-              prop="order_number"
+              prop="productNo"
               label="序列号 "
               align="center"
               width="200"
             >
             </el-table-column>
             <el-table-column
-              prop="batch_number"
+              prop="batchNo"
               label="产品批号 "
               align="center"
               width="200"
             >
             </el-table-column>
             <el-table-column
-              prop="numbers"
+              prop="spec"
               label="规格 "
               align="center"
               width="80"
             >
             </el-table-column>
             <el-table-column
-              prop="d_date"
+              prop="produceDate"
               label="生产日期 "
               align="center"
               width="100"
@@ -130,27 +136,27 @@
             </el-table-column>
 
             <el-table-column
-              prop="e_date"
+              prop="expiryDate"
               label="失效日期"
               align="center"
               width="100"
             >
             </el-table-column>
             <el-table-column
-              prop="b_code"
+              prop="cartonCode"
               label="箱码"
               align="center"
               width="200"
             >
             </el-table-column>
             <el-table-column
-              prop="e_code"
+              prop="activateCode"
               label="激活码"
               align="center"
               width="200"
             ></el-table-column>
             <el-table-column
-              prop="vendor"
+              prop="producer"
               label="生产厂家"
               align="center"
               width="150"
@@ -158,37 +164,45 @@
             </el-table-column>
             <el-table-column
               v-if="a_statu"
-              prop="u_acount"
+              prop="opUser"
               label="操作账户"
               align="center"
               width="100"
             ></el-table-column>
             <el-table-column
               v-if="a_statu"
-              prop="r_acount"
+              prop="receiver"
               label="接收账户"
               align="center"
               width="100"
             ></el-table-column>
             <el-table-column
               v-if="wait_pro"
-              prop="g_people"
+              prop="receiver"
               label="收货人"
               align="center"
               width="150"
             >
             </el-table-column>
-            <el-table-column
+            <!-- <el-table-column
               v-if="wait_pro"
-              prop="p_statu"
+              prop="productStatus"
               label="状态"
               align="center"
               width="150"
               :filter-multiple="false"
               :filters="p_statuGroup"
               :filter-method="filterTag"
-              column-key="p_statu"
+              column-key="productStatus"
+              key="p_statu"
               filter-placement="bottom-end"
+            ></el-table-column> -->
+            <el-table-column
+              v-if="wait_pro"
+              prop="productStatus"
+              label="状态"
+              align="center"
+              width="150"
             ></el-table-column>
             <el-table-column
               label="操作"
@@ -198,8 +212,8 @@
             >
               <template slot-scope="scope">
                 <span
-                  @click="restart"
-                  v-if="scope.row.p_statu === '已拒绝'"
+                  @click="restart(scope.row)"
+                  v-if="scope.row.productStatus === '已拒绝'"
                   class="loseContro"
                   >重新发货</span
                 >
@@ -207,7 +221,7 @@
               </template>
             </el-table-column>
             <el-table-column
-              prop="c_statu"
+              prop="productStatus"
               label="状态"
               align="center"
               width="150"
@@ -225,7 +239,6 @@
           :limit="limit"
           :small="true"
           @handleCurrentChange="handleCurrentChange"
-          @handleSizeChange="handleSizeChange"
           style="margin:15px 50px;"
         />
       </el-tab-pane>
@@ -234,28 +247,33 @@
       :close-on-click-modal="false"
       :visible.sync="dialogVisibleClassify"
       center
-      width="1500px"
+      width="90%"
+      top="10vh"
     >
       <div class="new_header">
-        <el-input
-          v-model="search1"
-          style="width:600px;border-radius:4px;padding-right:15px"
-          placeholder="输入关键字搜索"
-        />
+        <div style="display:flex;margin-right:10px">
+          <el-input
+            v-model="search1"
+            style="border-radius:4px;width:400px;margin-right:10px"
+            placeholder="输入关键字搜索"
+          />
+          <el-button @click="searchEnterFun1()" type="primary">搜索</el-button>
+        </div>
 
         <el-button @click="chosePro" type="primary"
           ><i class="el-icon-plus"></i> 添加</el-button
         >
       </div>
       <el-table
-        ref="filterTable1"
+        ref="getProducts"
         :data="
           newTableData.slice((currentPage1 - 1) * limit1, currentPage1 * limit1)
         "
         @filter-change="fnFilterChangeInit1"
         @selection-change="selectionChangeHandle1"
         :row-key="getRowKey"
-        style="width: 100%; padding:10px 60px"
+        height="600"
+        style="margin:10px 0;width:100%"
         border
       >
         <el-table-column class-name="t_header">
@@ -266,54 +284,47 @@
             :reserve-selection="true"
           ></el-table-column>
           <el-table-column
-            prop="p_type"
+            prop="materialType"
             label="产品类别"
             align="center"
             width="100"
           >
           </el-table-column>
           <el-table-column
-            prop="p_number"
+            prop="materialCode"
             label="产品编号"
             align="center"
             width="200"
           >
           </el-table-column>
           <el-table-column
-            prop="p_model"
+            prop="materialModel"
             label="产品型号"
             align="center"
             width="150"
             :filter-multiple="false"
-            :filters="p_modelGroup"
+            :filters="materialModelGroup"
             :filter-method="filterTag"
-            column-key="p_model"
-            filter-placement="bottom-end"
           >
           </el-table-column>
           <el-table-column
-            prop="order_number"
+            prop="productNo"
             label="序列号 "
             align="center"
             width="200"
           >
           </el-table-column>
           <el-table-column
-            prop="batch_number"
+            prop="batchNo"
             label="产品批号 "
             align="center"
             width="200"
           >
           </el-table-column>
-          <el-table-column
-            prop="numbers"
-            label="规格 "
-            align="center"
-            width="80"
-          >
+          <el-table-column prop="spec" label="规格 " align="center" width="80">
           </el-table-column>
           <el-table-column
-            prop="d_date"
+            prop="produceDate"
             label="生产日期 "
             align="center"
             width="100"
@@ -321,27 +332,27 @@
           </el-table-column>
 
           <el-table-column
-            prop="e_date"
+            prop="expiryDate"
             label="失效日期"
             align="center"
             width="100"
           >
           </el-table-column>
           <el-table-column
-            prop="b_code"
+            prop="cartonCode"
             label="箱码"
             align="center"
             width="200"
           >
           </el-table-column>
           <el-table-column
-            prop="e_code"
+            prop="activateCode"
             label="激活码"
             align="center"
             width="200"
           ></el-table-column>
           <el-table-column
-            prop="vendor"
+            prop="producer"
             label="生产厂家"
             align="center"
             width="150"
@@ -359,7 +370,6 @@
         :limit="limit1"
         :small="true"
         @handleCurrentChange="handleCurrentChange1"
-        @handleSizeChange="handleSizeChange1"
         style="margin:15px 50px;"
       />
     </el-dialog>
@@ -373,9 +383,9 @@
       <ul class="sendContainer">
         <li>
           <span>退货原因：</span>
-          <el-select v-model="recived" placeholder="请选择">
+          <el-select v-model="reason" placeholder="请选择">
             <el-option
-              v-for="item in reciveGroup"
+              v-for="item in reasonGroup"
               :key="item.value"
               :label="item.label"
               :value="item.value"
@@ -397,6 +407,18 @@
           </div>
         </li>
         <li>
+          <span>收货单位：</span>
+          <el-select v-model="recived" placeholder="请选择">
+            <el-option
+              v-for="item in reciveGroup"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            >
+            </el-option>
+          </el-select>
+        </li>
+        <li>
           <span>货物清单：</span>
           <el-table
             :data="gridData"
@@ -407,8 +429,9 @@
           >
             <el-table-column type="index" width="50" label="序号">
             </el-table-column>
-            <el-table-column prop="sp_type" label="产品类别"> </el-table-column>
-            <el-table-column prop="sp_model" label="产品型号">
+            <el-table-column prop="materialType" label="产品类别">
+            </el-table-column>
+            <el-table-column prop="materialModel" label="产品型号">
             </el-table-column>
             <el-table-column prop="sp_size" label="规格"> </el-table-column>
             <el-table-column prop="sp_sum" label="数量/个"> </el-table-column>
@@ -416,31 +439,27 @@
         </li>
         <li>
           <span>订单编号：</span>
-          <span>123456789012345</span>
+          <span>{{ order.orderNo }}</span>
         </li>
         <li>
           <span>订单时间：</span>
-          <span>2020.03.09 12:34:32</span>
-        </li>
-        <li>
-          <span>收件地址：</span>
-          <span>广东省珠海市天煞大道888号</span>
+          <span>{{ order.orderTime }}</span>
         </li>
         <li>
           <span>退回单位：</span>
-          <span>大族三维科技有限公司</span>
+          <span>{{ sender.username }}</span>
         </li>
         <li>
           <span>单位地址：</span>
-          <span>广东省深圳市天天大道888号</span>
+          <span>{{ sender.address }}</span>
         </li>
         <li>
           <span>联系人：</span>
-          <span>胡小笼</span>
+          <span>{{ sender.contact }}</span>
         </li>
         <li>
           <span>联系电话：</span>
-          <span>15365521111</span>
+          <span>{{ sender.mobile }}</span>
         </li>
       </ul>
       <div style="text-align: center;">
@@ -454,7 +473,7 @@
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
-import pagination from "../components/Pagenation";
+import pagination from '../components/Pagenation'
 
 export default {
   // import引入的组件需要注入到对象中才能使用
@@ -463,116 +482,52 @@ export default {
     // 这里存放数据
     return {
       currentPage: 1,
-      limit: 9,
+      limit: 100,
       total: 0,
       currentPage1: 1,
-      limit1: 8,
+      limit1: 100,
       total1: 0,
-      p_modelGroup: [
-        { text: "DY10-204K", value: "DY10-204K" },
-        { text: "DY10-204", value: "DY10-204" }
-      ],
+      materialModelGroup: [],
       p_statuGroup: [
-        { text: "已拒绝", value: "已拒绝" },
-        { text: "等待验收", value: "等待验收" }
+        { text: '已拒绝', value: '已拒绝' },
+        { text: '等待签收', value: '等待签收' }
       ],
       tableData: [],
       newTableData: [],
-      search: "",
-      search1: "",
+      search: '',
+      search1: '',
       tabNames: [
-        { label: "退货", name: "one" },
-        { label: "待收货", name: "two" },
-        { label: "已完成", name: "third" }
+        { label: '发货', name: 'one' },
+        { label: '待收货', name: 'two' },
+        { label: '已完成', name: 'third' }
       ],
-      roleGroups: [
-        {
-          value: "系统管理员",
-          label: "系统管理员"
-        },
-        {
-          value: "普通管理员",
-          label: "普通管理员"
-        },
-        {
-          value: "用户",
-          label: "用户"
-        }
-      ],
-      p_role: "",
-      activeName: "one",
+      roleGroups: [],
+      p_role: '',
+      activeName: 'one',
       tableDataSelections: [],
       tableDataSelections1: [],
       mark: false,
       btnShow: true,
-      a_statu: false,
       wait_pro: false,
+      a_statu: false,
       add_show: true,
       show_role: false,
       newDialogTableVisible: false,
       dialogVisibleClassify: false, // 弹窗是否显示
-      gridData: [
-        {
-          id: "12987122",
-          sp_type: "王小虎",
-          sp_model: "DY10-204K",
-          sp_size: "3",
-          sp_sum: 10
-        },
-        {
-          id: "12987122",
-          sp_type: "王小虎",
-          sp_model: "DY10-204K",
-          sp_size: "3",
-          sp_sum: 33
-        },
-        {
-          id: "12987122",
-          sp_type: "王小虎",
-          sp_model: "DY10-204K",
-          sp_size: "2",
-          sp_sum: 22
-        },
-        {
-          id: "12987122",
-          sp_type: "王小虎",
-          sp_model: "DY10-204K",
-          sp_size: "5",
-          sp_sum: 15
-        },
-        {
-          id: "12987122",
-          sp_type: "王小虎",
-          sp_model: "DY10-204K",
-          sp_size: "2",
-          sp_sum: 12
-        }
-      ],
-      reciveGroup: [
-        {
-          value: "选项1",
-          label: "黄金糕"
-        },
-        {
-          value: "选项2",
-          label: "双皮奶"
-        },
-        {
-          value: "选项3",
-          label: "蚵仔煎"
-        },
-        {
-          value: "选项4",
-          label: "龙须面"
-        },
-        {
-          value: "选项5",
-          label: "北京烤鸭"
-        }
-      ],
-      recived: "",
-      loseReason: ""
-    };
+      gridData: [],
+      reciveGroup: [],
+      reason: '',
+      reasonGroup: [],
+      receiverList: [],
+      reasonList: [],
+      reciver: {},
+      sender: {},
+      order: {},
+      recived: '',
+      s_show: false,
+      e_show: false,
+      loseReason: ''
+    }
   },
   // 监听属性 类似于data概念
   computed: {},
@@ -580,206 +535,328 @@ export default {
   watch: {},
   // 方法集合
   methods: {
-    initData() {
-      this.tableData = [];
-      for (let i = 0; i < 30; i++) {
-        this.tableData.push({
-          p_type: i % 3 === 0 ? "鼻假体" : "下巴假体",
-          p_number: "23232323232323" + i,
-          p_model: i % 2 === 0 ? "DY10-204K" : "DY10-204",
-          p_statu: i % 3 === 0 ? "已拒绝" : "等待验收",
-          batch_number: "232323232" + i,
-          order_number: "2323232323232" + i,
-          numbers: i + "个",
-          d_date: "2019.12." + i,
-          e_date: "2019.1." + i,
-          b_code: "232323236667" + i,
-          e_code: "54645482215" + i,
-          vendor: i % 2 === 0 ? "上海东月医疗" : "南京新创",
-          u_acount: "李" + i,
-          r_acount: "王" + i,
-          u_date: "2019.3." + i,
-          g_reason: "没" + i,
-          p_id: i,
-          c_statu: "已完成",
-          g_people: "刘" + i
-        });
-      }
-      this.getDataList();
-    },
+    initData(status) {},
     initData1() {
-      this.newTableData = [];
-      for (let i = 0; i < 30; i++) {
-        this.newTableData.push({
-          p_type: i % 3 === 0 ? "鼻假体" : "下巴假体",
-          p_number: "23232323232323" + i,
-          p_model: i % 2 === 0 ? "DY10-204K" : "DY10-204",
-          p_statu: i % 3 === 0 ? "已拒绝" : "等待验收",
-          batch_number: "232323232" + i,
-          order_number: "2323232323232" + i,
-          numbers: i + "个",
-          d_date: "2019.12." + i,
-          e_date: "2019.1." + i,
-          b_code: "232323236667" + i,
-          e_code: "54645482215" + i,
-          vendor: i % 2 === 0 ? "上海东月医疗" : "南京新创",
-          u_acount: "李" + i,
-          r_acount: "王" + i,
-          u_date: "2019.3." + i,
-          g_reason: "没" + i,
-          p_id: i,
-          c_statu: "已完成",
-          g_people: "刘" + i
-        });
-      }
-      this.getDataList1();
+      this.searchAll(
+        this.currentPage1,
+        this.limit1,
+        '/inventory/listData',
+        '&materialId=',
+        '',
+        '&selectedOpIds=',
+        '',
+        '&uid',
+        '',
+        '&value=',
+        this.search
+      ).then(res => {
+        this.newTableData = []
+        this.newTableData = res.data.object.list
+        console.log(res.data.object.total)
+
+        this.getDataList1(res.data.object.total)
+      })
     },
-    selectionChangeHandle(selection, row) {
-      this.tableDataSelections = selection;
+    selectionChangeHandle(selection) {
+      console.log(selection)
+
+      this.tableDataSelections = []
+      // this.btnShow = false
+      for (let i = 0; i < selection.length; i++) {
+        this.tableDataSelections.push(selection[i].opId)
+      }
       if (selection.length > 0) {
-        this.btnShow = false;
+        this.btnShow = false
       } else {
-        this.btnShow = true;
+        this.btnShow = true
       }
+      console.log(this.tableDataSelections)
     },
-    selectionChangeHandle1(selection, row) {
-      this.tableDataSelections1 = selection;
+    selectionChangeHandle1(selection) {
+      console.log(selection)
+
+      this.tableDataSelections1 = []
+      for (let i = 0; i < selection.length; i++) {
+        this.tableDataSelections1.push(selection[i].opId)
+      }
     },
     // table column 的方法，改写这个方法
     filterTag(value, row, column) {
-      return true;
+      return true
     },
-    getDataList() {
-      this.total = this.tableData.length;
+    getDataList(total) {
+      this.total = total
     },
-    getDataList1() {
-      this.total1 = this.newTableData.length;
+    getDataList1(total) {
+      this.total1 = total
     },
     handleCurrentChange(val) {
-      this.currentPage = val;
-    },
-    handleSizeChange(val) {
-      this.limit = val;
-      this.currentPage = 1;
+      this.currentPage = val
     },
     handleCurrentChange1(val) {
-      this.currentPage1 = val;
-    },
-    handleSizeChange1(val) {
-      this.limit1 = val;
-      this.currentPage1 = 1;
+      this.currentPage1 = val
+      console.log(this.currentPage1)
+
+      this.initData1()
     },
     handleClick(tab, event) {
-      if (tab.index === "2") {
-        this.initData();
-        this.show_role = true;
-        this.add_show = false;
-        this.a_statu = true;
-        this.wait_pro = false;
-        this.btnShow = true;
-      } else if (tab.index === "1") {
-        this.initData();
-        this.show_role = false;
-        this.add_show = false;
-        this.a_statu = false;
-        this.wait_pro = true;
-        this.btnShow = true;
+      if (tab.index === '2') {
+        this.$nextTick(() => {
+          this.getUid()
+          this.show_role = true
+          this.add_show = false
+          this.a_statu = true
+          this.wait_pro = false
+        })
+      } else if (tab.index === '1') {
+        this.$nextTick(() => {
+          this.changeTab('0', '')
+          this.show_role = false
+          this.add_show = false
+          this.a_statu = false
+          this.wait_pro = true
+        })
       } else {
-        this.tableData = [];
-        this.getDataList();
-        this.show_role = false;
-        this.add_show = true;
-        this.a_statu = false;
-        this.wait_pro = false;
+        this.tableData = []
+        this.getDataList(0)
+        this.show_role = false
+        this.add_show = true
+        this.a_statu = false
+        this.wait_pro = false
       }
     },
     fnFilterChangeInit(filter) {
-      console.log(filter);
-      const arr = [];
-      for (let i = 0; i < this.tableData.length; i++) {
-        if (this.tableData[i].p_model === filter.p_model[0]) {
-          arr.push(this.tableData[i]);
-        }
-      }
-      this.tableData = arr;
-      this.getDataList();
+      console.log(filter)
     },
     fnFilterChangeInit1(filter) {
-      console.log(filter);
-      const arr = [];
-      for (let i = 0; i < this.newTableData.length; i++) {
-        if (this.newTableData[i].p_model === filter.p_model[0]) {
-          arr.push(this.newTableData[i]);
-        }
-      }
-      this.newTableData = arr;
-      this.getDataList1();
+      console.log(filter)
+      this.searchAll(
+        this.currentPage1,
+        this.limit1,
+        '/inventory/listData',
+        '&materialId=',
+        filter.materialModel[0],
+        '&selectedOpIds=',
+        '',
+        '&uid',
+        '',
+        '&value=',
+        this.search
+      ).then(res => {
+        console.log(res)
+
+        this.newTableData = res.data.object.list
+        this.getDataList1(res.data.object.total)
+      })
     },
     getRowKey(row) {
-      return row.p_id;
-    },
-
-    restart() {
-      console.log(2);
+      return row.opId
     },
     changRole(val) {
-      console.log("角色改变", val);
+      this.changeTab('3', val)
+      console.log('角色改变', val)
     },
     addData() {
       if (this.newTableData.length === 0) {
-        this.initData1();
+        this.initData1()
       }
-      this.dialogVisibleClassify = true;
+      this.dialogVisibleClassify = true
     },
     n_addPro() {
-      console.log("重新发货");
+      console.log('重新发货')
     },
     delData() {
-      console.log("删除");
-    },
-    chosePro() {
-      this.dialogVisibleClassify = false;
-      // const arr = [];
-      for (let i = 0; i < this.newTableData.length; i++) {
-        for (let j = 0; j < this.tableDataSelections1.length; j++) {
-          if (this.newTableData[i].p_id === this.tableDataSelections1[j].p_id) {
-            // arr.push(this.newTableData[i]);
-            this.newTableData.splice(i, 1);
-          }
-        }
-      }
-      // this.newTableData = arr;
-      this.getDataList1();
-      for (let m = 0; m < this.tableDataSelections1.length; m++) {
-        this.tableData.push(this.tableDataSelections1[m]);
-      }
-      this.$refs.filterTable1.clearSelection();
-    },
-    sendPro() {
-      this.newDialogTableVisible = true;
-    },
-    refreshData() {
-      console.log("刷新");
-    },
-    quitSend() {
-      this.newDialogTableVisible = false;
-      console.log("退出");
-    },
-    sendProduct() {
-      this.newDialogTableVisible = false;
+      console.log('删除', this.tableDataSelections)
       for (let i = 0; i < this.tableData.length; i++) {
         for (let j = 0; j < this.tableDataSelections.length; j++) {
-          if (this.tableData[i].p_id === this.tableDataSelections[j].p_id) {
-            // arr.push(this.newTableData[i]);
-            this.tableData.splice(i, 1);
+          if (this.tableDataSelections[j] === this.tableData[i].opId) {
+            this.tableData.splice(i, 1)
           }
         }
       }
-      this.$refs.sendProFilterTable[0].clearSelection();
+      this.$refs.sendProFilterTable[0].clearSelection()
+    },
+    chosePro() {
+      this.dialogVisibleClassify = false
+      const ids = this.tableDataSelections1.join(',')
+      this.searchAll(
+        this.currentPage,
+        this.limit,
+        '/inventory/listByOpIdArray',
+        '&opIds=',
+        ids,
+        '',
+        '',
+        '',
+        '',
+        '',
+        ''
+      ).then(res => {
+        console.log(res)
+        for (let i = 0; i < res.data.object.length; i++) {
+          this.tableData.push(res.data.object[i])
+        }
+        this.getDataList(this.tableData.length)
+        this.$refs.getProducts.clearSelection()
+      })
+    },
+    sendPro() {
+      this.newDialogTableVisible = true
+      const ids = this.tableDataSelections.join(',')
+      console.log(this.tableDataSelections)
+      this.sendProducts(ids, '', '', '', '/return/generateOrderInfo').then(
+        res => {
+          console.log(res.data.object)
+          for (let i = 0; i < res.data.object.receiverList.length; i++) {
+            this.reciveGroup.push({
+              value: res.data.object.receiverList[i].id,
+              label: res.data.object.receiverList[i].address
+            })
+          }
+          for (let i = 0; i < res.data.object.returnReasonList.length; i++) {
+            this.reasonGroup.push({
+              value: res.data.object.returnReasonList[i].value,
+              label: res.data.object.returnReasonList[i].desc
+            })
+          }
+          this.receiverList = res.data.object.receiverList
+          this.reasonList = res.data.object.returnReasonList
+          this.reason = res.data.object.returnReasonList[0].desc
+          this.reciver = res.data.object.receiverList[0]
+          if (res.data.object.receiverList.length > 0) {
+            this.recived = res.data.object.receiverList[0].username
+          }
+
+          this.sender = res.data.object.sender
+          this.order = res.data.object.order
+          for (let j = 0; j < res.data.object.goodsList.list.length; j++) {
+            this.gridData.push({
+              materialType: res.data.object.goodsList.list[j].materialType,
+              materialModel: res.data.object.goodsList.list[j].materialModel,
+              sp_size: res.data.object.goodsList.list[j].spec,
+              sp_sum: res.data.object.goodsList.list[j].amount
+            })
+          }
+        }
+      )
+    },
+    reciverChange(val) {
+      for (let index = 0; index < this.receiverList.length; index++) {
+        if (val === this.receiverList[index].id) {
+          this.reciver = this.receiverList[index]
+        }
+      }
+    },
+    refreshData() {
+      console.log('刷新')
+    },
+    quitSend() {
+      this.newDialogTableVisible = false
+      console.log('退出')
+    },
+    sendProduct() {
+      this.newDialogTableVisible = false
+      const ids = this.tableDataSelections.join(',')
+      this.dataChange(
+        {
+          opIds: ids,
+          orderNo: this.order.orderNo,
+          orderTime: this.order.orderTime.replace(/-/g, '/'),
+          receiver: this.reciver.id,
+          returnReason: this.reasonList[0].value,
+          returnReasonType: this.reasonList[0].value
+        },
+        '/return/sureReturn'
+      ).then(res => {
+        console.log(res)
+
+        if (res.data.code === 200) {
+          for (let i = 0; i < this.tableData.length; i++) {
+            for (let j = 0; j < this.tableDataSelections.length; j++) {
+              if (this.tableDataSelections[j] === this.tableData[i].opId) {
+                this.tableData.splice(i, 1)
+              }
+            }
+          }
+          this.$refs.sendProFilterTable[0].clearSelection()
+          this.$notify({
+            title: '退货状态',
+            message: '产品退货成功',
+            position: 'top-right',
+            duration: 2000
+          })
+        }
+      })
+    },
+    initBtn() {
+      const btnArr = JSON.parse(this.$route.query.btnRight)
+      console.log(btnArr)
+
+      btnArr.forEach(item => {
+        if (item.rightName === '退货') {
+          this.s_show = true
+        } else if (item.rightName === '导出') {
+          this.e_show = true
+        }
+      })
+    },
+    searchEnterFun() {
+      this.initData()
+    },
+    getType() {
+      this.getSums('/material/listAboutSelf').then(res => {
+        for (let i = 0; i < res.data.object.length; i++) {
+          this.materialModelGroup.push({
+            text: res.data.object[i].materialModel,
+            value: res.data.object[i].id
+          })
+        }
+      })
+    },
+    changeTab(statu, uid) {
+      this.searchAll(
+        this.currentPage,
+        8,
+        '/deliver/listData',
+        '&materialId=',
+        '',
+        '&status=',
+        statu,
+        '&uid=',
+        uid,
+        '&value=',
+        this.search
+      ).then(res => {
+        console.log(res)
+        this.tableData = res.data.object.list
+        this.getDataList(res.data.object.total)
+      })
+    },
+    getUid() {
+      this.getSums('/user/selfAndChild').then(res => {
+        console.log(res)
+        for (let i = 0; i < res.data.object.length; i++) {
+          this.roleGroups.push({
+            value: res.data.object[i].id,
+            label: res.data.object[i].username
+          })
+        }
+        this.changeTab('3', res.data.object[0].id)
+      })
+    },
+    restart(row) {
+      this.dataChange({ opId: row.opId }, '/deliver/reSend').then(res => {
+        if (res.data.code === 200) {
+          this.changeTab('0', '')
+        }
+      })
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+    this.initBtn()
+    this.getType()
+  },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, // 生命周期 - 创建之前
@@ -789,9 +866,12 @@ export default {
   beforeDestroy() {}, // 生命周期 - 销毁之前
   destroyed() {}, // 生命周期 - 销毁完成
   activated() {} // 如果页面有keep-alive缓存功能，这个函数会触发
-};
+}
 </script>
 <style scoped>
+.el-dialog {
+  margin-top: 0 !important;
+}
 .container {
   margin: 40px 60px;
   width: 95%;
@@ -825,10 +905,7 @@ export default {
 .sendPro {
   text-align: center;
 }
-.sendContainer {
-  margin: 0 35px;
-}
 .sendContainer li {
-  margin-bottom: 15px;
+  margin-bottom: 24px;
 }
 </style>
