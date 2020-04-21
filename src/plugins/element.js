@@ -1,4 +1,4 @@
-import Vue from "vue";
+import Vue from 'vue'
 import {
   Button,
   Container,
@@ -29,44 +29,51 @@ import {
   Progress,
   Tabs,
   TabPane,
-  Alert,
+  MessageBox,
   Message,
   Notification,
   Steps,
-  Step
-} from "element-ui";
+  Step,
+  Upload,
+  RadioGroup,
+  Radio
+} from 'element-ui'
 
-Vue.use(Button);
-Vue.use(Container);
-Vue.use(Header);
-Vue.use(Aside);
-Vue.use(Main);
-Vue.use(Menu);
-Vue.use(Submenu);
-Vue.use(Row);
-Vue.use(Col);
-Vue.use(MenuItem);
-Vue.use(MenuItemGroup);
-Vue.use(Form);
-Vue.use(FormItem);
-Vue.use(Input);
-Vue.use(Dialog);
-Vue.use(Checkbox);
-Vue.use(Table);
-Vue.use(TableColumn);
-Vue.use(Select);
-Vue.use(Option);
-Vue.use(DatePicker);
-Vue.use(Pagination);
-Vue.use(Tag);
-Vue.use(CascaderPanel);
-Vue.use(Icon);
-Vue.use(Card);
-Vue.use(Progress);
-Vue.use(Tabs);
-Vue.use(TabPane);
-Vue.use(Alert);
-Vue.use(Steps);
-Vue.use(Step);
-Vue.prototype.$message = Message;
-Vue.prototype.$notify = Notification;
+Vue.use(Button)
+Vue.use(Container)
+Vue.use(Header)
+Vue.use(Aside)
+Vue.use(Main)
+Vue.use(Menu)
+Vue.use(Submenu)
+Vue.use(Row)
+Vue.use(Col)
+Vue.use(MenuItem)
+Vue.use(MenuItemGroup)
+Vue.use(Form)
+Vue.use(FormItem)
+Vue.use(Input)
+Vue.use(Dialog)
+Vue.use(Checkbox)
+Vue.use(Table)
+Vue.use(TableColumn)
+Vue.use(Select)
+Vue.use(Option)
+Vue.use(DatePicker)
+Vue.use(Pagination)
+Vue.use(Tag)
+Vue.use(CascaderPanel)
+Vue.use(Icon)
+Vue.use(Card)
+Vue.use(Progress)
+Vue.use(Tabs)
+Vue.use(TabPane)
+Vue.use(Steps)
+Vue.use(Step)
+Vue.use(Upload)
+Vue.use(RadioGroup)
+Vue.use(Radio)
+Vue.prototype.$message = Message
+Vue.prototype.$notify = Notification
+Vue.prototype.$msgbox = MessageBox
+Vue.prototype.$alert = MessageBox.alert

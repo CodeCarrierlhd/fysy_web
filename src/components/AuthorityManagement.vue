@@ -8,11 +8,7 @@
         style="margin:40px 60px;"
         @cell-click="hideInfo"
       >
-<<<<<<< HEAD
         <el-table-column>
-=======
-        <el-table-column class-rightName="t_header">
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
           <template slot="header" header-align="center">
             <div style="display: flex;justify-content: space-between;">
               <div v-if="s_show" style="display:flex;width:80%;">
@@ -169,11 +165,7 @@
       />
     </div>
     <transition rightName="slide-fade">
-<<<<<<< HEAD
       <div class="contentRight" v-show="powerInfo" :style="contentStyleObj">
-=======
-      <div class="contentRight" v-show="powerInfo">
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
         <h1 class="powerHeader">{{ this.rolerightName }}权限</h1>
         <div v-for="(first, index) in info" :key="index" class="powerContent">
           <div style="display:flex">
@@ -207,204 +199,20 @@ export default {
   data() {
     // 这里存放数据
     return {
-<<<<<<< HEAD
       tableData: [],
       roleOptions: [],
-=======
-      tableData: [
-        // {
-        //   roleType: '超级管理员',
-        //   rightList: [
-        //     {
-        //       id: '1',
-        //       rightName: '设置管理',
-        //       status: 2,
-        //       nodes: [
-        //         {
-        //           id: '11',
-        //           rightName: '物料管理',
-        //           status: 2,
-        //           nodes: [
-        //             {
-        //               id: '111',
-        //               rightName: '查询',
-        //               status: 2
-        //             },
-        //             {
-        //               id: '112',
-        //               rightName: '新增',
-        //               status: 2
-        //             },
-        //             {
-        //               id: '113',
-        //               rightName: '编辑',
-        //               status: 2
-        //             },
-        //             {
-        //               id: '114',
-        //               rightName: '删除',
-        //               status: 2
-        //             }
-        //           ]
-        //         }
-        //       ]
-        //     }
-        //   ]
-        // },
-        // {
-        //   roleType: '普通管理员',
-        //   rightList: [
-        //     {
-        //       id: '1',
-        //       rightName: '设置管理',
-        //       status: 1,
-        //       nodes: [
-        //         {
-        //           id: '11',
-        //           rightName: '物料管理',
-        //           status: 1,
-        //           nodes: [
-        //             {
-        //               id: '111',
-        //               rightName: '查询',
-        //               status: 2
-        //             },
-        //             {
-        //               id: '112',
-        //               rightName: '新增',
-        //               status: 2
-        //             },
-        //             {
-        //               id: '113',
-        //               rightName: '编辑',
-        //               status: 0
-        //             },
-        //             {
-        //               id: '114',
-        //               rightName: '删除',
-        //               status: 0
-        //             }
-        //           ]
-        //         }
-        //       ]
-        //     }
-        //   ]
-        // },
-        // {
-        //   roleType: '普通用户',
-        //   rightList: [
-        //     {
-        //       id: '1',
-        //       rightName: '设置管理',
-        //       status: 1,
-        //       nodes: [
-        //         {
-        //           id: '11',
-        //           rightName: '物料管理',
-        //           status: 1,
-        //           nodes: [
-        //             {
-        //               id: '111',
-        //               rightName: '查询',
-        //               status: 2
-        //             },
-        //             {
-        //               id: '112',
-        //               rightName: '新增',
-        //               status: 0
-        //             },
-        //             {
-        //               id: '113',
-        //               rightName: '编辑',
-        //               status: 0
-        //             },
-        //             {
-        //               id: '114',
-        //               rightName: '删除',
-        //               status: 0
-        //             }
-        //           ]
-        //         }
-        //       ]
-        //     }
-        //   ]
-        // },
-        // {
-        //   roleType: '游客',
-        //   rightList: [
-        //     {
-        //       id: '1',
-        //       rightName: '设置管理',
-        //       status: 0,
-        //       nodes: [
-        //         {
-        //           id: '11',
-        //           rightName: '物料管理',
-        //           status: 0,
-        //           nodes: [
-        //             {
-        //               id: '111',
-        //               rightName: '查询',
-        //               status: 0
-        //             },
-        //             {
-        //               id: '112',
-        //               rightName: '新增',
-        //               status: 0
-        //             },
-        //             {
-        //               id: '113',
-        //               rightName: '编辑',
-        //               status: 0
-        //             },
-        //             {
-        //               id: '114',
-        //               rightName: '删除',
-        //               status: 0
-        //             }
-        //           ]
-        //         }
-        //       ]
-        //     }
-        //   ]
-        // }
-      ],
-      roleOptions: [
-        {
-          value: '超级管理员',
-          label: '超级管理员'
-        },
-        {
-          value: '普通管理员',
-          label: '普通管理员'
-        },
-        {
-          value: '普通用户',
-          label: '普通用户'
-        },
-        {
-          value: '游客',
-          label: '游客'
-        }
-      ],
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
       roleValue: '',
       search: '',
       currentPage: 1,
       limit: 10,
       total: 0,
       dialogVisibleClassify: false, // 弹窗是否显示
-<<<<<<< HEAD
       options: '',
-=======
-      options: [],
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
       showTitle: '新增用户角色',
       menuList: [],
       funrightName: true,
       rolerightName: '',
       info: [],
-<<<<<<< HEAD
       powerInfo: false,
       keyId: '',
       contentStyleObj: {
@@ -415,9 +223,6 @@ export default {
       d_show: false,
       e_show: false,
       edit: false
-=======
-      powerInfo: false
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
     }
   },
   // 监听属性 类似于data概念
@@ -432,7 +237,6 @@ export default {
   methods: {
     initTableData() {
       this.dialogVisibleClassify = false
-<<<<<<< HEAD
       this.getIds(this.menuList)
       this.rightInsert(this.options, this.roleValue, '/roleRight/insert').then(
         res => {
@@ -466,364 +270,6 @@ export default {
         }
         this.menuList = result
       })
-=======
-      for (let i = 0; i < this.menuList.length; i++) {
-        if (this.menuList[i].allChecked) {
-          this.options.push(this.menuList[i].id)
-        } else {
-          for (let j = 0; j < this.menuList[i].nodes.length; j++) {
-            if (this.menuList[i].nodes[j].mychecked) {
-              this.options.push(
-                this.menuList[i].nodes[j].id,
-                this.menuList[i].id
-              )
-            } else {
-              for (let m = 0; m < this.menuList[i].nodes[j].nodes.length; m++) {
-                if (this.menuList[i].nodes[j].nodes[m].onechecked) {
-                  this.options.push(
-                    this.menuList[i].nodes[j].nodes[m].id,
-                    this.menuList[i].nodes[j].id,
-                    this.menuList[i].id
-                  )
-                } else {
-                }
-              }
-            }
-          }
-        }
-      }
-      // console.log(Array.from(new Set(this.options))
-      this.options = this.unique(this.options)
-      // console.log(this.options, this.roleValue);
-      this.tableData.push({
-        roleType: this.roleValue,
-        rightList: this.menuList
-      })
-    },
-    initStatu() {
-      this.roleValue = ''
-      const result = [
-        {
-          id: '1',
-          rightName: '设置管理',
-          nodes: [
-            {
-              id: '11',
-              rightName: '物料管理',
-              nodes: [
-                {
-                  id: '111',
-                  rightName: '查询'
-                },
-                {
-                  id: '112',
-                  rightName: '新增'
-                },
-                {
-                  id: '113',
-                  rightName: '编辑'
-                },
-                {
-                  id: '114',
-                  rightName: '删除'
-                }
-              ]
-            }
-
-            // {
-            //   value: "权限管理",
-            //   label: "权限管理",
-            //   children: [
-            //     {
-            //       value: "查询",
-            //       label: "查询"
-            //     },
-            //     {
-            //       value: "新增",
-            //       label: "新增"
-            //     },
-            //     {
-            //       value: "编辑",
-            //       label: "编辑"
-            //     },
-            //     {
-            //       value: "删除",
-            //       label: "删除"
-            //     }
-            //   ]
-            // },
-            // {
-            //   value: "账号管理",
-            //   label: "账号管理",
-            //   children: [
-            //     {
-            //       value: "查询",
-            //       label: "查询"
-            //     },
-            //     {
-            //       value: "新增",
-            //       label: "新增"
-            //     },
-            //     {
-            //       value: "编辑",
-            //       label: "编辑"
-            //     },
-            //     {
-            //       value: "删除",
-            //       label: "删除"
-            //     }
-            //   ]
-            // },
-
-            // {
-            //   value: "生产商管理",
-            //   label: "生产商管理",
-            //   children: [
-            //     {
-            //       value: "查询",
-            //       label: "查询"
-            //     },
-            //     {
-            //       value: "新增",
-            //       label: "新增"
-            //     },
-            //     {
-            //       value: "编辑",
-            //       label: "编辑"
-            //     },
-            //     {
-            //       value: "删除",
-            //       label: "删除"
-            //     }
-            //   ]
-            // }
-          ]
-        }
-        // {
-        //   value: "标签管理",
-        //   label: "标签管理",
-        //   children: [
-        //     {
-        //       value: "激活码管理",
-        //       label: "激活码管理",
-        //       children: [
-        //         {
-        //           value: "统计",
-        //           label: "统计"
-        //         },
-        //         {
-        //           value: "导入",
-        //           label: "导入"
-        //         }
-        //       ]
-        //     },
-        //     {
-        //       value: "防伪码管理",
-        //       label: "防伪码管理",
-        //       children: [
-        //         {
-        //           value: "统计",
-        //           label: "统计"
-        //         },
-        //         {
-        //           value: "导入",
-        //           label: "导入"
-        //         }
-        //       ]
-        //     }
-        //   ]
-        // },
-        // {
-        //   value: "仓库管理",
-        //   label: "仓库管理",
-        //   children: [
-        //     {
-        //       value: "入仓管理",
-        //       label: "入仓管理",
-        //       children: [
-        //         {
-        //           value: "入仓",
-        //           label: "入仓"
-        //         },
-        //         {
-        //           value: "导出",
-        //           label: "导出"
-        //         }
-        //       ]
-        //     },
-        //     {
-        //       value: "发货管理",
-        //       label: "发货管理",
-        //       children: [
-        //         {
-        //           value: "手动",
-        //           label: "手动"
-        //         },
-        //         {
-        //           value: "扫码",
-        //           label: "扫码"
-        //         },
-        //         {
-        //           value: "导出",
-        //           label: "导出"
-        //         },
-        //         {
-        //           value: "删除",
-        //           label: "删除"
-        //         }
-        //       ]
-        //     },
-        //     {
-        //       value: "退货管理",
-        //       label: "退货管理",
-        //       children: [
-        //         {
-        //           value: "手动",
-        //           label: "手动"
-        //         },
-        //         {
-        //           value: "扫码",
-        //           label: "扫码"
-        //         },
-        //         {
-        //           value: "导出",
-        //           label: "导出"
-        //         },
-        //         {
-        //           value: "删除",
-        //           label: "删除"
-        //         }
-        //       ]
-        //     },
-
-        //     {
-        //       value: "库存管理",
-        //       label: "库存管理",
-        //       children: [
-        //         {
-        //           value: "查询",
-        //           label: "查询"
-        //         },
-        //         {
-        //           value: "导出",
-        //           label: "导出"
-        //         },
-        //         {
-        //           value: "拆解",
-        //           label: "拆解"
-        //         }
-        //       ]
-        //     }
-        //   ]
-        // },
-        // {
-        //   value: "信息管理",
-        //   label: "信息管理",
-        //   children: [
-        //     {
-        //       value: "物料管理",
-        //       label: "物料管理",
-        //       children: [
-        //         {
-        //           value: "查询",
-        //           label: "查询"
-        //         },
-        //         {
-        //           value: "新增",
-        //           label: "新增"
-        //         },
-        //         {
-        //           value: "编辑",
-        //           label: "编辑"
-        //         },
-        //         {
-        //           value: "删除",
-        //           label: "删除"
-        //         }
-        //       ]
-        //     },
-        //     {
-        //       value: "权限管理",
-        //       label: "权限管理",
-        //       children: [
-        //         {
-        //           value: "查询",
-        //           label: "查询"
-        //         },
-        //         {
-        //           value: "新增",
-        //           label: "新增"
-        //         },
-        //         {
-        //           value: "编辑",
-        //           label: "编辑"
-        //         },
-        //         {
-        //           value: "删除",
-        //           label: "删除"
-        //         }
-        //       ]
-        //     },
-        //     {
-        //       value: "账号管理",
-        //       label: "账号管理",
-        //       children: [
-        //         {
-        //           value: "查询",
-        //           label: "查询"
-        //         },
-        //         {
-        //           value: "新增",
-        //           label: "新增"
-        //         },
-        //         {
-        //           value: "编辑",
-        //           label: "编辑"
-        //         },
-        //         {
-        //           value: "删除",
-        //           label: "删除"
-        //         }
-        //       ]
-        //     },
-
-        //     {
-        //       value: "生产商管理",
-        //       label: "生产商管理",
-        //       children: [
-        //         {
-        //           value: "查询",
-        //           label: "查询"
-        //         },
-        //         {
-        //           value: "新增",
-        //           label: "新增"
-        //         },
-        //         {
-        //           value: "编辑",
-        //           label: "编辑"
-        //         },
-        //         {
-        //           value: "删除",
-        //           label: "删除"
-        //         }
-        //       ]
-        //     }
-        //   ]
-        // }
-      ]
-      for (let i = 0; i < result.length; i++) {
-        result[i].allChecked = false
-        result[i].childShow = false
-        for (let j = 0; j < result[i].nodes.length; j++) {
-          result[i].nodes[j].mychecked = false
-          for (let m = 0; m < result[i].nodes[j].nodes.length; m++) {
-            result[i].nodes[j].nodes[m].onechecked = false
-          }
-        }
-      }
-      this.menuList = result
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
     },
     showBlock(index) {
       if (this.menuList[index].childShow) {
@@ -836,10 +282,7 @@ export default {
     },
     handleFilterClassify() {
       this.options = []
-<<<<<<< HEAD
       // this.funrightName = false
-=======
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
       this.dialogVisibleClassify = true
       this.initStatu()
     },
@@ -847,18 +290,12 @@ export default {
       return Array.from(new Set(arr))
     },
     editRole(row, index) {
-<<<<<<< HEAD
       // const arrList = this.getRightList(row.roleId)
-=======
-      console.log(row, index)
-      this.getRightList(row.roleId)
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
       this.funrightName = false
       this.menuList = []
       this.dialogVisibleClassify = true
       this.showTitle = '编辑用户角色'
       this.roleValue = row.roleType
-<<<<<<< HEAD
       this.keyId = row.roleId
       this.rightList(row.roleId, 'right/listData').then(res => {
         let arr = []
@@ -889,49 +326,6 @@ export default {
                     this.$set(arr.child[j].child[m], 'onechecked', false)
                     // arr.child[j].child[m].onechecked = false;
                   }
-=======
-      for (let i = 0; i < row.rightList.length; i++) {
-        const arr = row.rightList[i]
-        if (arr.status === 2) {
-          this.$set(arr, 'allChecked', true)
-          // arr.allChecked = true;
-          for (let j = 0; j < arr.nodes.length; j++) {
-            this.$set(arr.nodes[j], 'mychecked', true)
-            // arr.nodes[j].mychecked = true;
-            for (let m = 0; m < arr.nodes[j].nodes.length; m++) {
-              this.$set(arr.nodes[j].nodes[m], 'onechecked', true)
-              // arr.nodes[j].nodes[m].onechecked = true;
-            }
-          }
-        } else if (arr.status === 1) {
-          this.$set(arr, 'allChecked', false)
-          // arr.allChecked = false;
-          for (let j = 0; j < arr.nodes.length; j++) {
-            if (arr.nodes[j].status === 2) {
-              for (let m = 0; m < arr.nodes[j].nodes.length; m++) {
-                this.$set(arr.nodes[j].nodes[m], 'onechecked', true)
-                // arr.nodes[j].nodes[m].onechecked = true;
-              }
-            } else if (arr.nodes[j].status === 1) {
-              for (let m = 0; m < arr.nodes[j].nodes.length; m++) {
-                if (arr.nodes[j].nodes[m].status === 2) {
-                  this.$set(arr.nodes[j].nodes[m], 'onechecked', true)
-                  // arr.nodes[j].nodes[m].onechecked = true;
-                } else {
-                  this.$set(arr.nodes[j].nodes[m], 'onechecked', false)
-                  // arr.nodes[j].nodes[m].onechecked = false;
-                }
-              }
-            } else {
-              this.$set(arr, 'allChecked', false)
-              // arr.allChecked = false;
-              for (let i = 0; i < arr.nodes.length; i++) {
-                this.$set(arr.nodes[i], 'mychecked', false)
-                // arr.nodes[i].mychecked = false;
-                for (let j = 0; j < arr.nodes[i].nodes.length; j++) {
-                  this.$set(arr.nodes[i].nodes[j], 'onechecked', false)
-                  // arr.nodes[i].nodes[j].onechecked = false;
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
                 }
               }
             }
@@ -950,7 +344,6 @@ export default {
           this.$set(arr, 'childShow', false)
           this.menuList.push(arr)
         }
-<<<<<<< HEAD
       })
     },
     editData() {
@@ -965,18 +358,6 @@ export default {
       )
       this.funrightName = true
       this.dialogVisibleClassify = false
-=======
-        this.$set(arr, 'childShow', false)
-        this.menuList.push(arr)
-      }
-      this.tableData[index].rightList = this.menuList
-      this.tableData[index].roleType = this.roleValue
-    },
-    editData() {
-      this.funrightName = true
-      this.dialogVisibleClassify = false
-      console.log(this.tableData)
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
     },
     getDataList() {
       this.total = this.tableData.length
@@ -991,24 +372,14 @@ export default {
       // this.getDataList();
     },
     firstChanged(index, id) {
-<<<<<<< HEAD
       const arr = this.menuList[index].child
-=======
-      const arr = this.menuList[index].nodes
-      // console.log(arr);
-
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
       if (this.menuList[index].allChecked) {
         this.$set(this.menuList[index], 'status', 2)
         // this.menuList[index].status = 2;
         for (let i = 0; i < arr.length; i++) {
           this.$set(arr[i], 'mychecked', true)
           // arr[i].mychecked = true;
-<<<<<<< HEAD
           const arr1 = arr[i].child
-=======
-          const arr1 = arr[i].nodes
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
           for (let j = 0; j < arr1.length; j++) {
             this.$set(arr1[j], 'onechecked', true)
             // arr1[j].onechecked = true;
@@ -1019,18 +390,13 @@ export default {
         for (let i = 0; i < arr.length; i++) {
           this.$set(arr[i], 'mychecked', false)
           // arr[i].mychecked = false;
-<<<<<<< HEAD
           const arr1 = arr[i].child
-=======
-          const arr1 = arr[i].nodes
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
           for (let j = 0; j < arr1.length; j++) {
             this.$set(arr1[j], 'onechecked', false)
             // arr1[j].onechecked = false;
           }
         }
       }
-<<<<<<< HEAD
     },
     secondChanged(fatherIndex, ownerIndex, ownerId, fatherId) {
       const arr = this.menuList[fatherIndex].child[ownerIndex]
@@ -1038,16 +404,6 @@ export default {
       const len = this.menuList[fatherIndex].child.length
       for (let n = 0; n < this.menuList[fatherIndex].child.length; n++) {
         if (this.menuList[fatherIndex].child[n].mychecked) {
-=======
-      console.log(this.menuList)
-    },
-    secondChanged(fatherIndex, ownerIndex, ownerId, fatherId) {
-      const arr = this.menuList[fatherIndex].nodes[ownerIndex]
-      let checkCount = 0
-      const len = this.menuList[fatherIndex].nodes.length
-      for (let n = 0; n < this.menuList[fatherIndex].nodes.length; n++) {
-        if (this.menuList[fatherIndex].nodes[n].mychecked) {
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
           checkCount++
         }
       }
@@ -1063,7 +419,6 @@ export default {
       }
       if (arr.mychecked) {
         arr.status = 2
-<<<<<<< HEAD
         for (let i = 0; i < arr.child.length; i++) {
           arr.child[i].onechecked = true
         }
@@ -1087,24 +442,6 @@ export default {
       let grandCount = 0
       const len = arr.length
       const gArr = this.menuList[grandfatherIndex].child
-=======
-        for (let i = 0; i < arr.nodes.length; i++) {
-          arr.nodes[i].onechecked = true
-        }
-      } else {
-        for (let i = 0; i < arr.nodes.length; i++) {
-          arr.nodes[i].onechecked = false
-        }
-      }
-      console.log(this.menuList)
-    },
-    thirdChanged(grandfatherIndex, fatherIndex, id, fatherId, grandfatherId) {
-      const arr = this.menuList[grandfatherIndex].nodes[fatherIndex].nodes
-      let checkCount = 0
-      let grandCount = 0
-      const len = arr.length
-      const gArr = this.menuList[grandfatherIndex].nodes
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
       for (let n = 0; n < arr.length; n++) {
         if (arr[n].onechecked) {
           arr[n].status = 2
@@ -1114,7 +451,6 @@ export default {
         }
       }
       if (checkCount === len) {
-<<<<<<< HEAD
         this.menuList[grandfatherIndex].child[fatherIndex].status = 2
         this.menuList[grandfatherIndex].status = 2
         this.menuList[grandfatherIndex].child[fatherIndex].mychecked = true
@@ -1126,19 +462,6 @@ export default {
         this.menuList[grandfatherIndex].child[fatherIndex].status = 0
         this.menuList[grandfatherIndex].status = 0
         this.menuList[grandfatherIndex].child[fatherIndex].mychecked = false
-=======
-        this.menuList[grandfatherIndex].nodes[fatherIndex].status = 2
-        this.menuList[grandfatherIndex].status = 2
-        this.menuList[grandfatherIndex].nodes[fatherIndex].mychecked = true
-      } else if (checkCount > 0) {
-        this.menuList[grandfatherIndex].nodes[fatherIndex].status = 1
-        this.menuList[grandfatherIndex].status = 1
-        this.menuList[grandfatherIndex].nodes[fatherIndex].mychecked = false
-      } else {
-        this.menuList[grandfatherIndex].nodes[fatherIndex].status = 0
-        this.menuList[grandfatherIndex].status = 0
-        this.menuList[grandfatherIndex].nodes[fatherIndex].mychecked = false
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
       }
 
       for (let j = 0; j < gArr.length; j++) {
@@ -1156,15 +479,10 @@ export default {
         // this.menuList[grandfatherIndex].status = 0;
         this.menuList[grandfatherIndex].allChecked = false
       }
-<<<<<<< HEAD
-=======
-      console.log(this.menuList)
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
     },
     hideInfo(row, column, cell, event) {
       if (column.property === 'roleType') {
         this.rolerightName = row.roleType
-<<<<<<< HEAD
         this.rightList(row.roleId, '/roleRight/getDetail').then(res => {
           this.info = res.data.object.rightList
           if (res.data.object.rightList.length > 0) {
@@ -1236,35 +554,15 @@ export default {
                   middleArr.push(this.menuList[index].child[i].id)
                   middleArr.push(this.menuList[index].child[i].child[m].id)
                 }
-=======
-        const arr = row.rightList
-
-        for (let i = 0; i < arr.length; i++) {
-          for (let j = 0; j < arr[i].nodes.length; j++) {
-            for (let m = 0; m < arr[i].nodes[j].nodes.length; m++) {
-              if (arr[i].nodes[j].nodes[m].status === 0) {
-                arr[i].nodes[j].nodes[m].rightName = ''
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
               }
             }
           }
         }
-<<<<<<< HEAD
       }
       this.options = middleArr.join(',')
     },
     searchEnterFun() {
       this.roleList(this.search, 'role/listData').then(res => {
-=======
-        this.info = arr[0].nodes
-        this.powerInfo = true
-      } else {
-        this.powerInfo = false
-      }
-    },
-    initData() {
-      this.rightList('', 'role/listData').then(res => {
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
         this.tableData = []
         for (let i = 0; i < res.data.object.length; i++) {
           this.tableData.push({
@@ -1274,7 +572,6 @@ export default {
         }
       })
     },
-<<<<<<< HEAD
     initBtn() {
       const btnArr = JSON.parse(this.$route.query.btnRight)
       console.log(btnArr)
@@ -1290,30 +587,15 @@ export default {
         } else if (item.rightName === '查询') {
           this.s_show = true
         }
-=======
-    getRightList(id) {
-      this.rightList(id, 'right/listData').then(res => {
-        console.log(res)
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
       })
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
-<<<<<<< HEAD
   created() {},
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
     this.initData()
     this.initBtn()
-=======
-  created() {
-    console.log(this.tableData)
-  },
-  // 生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {
-    this.getDataList()
-    this.initData()
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
   },
   beforeCreate() {}, // 生命周期 - 创建之前
   beforeMount() {}, // 生命周期 - 挂载之前

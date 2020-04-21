@@ -2,7 +2,7 @@ import qs from 'qs'
 import axios from 'axios'
 export default {
   identifyCode() {
-    return 'http://192.168.16.14:8080/login/getVerifyCode'
+    return 'http://192.168.16.5:8080/login/getVerifyCode'
   },
   identifyLogin() {
     return axios.get('/login/isLogin')

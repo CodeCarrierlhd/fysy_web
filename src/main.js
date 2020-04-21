@@ -28,6 +28,8 @@ import {
   sendId,
   sendProducts
 } from '@/utils/comon'
+
+import { exportCompanyExcel, downloadFile } from '../src/utils/importCommon'
 import interceptor from './interceptor'
 
 // axios.defaults.timeout = 5000; // 请求超时
@@ -53,6 +55,8 @@ Vue.prototype.productDone = productDone
 Vue.prototype.searchAll = searchAll
 Vue.prototype.sendId = sendId
 Vue.prototype.sendProducts = sendProducts
+Vue.prototype.exportCompanyExcel = exportCompanyExcel
+Vue.prototype.downloadFile = downloadFile
 
 Vue.config.productionTip = false
 interceptor()

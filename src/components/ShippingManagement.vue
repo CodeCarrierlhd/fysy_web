@@ -26,7 +26,7 @@
               >
             </div>
             <el-button
-              @click="exportData()"
+              @click="exportClientInfoExcel()"
               type="primary"
               size="medium"
               v-if="e_show"
@@ -75,7 +75,7 @@
           @filter-change="fnFilterChangeInit"
           :row-key="getRowKey"
           max-height="660"
-          style="width: 96%; margin:10px 60px"
+          style="width: 96%; margin:10px 0"
           border
         >
           <el-table-column class-name="t_header">
@@ -266,9 +266,7 @@
       </div>
       <el-table
         ref="getProducts"
-        :data="
-          newTableData.slice((currentPage1 - 1) * limit1, currentPage1 * limit1)
-        "
+        :data="newTableData"
         @filter-change="fnFilterChangeInit1"
         @selection-change="selectionChangeHandle1"
         :row-key="getRowKey"
@@ -529,7 +527,8 @@ export default {
       order: {},
       recived: '',
       s_show: false,
-      e_show: false
+      e_show: false,
+      key_index: '2'
     }
   },
   // 监听属性 类似于data概念
@@ -538,7 +537,7 @@ export default {
   watch: {},
   // 方法集合
   methods: {
-    initData(status) {},
+    initData() {},
     initData1() {
       this.searchAll(
         this.currentPage1,
@@ -598,11 +597,10 @@ export default {
     },
     handleCurrentChange1(val) {
       this.currentPage1 = val
-      console.log(this.currentPage1)
-
       this.initData1()
     },
     handleClick(tab, event) {
+      this.key_index = '4'
       if (tab.index === '2') {
         this.$nextTick(() => {
           this.getUid()
@@ -612,6 +610,7 @@ export default {
           this.wait_pro = false
         })
       } else if (tab.index === '1') {
+        this.key_index = '3'
         this.$nextTick(() => {
           this.changeTab('0', '')
           this.show_role = false
@@ -620,6 +619,7 @@ export default {
           this.wait_pro = true
         })
       } else {
+        this.key_index = '2'
         this.tableData = []
         this.getDataList(0)
         this.show_role = false
@@ -657,7 +657,9 @@ export default {
         '&uid',
         '',
         '&value=',
-        this.search
+        this.search,
+        '',
+        ''
       ).then(res => {
         console.log(res)
 
@@ -673,9 +675,8 @@ export default {
       console.log('角色改变', val)
     },
     addData() {
-      if (this.newTableData.length === 0) {
-        this.initData1()
-      }
+      this.newTableData = []
+      this.initData1()
       this.dialogVisibleClassify = true
     },
     n_addPro() {
@@ -803,7 +804,7 @@ export default {
       })
     },
     searchEnterFun() {
-      this.initData()
+      // this.initData()
     },
     getType() {
       this.getSums('/material/listAboutSelf').then(res => {
@@ -850,6 +851,26 @@ export default {
       this.dataChange({ opId: row.opId }, '/deliver/reSend').then(res => {
         if (res.data.code === 200) {
           this.changeTab('0', '')
+        }
+      })
+    },
+    exportClientInfoExcel() {
+      const ids = this.tableDataSelections.join(',')
+      let names = ''
+      if (this.key_index === '2') {
+        names = '发货数据导出'
+      } else if (this.key_index === '3') {
+        names = '待收货数据导出'
+      } else {
+        names = '发货完成数据导出'
+      }
+      const that = this
+      this.exportCompanyExcel(
+        { opIds: ids, status: this.key_index },
+        '/deliver/export'
+      ).then(response => {
+        if (response.status === 200) {
+          that.downloadFile(response.data, names)
         }
       })
     }

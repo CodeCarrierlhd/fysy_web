@@ -49,8 +49,9 @@
             :data="
               tableData.slice((currentPage - 1) * limit, currentPage * limit)
             "
-            style="width: 96%;margin:20px"
+            style="width: 96%;margin:20px;"
             border
+            height="400"
           >
             <el-table-column class-name="t_header">
               <template
@@ -71,9 +72,6 @@
                 <div>
                   <el-button @click="importData()" type="primary" v-if="i_show"
                     >导入</el-button
-                  >
-                  <el-button @click="updateData()" type="primary"
-                    >刷新</el-button
                   >
                 </div>
               </template>
@@ -109,6 +107,27 @@
         <el-tab-pane label="已使用" name="hasUsed">角色管理</el-tab-pane> -->
       </el-tabs>
     </div>
+    <el-dialog
+      title="导入数据"
+      :visible.sync="newDialogTableVisible"
+      custom-class="sendPro"
+      center
+      width="620px"
+    >
+      <el-radio-group v-model="radio">
+        <el-radio :label="0">激活码</el-radio>
+        <el-radio :label="1">箱码</el-radio>
+      </el-radio-group>
+      <el-upload
+        :multiple="false"
+        :show-file-list="false"
+        :http-request="handleChange"
+        accept=".xls,.xlsx"
+        action="string"
+      >
+        <el-button size="medium" type="primary">上传文件</el-button>
+      </el-upload>
+    </el-dialog>
   </div>
 </template>
 
@@ -116,6 +135,7 @@
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
 import pagination from '../components/Pagenation'
+import axios from 'axios'
 
 export default {
   // import引入的组件需要注入到对象中才能使用
@@ -127,7 +147,7 @@ export default {
       activeName: '-1',
       tableData: [],
       currentPage: 1,
-      limit: 5,
+      limit: 100,
       total: 0,
       search: '',
       nowPage: '-1',
@@ -144,7 +164,9 @@ export default {
       },
       dataArr: [],
       c_number: 0,
-      a_number: 0
+      a_number: 0,
+      radio: 0,
+      newDialogTableVisible: false
     }
   },
   // 监听属性 类似于data概念
@@ -242,6 +264,31 @@ export default {
           })
         }
         this.getDataList(res.data.object.total)
+      })
+    },
+    importData() {
+      this.newDialogTableVisible = true
+    },
+    handleChange(param) {
+      const fd = new FormData()
+      fd.append('file', param.file) // 传文件
+      fd.append('codeType ', this.radio) // 传参数
+      axios.post('/serveCode/import/activateCode', fd).then(res => {
+        console.log(res)
+        this.initData()
+        this.initSums()
+        if (res.data.code === 200) {
+          this.$notify({
+            title: '提示',
+            message: res.data.msg,
+            duration: 2000
+          })
+        } else {
+          this.$alert(res.data.msg, '错误提示', {
+            confirmButtonText: '确定'
+          })
+        }
+        this.newDialogTableVisible = false
       })
     }
   },

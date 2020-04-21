@@ -31,7 +31,7 @@
               >
             </div>
             <el-button
-              @click="exportData()"
+              @click="exportClientInfoExcel()"
               type="primary"
               size="medium"
               v-if="e_show"
@@ -58,14 +58,13 @@
         </div>
         <el-table
           ref="filterTable"
-          :data="
-            tableData.slice((currentPage - 1) * limit, currentPage * limit)
-          "
+          :data="tableData"
           @filter-change="fnFilterChangeInit"
           @selection-change="selectionChangeHandle"
           :row-key="getRowKey"
-          style="width: 100%; padding:10px 60px"
+          style="width: 100%;margin:10px 0;"
           border
+          height="600"
         >
           <el-table-column class-name="t_header">
             <el-table-column
@@ -224,7 +223,7 @@ export default {
     // 这里存放数据
     return {
       currentPage: 1,
-      limit: 9,
+      limit: 100,
       total: 0,
       materialModelGroup: [],
       tableData: [],
@@ -260,6 +259,8 @@ export default {
         '',
         ''
       ).then(res => {
+        console.log(res.data.object)
+
         this.tableData = res.data.object.list
         this.getDataList(res.data.object.total)
       })
@@ -298,6 +299,7 @@ export default {
     },
     handleCurrentChange(val) {
       this.currentPage = val
+      this.initData()
     },
     handleSizeChange(val) {
       this.limit = val
@@ -383,6 +385,24 @@ export default {
     },
     searchEnterFun() {
       this.initData()
+    },
+    exportClientInfoExcel() {
+      const ids = this.tableDataSelections.join(',')
+      let names = ''
+      if (this.key_index === '0') {
+        names = '待入仓数据导出'
+      } else {
+        names = '退货数据导出'
+      }
+      const that = this
+      this.exportCompanyExcel(
+        { opIds: ids, status: this.key_index },
+        '/stock/export'
+      ).then(response => {
+        if (response.status === 200) {
+          that.downloadFile(response.data, names)
+        }
+      })
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）

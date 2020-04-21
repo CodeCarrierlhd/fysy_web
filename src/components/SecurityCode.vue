@@ -51,6 +51,7 @@
             "
             style="width: 96%;margin:20px"
             border
+            height="400"
             @filter-change="fnFilterChangeInit"
           >
             <el-table-column class-name="t_header">
@@ -71,10 +72,7 @@
                 </div>
                 <div>
                   <el-button @click="importData()" type="primary" v-if="i_show"
-                    >导入</el-button
-                  >
-                  <el-button @click="updateData()" type="primary"
-                    >刷新</el-button
+                    >生成并导出</el-button
                   >
                 </div>
               </template>
@@ -122,6 +120,25 @@
         <el-tab-pane label="已使用" name="hasUsed">角色管理</el-tab-pane> -->
       </el-tabs>
     </div>
+    <el-dialog
+      title="导出数据"
+      :visible.sync="newDialogTableVisible"
+      custom-class="sendPro"
+      center
+      width="620px"
+    >
+      <p>类型：卡片防伪码</p>
+      <div>
+        <span>导出数量：</span>
+        <el-input
+          v-model="sums"
+          style="width:300px;margin:20px 15px"
+        ></el-input>
+        <el-button @click="exportClientInfoExcel()" type="primary"
+          >确认导出</el-button
+        >
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -141,7 +158,7 @@ export default {
       activeName: 'unUsed',
       tableData: [],
       currentPage: 1,
-      limit: 5,
+      limit: 100,
       total: 0,
       search: '',
       tabNames: [
@@ -163,7 +180,9 @@ export default {
         a_img: require('../assets/imgs/whm.png')
       },
       c_number: 0,
-      a_number: 0
+      a_number: 0,
+      newDialogTableVisible: false,
+      sums: 0
     }
   },
   // 监听属性 类似于data概念
@@ -287,7 +306,7 @@ export default {
       btnArr.forEach(item => {
         if (item.rightName === '统计') {
           this.s_show = true
-        } else if (item.rightName === '导入') {
+        } else if (item.rightName === '生成并导出') {
           this.i_show = true
         }
       })
@@ -308,6 +327,22 @@ export default {
           })
         }
         this.getDataList(res.data.object.total)
+      })
+    },
+    importData() {
+      this.newDialogTableVisible = true
+    },
+    exportClientInfoExcel() {
+      const that = this
+      this.exportCompanyExcel(
+        { number: that.sums },
+        '/serveCode/fwCode/createAndExport'
+      ).then(response => {
+        if (response.status === 200) {
+          that.downloadFile(response.data, '卡片防伪码')
+          this.newDialogTableVisible = false
+          this.sums = 0
+        }
       })
     }
   },

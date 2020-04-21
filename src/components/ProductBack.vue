@@ -26,7 +26,7 @@
               >
             </div>
             <el-button
-              @click="exportData()"
+              @click="exportClientInfoExcel()"
               type="primary"
               size="medium"
               v-if="e_show"
@@ -266,9 +266,7 @@
       </div>
       <el-table
         ref="getProducts"
-        :data="
-          newTableData.slice((currentPage1 - 1) * limit1, currentPage1 * limit1)
-        "
+        :data="newTableData"
         @filter-change="fnFilterChangeInit1"
         @selection-change="selectionChangeHandle1"
         :row-key="getRowKey"
@@ -526,7 +524,8 @@ export default {
       recived: '',
       s_show: false,
       e_show: false,
-      loseReason: ''
+      loseReason: '',
+      key_index: '2'
     }
   },
   // 监听属性 类似于data概念
@@ -535,7 +534,7 @@ export default {
   watch: {},
   // 方法集合
   methods: {
-    initData(status) {},
+    initData() {},
     initData1() {
       this.searchAll(
         this.currentPage1,
@@ -601,6 +600,7 @@ export default {
     },
     handleClick(tab, event) {
       if (tab.index === '2') {
+        this.key_index = '6'
         this.$nextTick(() => {
           this.getUid()
           this.show_role = true
@@ -609,6 +609,7 @@ export default {
           this.wait_pro = false
         })
       } else if (tab.index === '1') {
+        this.key_index = '5'
         this.$nextTick(() => {
           this.changeTab('0', '')
           this.show_role = false
@@ -617,6 +618,7 @@ export default {
           this.wait_pro = true
         })
       } else {
+        this.key_index = '2'
         this.tableData = []
         this.getDataList(0)
         this.show_role = false
@@ -848,6 +850,26 @@ export default {
       this.dataChange({ opId: row.opId }, '/deliver/reSend').then(res => {
         if (res.data.code === 200) {
           this.changeTab('0', '')
+        }
+      })
+    },
+    exportClientInfoExcel() {
+      const ids = this.tableDataSelections.join(',')
+      let names = ''
+      if (this.key_index === '2') {
+        names = '发货数据导出'
+      } else if (this.key_index === '3') {
+        names = '待收货数据导出'
+      } else {
+        names = '发货完成数据导出'
+      }
+      const that = this
+      this.exportCompanyExcel(
+        { opIds: ids, status: this.key_index },
+        '/deliver/export'
+      ).then(response => {
+        if (response.status === 200) {
+          that.downloadFile(response.data, names)
         }
       })
     }

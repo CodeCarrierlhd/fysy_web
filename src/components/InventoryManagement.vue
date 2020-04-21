@@ -12,7 +12,7 @@
           <el-button @click="searchEnterFun()" type="primary">搜索</el-button>
         </div>
         <el-button
-          @click="exportData()"
+          @click="exportClientInfoExcel()"
           type="primary"
           size="medium"
           v-if="e_show"
@@ -44,12 +44,13 @@
     </div>
     <el-table
       ref="filterTable"
-      :data="tableData.slice((currentPage - 1) * limit, currentPage * limit)"
+      :data="tableData"
       @filter-change="fnFilterChangeInit"
       @selection-change="selectionChangeHandle"
       :row-key="getRowKey"
-      style="width: 100%; padding:10px 60px"
+      style="width: 100%;"
       border
+      height="700"
     >
       <el-table-column>
         <el-table-column
@@ -147,7 +148,6 @@
       :limit="limit"
       :small="true"
       @handleCurrentChange="handleCurrentChange"
-      @handleSizeChange="handleSizeChange"
       style="margin:15px 50px;"
     />
   </div>
@@ -165,7 +165,7 @@ export default {
     // 这里存放数据
     return {
       currentPage: 1,
-      limit: 8,
+      limit: 100,
       total: 0,
       materialModelGroup: [],
       tableData: [],
@@ -177,7 +177,20 @@ export default {
       btnShow: true,
       s_show: false,
       b_show: false,
-      e_show: false
+      e_show: false,
+      columns: [
+        { title: '产品类别', key: 'materialType' },
+        { title: '产品编号', key: 'materialCode' },
+        { title: '产品型号', key: 'materialModel' },
+        { title: '序列号', key: 'productNo' },
+        { title: '产品批号', key: 'batchNo' },
+        { title: '规格', key: 'spec' },
+        { title: '生产日期', key: 'produceDate' },
+        { title: '失效日期', key: 'expiryDate' },
+        { title: '箱码', key: 'cartonCode' },
+        { title: '激活码', key: 'activateCode' },
+        { title: '生产厂家', key: 'producer' }
+      ]
     }
   },
   // 监听属性 类似于data概念
@@ -221,10 +234,7 @@ export default {
     },
     handleCurrentChange(val) {
       this.currentPage = val
-    },
-    handleSizeChange(val) {
-      this.limit = val
-      this.currentPage = 1
+      this.initData()
     },
     fnFilterChangeInit(filter) {
       console.log(filter)
@@ -311,6 +321,17 @@ export default {
           this.b_show = true
         }
       })
+    },
+    exportClientInfoExcel() {
+      const ids = this.tableDataSelections.join(',')
+      const that = this
+      this.exportCompanyExcel({ opIds: ids }, '/inventory/export').then(
+        response => {
+          if (response.status === 200) {
+            that.downloadFile(response.data, '库存数据导出')
+          }
+        }
+      )
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）

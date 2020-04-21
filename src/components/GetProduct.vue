@@ -24,46 +24,36 @@
           </div>
           <div>
             <el-button
-              @click="exportData()"
+              @click="exportClientInfoExcel()"
               type="primary"
               size="medium"
               v-if="i_show"
               >导出</el-button
             >
-            <el-button @click="refreshData()" type="primary" size="medium"
-              >刷新</el-button
-            >
           </div>
         </div>
         <el-table
           ref="filterTable"
-          :data="
-            tableData.slice((currentPage - 1) * limit, currentPage * limit)
-          "
+          :data="tableData"
+          @selection-change="selectionChangeHandle"
           @filter-change="fnFilterChangeInit"
           :row-key="getRowKey"
-          style="width: 100%; padding:10px 60px"
+          style="width: 100%; margin:10px 0"
           border
+          height="600"
         >
           <el-table-column class-name="t_header">
             <el-table-column
-              type="index"
-              width="100"
+              type="selection"
+              width="150"
               align="center"
-              label="序号"
+              :reserve-selection="true"
             ></el-table-column>
             <el-table-column
               prop="materialType"
               label="产品类别"
               align="center"
               width="100"
-            >
-            </el-table-column>
-            <el-table-column
-              prop="materialCode"
-              label="产品编号"
-              align="center"
-              width="200"
             >
             </el-table-column>
             <el-table-column
@@ -115,6 +105,55 @@
             >
             </el-table-column>
             <el-table-column
+              v-if="unsed"
+              prop="user"
+              label="使用人 "
+              align="center"
+              width="80"
+            >
+            </el-table-column>
+            <el-table-column
+              v-if="unsed"
+              prop="sex"
+              label="性别 "
+              align="center"
+              width="80"
+            >
+            </el-table-column>
+            <el-table-column
+              v-if="unsed"
+              prop="age"
+              label="年龄 "
+              align="center"
+              width="80"
+            >
+            </el-table-column>
+            <el-table-column
+              v-if="unsed"
+              prop="hospitalName"
+              label="手术机构 "
+              align="center"
+              width="80"
+            >
+            </el-table-column>
+            <el-table-column
+              v-if="unsed"
+              prop="hospitalAddress"
+              label="机构地址 "
+              align="center"
+              width="80"
+            >
+            </el-table-column>
+            <el-table-column
+              v-if="unsed"
+              prop="appointmentDate"
+              label="预约日期 "
+              align="center"
+              width="80"
+            >
+            </el-table-column>
+            <el-table-column
+              v-if="!unsed"
               prop="cartonCode"
               label="箱码"
               align="center"
@@ -122,12 +161,14 @@
             >
             </el-table-column>
             <el-table-column
+              v-if="!unsed"
               prop="activateCode"
               label="激活码"
               align="center"
               width="200"
             ></el-table-column>
             <el-table-column
+              v-if="!unsed"
               prop="lastSigner"
               label="签收单位"
               align="center"
@@ -135,6 +176,7 @@
             >
             </el-table-column>
             <el-table-column
+              v-if="!unsed"
               prop="signTime"
               label="签收日期"
               align="center"
@@ -142,6 +184,7 @@
             >
             </el-table-column>
             <el-table-column
+              v-if="!unsed"
               prop="activateStatus"
               label="激活状态"
               align="center"
@@ -149,6 +192,7 @@
             >
             </el-table-column>
             <el-table-column
+              v-if="!unsed"
               prop="activateTime"
               label="激活日期"
               align="center"
@@ -222,9 +266,10 @@ export default {
     // 这里存放数据
     return {
       currentPage: 1,
-      limit: 11,
+      limit: 100,
       total: 0,
       materialModelGroup: [],
+      tableDataSelections: [],
       tableData: [],
       search: '',
       tabNames: [
@@ -237,7 +282,8 @@ export default {
       s_show: false,
       i_show: false,
       r_show: false,
-      nowStatu: '0'
+      key_index: '0',
+      unsed: false
     }
   },
   // 监听属性 类似于data概念
@@ -253,7 +299,7 @@ export default {
         this.limit,
         '/productTrace/listData',
         '&type=',
-        this.nowStatu,
+        this.key_index,
         '&value=',
         this.search,
         '',
@@ -263,9 +309,6 @@ export default {
       ).then(res => {
         console.log(res)
         this.tableData = res.data.object.list
-        for (let i = 0; i < this.tableData.length; i++) {
-          this.tableData[i].id = i
-        }
         this.getDataList(res.data.object.total)
       })
     },
@@ -274,18 +317,29 @@ export default {
     filterTag(value, row, column) {
       return true
     },
+    selectionChangeHandle(selection) {
+      this.tableDataSelections = []
+      // this.btnShow = false
+      for (let i = 0; i < selection.length; i++) {
+        this.tableDataSelections.push(selection[i].productId)
+      }
+      console.log(this.tableDataSelections)
+    },
     getDataList(total) {
       this.total = total
     },
     handleCurrentChange(val) {
       this.currentPage = val
+      this.initData()
     },
 
     handleClick(tab, event) {
       if (tab.index === '1') {
-        this.nowStatu = '1'
+        this.key_index = '1'
+        this.unsed = true
       } else {
-        this.nowStatu = '0'
+        this.key_index = '0'
+        this.unsed = false
       }
       this.initData()
     },
@@ -300,36 +354,12 @@ export default {
       this.tableData = arr
     },
     getRowKey(row) {
-      return row.id
+      return row.productId
     },
     getReport(row) {
       this.dialogVisible = true
       this.stepGroups = []
       this.sendId(row.productId, '/productTrace/generateReport').then(res => {
-        //  {
-        //   stepName: '已发出',
-        //   iconType: 'el-icon-truck',
-        //   stepContent: '激活单位：上海美莱医疗美容整形医院',
-        //   stepTime: '2020.02.03 10:00:31'
-        // },
-        // {
-        //   stepName: '已签收',
-        //   iconType: 'el-icon-circle-check',
-        //   stepContent: '签收单位：上海美莱医疗美容整形医院',
-        //   stepTime: '2020.02.03 10:00:31'
-        // },
-        // {
-        //   stepName: '已激活',
-        //   iconType: 'el-icon-unlock',
-        //   stepContent: '激活单位：上海美莱美容整形医院',
-        //   stepTime: '2020.02.03 10:00:31'
-        // },
-        // {
-        //   stepName: '已使用',
-        //   iconType: 'el-icon-user',
-        //   stepContent: '使用单位：上海美莱美',
-        //   stepTime: '2020.02.03 10:00:31'
-        // }
         for (let i = 0; i < res.data.object.length; i++) {
           if (res.data.object[i].productStatus === '已发出') {
             this.stepGroups.push({
@@ -382,20 +412,6 @@ export default {
       console.log('取消')
     },
     translateTime(times) {
-      /**
- 1. 下面是获取时间日期的方法，需要什么样的格式自己拼接起来就好了
- 2. 更多好用的方法可以在这查到 -> http://www.w3school.com.cn/jsref/jsref_obj_date.asp
- */
-      // date.getFullYear() // 获取完整的年份(4位,1970)
-      // date.getMonth() // 获取月份(0-11,0代表1月,用的时候记得加上1)
-      // date.getDate() // 获取日(1-31)
-      // date.getTime() // 获取时间(从1970.1.1开始的毫秒数)
-      // date.getHours() // 获取小时数(0-23)
-      // date.getMinutes() // 获取分钟数(0-59)
-      // date.getSeconds() // 获取秒数(0-59)
-
-      // 例如：
-      // 比如需要这样的格式 yyyy-MM-dd hh:mm:ss
       const date = new Date(times)
       const Y = date.getFullYear() + '-'
       const M =
@@ -434,6 +450,24 @@ export default {
     },
     searchEnterFun() {
       this.initData()
+    },
+    exportClientInfoExcel() {
+      const ids = this.tableDataSelections.join(',')
+      let names = ''
+      if (this.key_index === '0') {
+        names = '产品全部数据导出'
+      } else {
+        names = '产品已激活数据导出'
+      }
+      const that = this
+      this.exportCompanyExcel(
+        { productIds: ids, type: this.key_index },
+        '/productTrace/export'
+      ).then(response => {
+        if (response.status === 200) {
+          that.downloadFile(response.data, names)
+        }
+      })
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）

@@ -16,7 +16,7 @@ if (env === 'production') {
 module.exports = {
   devServer: {
     // open: process.platform === "darwin",
-    host: '192.168.16.12',
+    host: '192.168.16.6',
     https: false,
     port: 8080,
     hotOnly: false,
