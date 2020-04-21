@@ -17,6 +17,7 @@ import {
   delItem,
   valueData,
   resetPassword,
+<<<<<<< HEAD
   rightList,
   codeData,
   rightChange,
@@ -27,6 +28,9 @@ import {
   searchAll,
   sendId,
   sendProducts
+=======
+  rightList
+>>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
 } from '@/utils/comon'
 import interceptor from './interceptor'
 
@@ -44,6 +48,7 @@ Vue.prototype.delItem = delItem
 Vue.prototype.valueData = valueData
 Vue.prototype.resetPassword = resetPassword
 Vue.prototype.rightList = rightList
+<<<<<<< HEAD
 Vue.prototype.codeData = codeData
 Vue.prototype.rightChange = rightChange
 Vue.prototype.rightInsert = rightInsert
@@ -53,6 +58,8 @@ Vue.prototype.productDone = productDone
 Vue.prototype.searchAll = searchAll
 Vue.prototype.sendId = sendId
 Vue.prototype.sendProducts = sendProducts
+=======
+>>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
 
 Vue.config.productionTip = false
 interceptor()

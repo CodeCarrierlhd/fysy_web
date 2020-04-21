@@ -149,6 +149,10 @@ export default {
     rightLists() {
       this.r_list = this.rightLists
       // console.log(this.r_list)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
       this.initData(this.r_list)
     }
   },
