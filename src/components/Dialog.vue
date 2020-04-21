@@ -61,7 +61,6 @@ export default {
   // 方法集合
   methods: {
     loginOut() {
-<<<<<<< HEAD
       this.getSums('/user/logout').then(res => {
         console.log(res)
         if (res.data.code === 200) {
@@ -88,26 +87,6 @@ export default {
       //   })
       //   this.show = false
       // }
-=======
-      if (!this.changePwd) {
-        this.$cookieStore.getCookie('name')
-        this.$cookieStore.delCookie('name')
-        this.$router.push('/login')
-        history.pushState(null, null, document.URL)
-        window.addEventListener(
-          'popstate',
-          function(e) {
-            history.pushState(null, null, document.URL)
-          },
-          false
-        )
-      } else {
-        this.resetPassword(this.id, 'user/resetPwd').then(res => {
-          console.log(res)
-        })
-        this.show = false
-      }
->>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
     },
     rebackStatu() {
       this.show = false
