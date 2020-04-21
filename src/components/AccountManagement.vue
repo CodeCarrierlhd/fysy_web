@@ -326,8 +326,13 @@ export default {
       a_show: false,
       d_show: false,
       e_show: false,
+<<<<<<< HEAD
       edit: false,
       tableDataSelections: []
+=======
+      tableDataSelections: [],
+      edit: false
+>>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
     }
   },
   // 监听属性 类似于data概念

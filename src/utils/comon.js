@@ -11,6 +11,7 @@ const rightList = (value, listName) => {
   return axios.get(listName + '?roleId=' + value)
 }
 
+<<<<<<< HEAD
 const roleList = (value, listName) => {
   return axios.get(listName + '?value=' + value)
 }
@@ -18,6 +19,8 @@ const getSums = listName => {
   return axios.get(listName)
 }
 
+=======
+>>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
 // 条件查询
 const valueData = (
   currentPage,
@@ -44,6 +47,7 @@ const valueData = (
       roleType
   )
 }
+<<<<<<< HEAD
 
 const codeData = (
   currentPage,
@@ -104,6 +108,8 @@ const searchAll = (
       k
   )
 }
+=======
+>>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
 // 提前获取生产厂家条件筛选数据
 const searchData = loadName => {
   return axios.get(loadName)
@@ -114,6 +120,7 @@ const dataChange = (arr, loadName) => {
 
   return axios.post(loadName, params)
 }
+<<<<<<< HEAD
 
 const sendProducts = (ids, orderNo, orderTime, receiver, loadName) => {
   var params = qs.stringify({
@@ -142,6 +149,8 @@ const rightInsert = (ids, roleType, loadName) => {
 
   return axios.post(loadName, params)
 }
+=======
+>>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
 // 删除操作
 const delItem = (id, loadName) => {
   return axios.delete(loadName, {
@@ -155,11 +164,14 @@ const resetPassword = (id, loadName) => {
 
   return axios.post(loadName, params)
 }
+<<<<<<< HEAD
 const productDone = (ids, opType, loadName) => {
   var params = qs.stringify({ opIds: ids, opType: opType })
 
   return axios.put(loadName, params)
 }
+=======
+>>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
 export {
   listData,
   searchData,
@@ -167,6 +179,7 @@ export {
   delItem,
   valueData,
   resetPassword,
+<<<<<<< HEAD
   rightList,
   codeData,
   rightChange,
@@ -177,4 +190,7 @@ export {
   searchAll,
   sendId,
   sendProducts
+=======
+  rightList
+>>>>>>> 24fc3efb833d66bce1a2dda8ac31c199c199a5f0
 }
