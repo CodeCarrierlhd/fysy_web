@@ -6,8 +6,8 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "eslint --ext .js,.vue src --fix",
-    "dev": "vue-cli-service serve --open",
-    "prod": "vue-cli-service build --mode=production"
+    "dev": "vue-cli-service serve --mode dev",
+    "pro": "vue-cli-service serve --mode pro"
   },
   "dependencies": {
     "area-data": "^5.0.6",
@@ -21,6 +21,7 @@
     "vue": "^2.6.11",
     "vue-area-linkage": "^5.1.0",
     "vue-axios": "^2.1.5",
+    "vue-cookie": "^1.1.4",
     "vue-router": "^3.1.5",
     "vuex": "^3.1.2",
     "xlsx": "^0.15.6"

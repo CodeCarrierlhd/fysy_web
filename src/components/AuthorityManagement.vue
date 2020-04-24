@@ -2,58 +2,42 @@
 <template>
   <div class="container">
     <div class="powerContain">
-      <el-table
-        ref="singleTable"
-        :data="tableData"
-        style="margin:40px 60px;"
-        @cell-click="hideInfo"
+      <div
+        style="display: flex;justify-content: space-between;width:100%;margin:20px 0"
       >
-        <el-table-column>
-          <template slot="header" header-align="center">
-            <div style="display: flex;justify-content: space-between;">
-              <div v-if="s_show" style="display:flex;width:80%;">
-                <el-input
-                  v-model="search"
-                  style="border-radius:4px;width:50%;height: 90%;margin-right:10px"
-                  placeholder="输入关键字搜索"
-                />
-                <el-button @click="searchEnterFun()" type="primary"
-                  >搜索</el-button
-                >
-              </div>
-              <el-button
-                type="primary"
-                @click="handleFilterClassify"
-                v-if="a_show"
-                >新增<i class="el-icon-plus"></i
-              ></el-button>
-            </div>
+        <div v-if="s_show" style="display:flex;width:100%;">
+          <el-input
+            v-model="search"
+            style="border-radius:4px;width:50%;height: 90%;margin-right:10px"
+            placeholder="输入关键字搜索"
+          />
+          <el-button @click="searchEnterFun()" type="primary">搜索</el-button>
+        </div>
+        <el-button type="primary" @click="handleFilterClassify" v-if="a_show"
+          >新增<i class="el-icon-plus"></i
+        ></el-button>
+      </div>
+      <el-table ref="singleTable" :data="tableData" @cell-click="hideInfo">
+        <el-table-column type="index" width="50" align="center" label="序号">
+        </el-table-column>
+        <el-table-column prop="roleType" label="角色类型" align="center">
+          <template slot-scope="scope">
+            <span class="roleType">{{ scope.row.roleType }}</span>
           </template>
-          <el-table-column type="index" width="50" align="center" label="序号">
-          </el-table-column>
-          <el-table-column prop="roleType" label="角色类型" align="center">
-            <template slot-scope="scope">
-              <span class="roleType">{{ scope.row.roleType }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="权限设置" align="center" prop="u_power">
-            <template slot-scope="scope">
-              <span
-                class="editButton"
-                @click="editRole(scope.row, scope.$index)"
-                >修改</span
-              >
-            </template>
-          </el-table-column>
-          <el-table-column label="角色删除" align="center">
-            <template slot-scope="scope">
-              <span
-                class="editButton"
-                @click="deltRole(scope.row, scope.$index)"
-                >删除</span
-              >
-            </template>
-          </el-table-column>
+        </el-table-column>
+        <el-table-column label="权限设置" align="center" prop="u_power">
+          <template slot-scope="scope">
+            <span class="editButton" @click="editRole(scope.row, scope.$index)"
+              >修改</span
+            >
+          </template>
+        </el-table-column>
+        <el-table-column label="角色删除" align="center">
+          <template slot-scope="scope">
+            <span class="editButton" @click="deltRole(scope.row, scope.$index)"
+              >删除</span
+            >
+          </template>
         </el-table-column>
       </el-table>
       <el-dialog
@@ -615,7 +599,9 @@ export default {
   width: 95%;
 }
 .powerContain {
-  width: 45%;
+  width: 50%;
+  padding: 10px 30px;
+  background-color: #fff;
 }
 .contentRight {
   background-color: #2a426e;

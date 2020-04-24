@@ -595,7 +595,6 @@ export default {
     handleCurrentChange1(val) {
       this.currentPage1 = val
       console.log(this.currentPage1)
-
       this.initData1()
     },
     handleClick(tab, event) {
@@ -803,7 +802,14 @@ export default {
       })
     },
     searchEnterFun() {
-      this.initData()
+      console.log(this.key_index)
+      let a = 0
+      if (this.key_index === 3) {
+        a = 3
+      } else {
+        a = 0
+      }
+      this.changeTab(a, '')
     },
     getType() {
       this.getSums('/material/listAboutSelf').then(res => {

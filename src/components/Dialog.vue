@@ -14,7 +14,9 @@
       }}</span>
       <span slot="footer" class="dialog-footer">
         <el-button @click="rebackStatu">取 消</el-button>
-        <el-button type="primary" @click="loginOut">确 定</el-button>
+        <el-button type="primary" @click="changeNow ? changepwd() : loginOut()"
+          >确 定</el-button
+        >
       </span>
     </el-dialog>
   </div>
@@ -47,7 +49,9 @@ export default {
   data() {
     // 这里存放数据
     return {
-      show: false
+      show: false,
+      changeNow: false,
+      keyId: 0
     }
   },
   // 监控data中的数据变化
@@ -56,6 +60,22 @@ export default {
       handler(newName, oldName) {
         this.show = true
       }
+    },
+    changePwd: {
+      handler(newName, oldName) {
+        if (newName) {
+          console.log(1)
+          this.changeNow = true
+        }
+      }
+    },
+    id: {
+      handler(newName, oldName) {
+        if (newName !== undefined) {
+          console.log(2)
+          this.keyId = newName
+        }
+      }
     }
   },
   // 方法集合
@@ -63,9 +83,10 @@ export default {
     loginOut() {
       this.getSums('/user/logout').then(res => {
         console.log(res)
+
         if (res.data.code === 200) {
           this.$router.push({
-            path: '/'
+            path: '/login'
           })
         }
       })
@@ -91,6 +112,13 @@ export default {
     rebackStatu() {
       this.show = false
       this.$emit('dialogClose')
+    },
+    changepwd() {
+      this.dataChange({ id: this.keyId }, '/user/resetPwd').then(res => {
+        if (res.data.code === 200) {
+          this.show = false
+        }
+      })
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）

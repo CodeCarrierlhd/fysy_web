@@ -93,17 +93,7 @@ export default {
         callback()
       }
     }
-    // 验证码自定义验证规则
-    // const validateverifyCode = (rule, value, callback) => {
-    //   if (value === "") {
-    //     callback(new Error("请输入验证码"));
-    //   } else if (value !== this.identifyCode) {
-    //     console.log("validateverifyCode:", value, this.identifyCode);
-    //     callback(new Error("验证码不正确!"));
-    //   } else {
-    //     callback();
-    //   }
-    // };
+
     return {
       r_img: require('@/assets/logo/bg1.png'),
       logoImg: require('@/assets/logo/log_b.png'),
@@ -116,8 +106,6 @@ export default {
       },
       name: '',
       checked: false,
-      // identifyCodes: "1234567890",
-      // identifyCode: "",
       loginRules: {
         // 绑定在form表单中的验证规则
         username: [
@@ -128,7 +116,7 @@ export default {
           { min: 6, message: '密码长度最少为6位', trigger: 'blur' }
         ]
         // verifyCode: [
-        //   { required: true, trigger: "blur", validator: validateverifyCode }
+        //   { required: true, trigger: 'blur', validator: validateverifyCode }
         // ]
       },
       passwordType: 'password'
@@ -145,6 +133,7 @@ export default {
     // 验证码初始化
     // this.identifyCode = "";
     // this.makeCode(this.identifyCodes, 4);
+    // console.log(process.env.VUE_APP_BASEURL)
   },
   computed: {},
   props: [],
@@ -165,8 +154,8 @@ export default {
           // 通过store 中的login 方法进行登陆验证
           us.login(this.loginForm)
             .then(res => {
-              // this.name = code;
-              // this.$cookieStore.setCookie("name", this.name, 60);
+              console.log(res)
+
               if (res.data.code === 200) {
                 if (this.checked) {
                   const str =

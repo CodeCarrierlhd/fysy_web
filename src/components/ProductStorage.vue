@@ -384,6 +384,8 @@ export default {
       })
     },
     searchEnterFun() {
+      console.log(111)
+
       this.initData()
     },
     exportClientInfoExcel() {

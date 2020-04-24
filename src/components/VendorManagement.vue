@@ -1,4 +1,4 @@
-<!-- 账号管理 -->
+<!-- 生产商管理 -->
 <template>
   <div style="width: 100%;">
     <el-table
@@ -536,7 +536,10 @@ export default {
         this.currentPage,
         this.limit,
         '/producer/listData',
-        this.search
+        this.search,
+        '',
+        '',
+        ''
       ).then(res => {
         this.tableData = []
         const vdata = res.data.object.list

@@ -45,6 +45,25 @@
           :key="index"
           :label="item.label"
         >
+          <div
+            style="display: flex;width: 96%;justify-content: space-around;margin: 0 auto;"
+          >
+            <div style="display:flex;width:100%;">
+              <el-input
+                v-model="search"
+                style="border-radius:4px;width:50%;height: 90%;margin-right:10px"
+                placeholder="输入关键字搜索"
+              />
+              <el-button @click="searchEnterFun()" type="primary"
+                >搜索</el-button
+              >
+            </div>
+            <div>
+              <el-button @click="importData()" type="primary" v-if="i_show"
+                >生成并导出</el-button
+              >
+            </div>
+          </div>
           <el-table
             :data="
               tableData.slice((currentPage - 1) * limit, currentPage * limit)
@@ -55,27 +74,6 @@
             @filter-change="fnFilterChangeInit"
           >
             <el-table-column class-name="t_header">
-              <template
-                slot="header"
-                style="display:flex;justify-content: space-between;"
-                header-align="center"
-              >
-                <div v-if="s_show" style="display:flex;width:80%;">
-                  <el-input
-                    v-model="search"
-                    style="border-radius:4px;width:50%;height: 90%;margin-right:10px"
-                    placeholder="输入关键字搜索"
-                  />
-                  <el-button @click="searchEnterFun()" type="primary"
-                    >搜索</el-button
-                  >
-                </div>
-                <div>
-                  <el-button @click="importData()" type="primary" v-if="i_show"
-                    >生成并导出</el-button
-                  >
-                </div>
-              </template>
               <el-table-column
                 label="序号"
                 type="index"
@@ -317,7 +315,9 @@ export default {
         this.limit,
         '/serveCode/fwCode/listData',
         this.search,
-        this.nowPage
+        this.nowPage,
+        '',
+        ''
       ).then(res => {
         for (let i = 0; i < res.data.object.list.length; i++) {
           this.tableData.push({

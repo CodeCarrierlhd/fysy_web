@@ -1,8 +1,11 @@
 import qs from 'qs'
 import axios from 'axios'
+
 export default {
   identifyCode() {
-    return 'http://192.168.16.5:8080/login/getVerifyCode'
+    // hans3d.transplus.cn/login/getVerifyCode
+    return process.env.VUE_APP_BASEURL + '/login/getVerifyCode'
+    // return 'http://39.108.187.58:8087/login/getVerifyCode'
   },
   identifyLogin() {
     return axios.get('/login/isLogin')
@@ -14,6 +17,7 @@ export default {
       username,
       verifyCode
     })
+
     return axios.post('/login/post', params)
   },
   getUserInfo() {

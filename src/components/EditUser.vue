@@ -11,43 +11,27 @@
     >
       <img :src="logoImg" style="width:360px" />
       <p>修改密码</p>
-      <!-- <el-form-item v-for="(item, index) in pd_array" :key="index" prop="item">
+      <el-form-item prop="oldPwd">
         <el-input
           @keyup.enter="handleLogin"
-          :type="item"
-          v-model="loginForm['item' + index]"
+          :type="oldPwd"
+          v-model="loginForm.oldPwd"
           placeholder="原密码"
           class="n_input"
         >
           <i
-            class="el-icon-view "
-            :style="item"
-            slot="suffix"
-            @click.self="showPassword"
-          ></i
-        ></el-input>
-      </el-form-item> -->
-      <el-form-item prop="o_password">
-        <el-input
-          @keyup.enter="handleLogin"
-          :type="o_password"
-          v-model="loginForm.o_password"
-          placeholder="原密码"
-          class="n_input"
-        >
-          <i
-            class="el-icon-view "
+            class="el-icon-view"
             :style="fontstyle"
             slot="suffix"
             @click="showPassword"
           ></i
         ></el-input>
       </el-form-item>
-      <el-form-item prop="n_password">
+      <el-form-item prop="newPwd">
         <el-input
           @keyup.enter="handleLogin"
-          :type="n_password"
-          v-model="loginForm.n_password"
+          :type="newPwd"
+          v-model="loginForm.newPwd"
           placeholder="新密码"
           class="n_input"
         >
@@ -59,11 +43,11 @@
           ></i
         ></el-input>
       </el-form-item>
-      <el-form-item prop="tn_password">
+      <el-form-item prop="newPwdAgain">
         <el-input
           @keyup.enter="handleLogin"
-          :type="tn_password"
-          v-model="loginForm.tn_password"
+          :type="newPwdAgain"
+          v-model="loginForm.newPwdAgain"
           placeholder="请再次输入新密码"
           class="n_input"
         >
@@ -75,23 +59,16 @@
           ></i
         ></el-input>
       </el-form-item>
-      <el-form-item prop="verifycode">
-        <!-- 注意：prop与input绑定的值一定要一致，否则验证规则中的value会报undefined，因为value即为绑定的input输入值 -->
-        <!-- <el-input
-          v-model="loginForm.verifycode"
-          placeholder="请输入验证码"
-          class="identifyinput"
-        ></el-input>-->
+      <el-form-item prop="verifyCode">
         <div style="display:flex;justify-content: space-between;">
           <el-input
             type="text"
-            v-model="loginForm.verifycode"
+            v-model="loginForm.verifyCode"
             placeholder="验证码"
             class="identifyinput"
           ></el-input>
           <div>
             <div @click="refreshCode">
-              <!-- <s-identify :identifyCode="identifyCode"></s-identify> -->
               <img
                 :src="identifyCode"
                 alt
@@ -124,15 +101,21 @@
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
+import us from '../services/users'
 
 export default {
   name: 'userEdit',
   // import引入的组件需要注入到对象中才能使用
   components: {},
-  data () {
-    const validateUsername = (rule, value, callback) => {
+  data() {
+    const validatePwd = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('请输入正确的用户名'))
+        callback(new Error('请再次输入新密码'))
+      } else if (value !== this.loginForm.newPwd) {
+        console.log(value, this.loginForm.newPwd)
+
+        console.log('nt_pwd:', value, this.loginForm.newPwdAgain)
+        callback(new Error('两次密码不一致请重新输入!'))
       } else {
         callback()
       }
@@ -140,36 +123,36 @@ export default {
     // 这里存放数据
     return {
       logoImg: require('@/assets/logo/log_b.png'),
-      identifyCode: 'http://192.168.16.15:8080/login/getVerifyCode',
-      // pd_array: ["o_password", "n_password", "tn_password"],
+      identifyCode: '',
       fontstyle: {},
       fontstyle1: {},
       fontstyle2: {},
       loginForm: {
-        o_password: '',
-        n_password: '',
-        tn_password: '',
-        verifycode: ''
+        oldPwd: '',
+        newPwd: '',
+        newPwdAgain: '',
+        verifyCode: ''
       },
+      oldPwd: 'password',
+      newPwd: 'password',
+      newPwdAgain: 'password',
       checked: false,
       // identifyCodes: "1234567890",
       // identifyCode: "",
       loginRules: {
-        // 绑定在form表单中的验证规则
-        username: [
-          { required: true, trigger: 'blur', validator: validateUsername }
-        ],
-        password: [
+        newPwd: [
           { required: true, message: '请输入密码', trigger: 'blur' },
           { min: 6, message: '密码长度最少为6位', trigger: 'blur' }
+        ],
+        newPwdAgain: [
+          {
+            required: true,
+            trigger: 'blur',
+            validator: validatePwd
+          },
+          { min: 6, message: '密码长度最少为6位', trigger: 'blur' }
         ]
-        // verifycode: [
-        //   { required: true, trigger: "blur", validator: validateVerifycode }
-        // ]
       },
-      o_password: 'password',
-      n_password: 'password',
-      tn_password: 'password',
       d_statu: false
     }
   },
@@ -179,80 +162,58 @@ export default {
   watch: {},
   // 方法集合
   methods: {
-    showPassword () {
+    showPassword() {
       this.fontstyle === ''
         ? (this.fontstyle = 'color: red')
         : (this.fontstyle = '') // 改变密码可见按钮颜色
-      this.o_password === ''
-        ? (this.o_password = 'password')
-        : (this.o_password = '')
+      this.oldPwd === '' ? (this.oldPwd = 'password') : (this.oldPwd = '')
     },
-    showPassword1 () {
+    showPassword1() {
       this.fontstyle1 === ''
         ? (this.fontstyle1 = 'color: red')
         : (this.fontstyle1 = '') // 改变密码可见按钮颜色
-      this.n_password === ''
-        ? (this.n_password = 'password')
-        : (this.n_password = '')
+      this.newPwd === '' ? (this.newPwd = 'password') : (this.newPwd = '')
     },
-    showPassword2 () {
+    showPassword2() {
       this.fontstyle2 === ''
         ? (this.fontstyle2 = 'color: red')
         : (this.fontstyle2 = '') // 改变密码可见按钮颜色
-      this.tn_password === ''
-        ? (this.tn_password = 'password')
-        : (this.tn_password = '')
+      this.newPwdAgain === ''
+        ? (this.newPwdAgain = 'password')
+        : (this.newPwdAgain = '')
     },
-    editUserInfo () {
+    editUserInfo() {
       console.log(this.loginForm)
-      // const { o_password, n_password, tn_password } = this.loginForm;
-      if (this.loginForm.n_password !== this.loginForm.tn_password) {
-        // this.d_statu = true;
-        // this.$emit("childFn", this.d_statu);
-      }
-      // this.$refs.loginForm.validate(valid => {
-      //   if (valid) {
-      //     // 通过store 中的login 方法进行登陆验证
-      //     this.$store
-      //       .dispatch("login", this.loginForm)
-      //       .then(code => {
-      //         console.log(code);
-      //         if (code === 0) {
-      //           const path = this.$route.query.redirect || "/";
-      //           this.$router.push({
-      //             path,
-      //             query: {
-      //               // 注意需要提前把对象当作字符串传递过去 在接收页面转为对象 这样页面刷新就不会将对象转成了字符串
-      //               userInfo: JSON.stringify(this.loginForm)
-      //             }
-      //           });
-      //         }
-      //       })
-      //       .catch(error => {
-      //         console.log(error.message);
-      //       });
-      //   }
-      // });
+      this.dataChange(this.loginForm, '/user/updatePwd').then(res => {
+        console.log(res)
+        if (res.data.code === 200) {
+          this.$emit('childFn', '')
+        }
+      })
     },
-    refreshCode () {
-      var timestamp = new Date().getTime()
-      this.identifyCode =
-        'http://192.168.16.15:8080/login/getVerifyCode?' + timestamp
 
+    refreshCode() {
+      this.getIdentifyCode()
       // this.makeCode(this.identifyCodes, 4);
+    },
+    getIdentifyCode() {
+      var timestamp = new Date().getTime()
+      this.identifyCode = us.identifyCode() + '?' + timestamp
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
-  created () {},
+  created() {
+    this.getIdentifyCode()
+  },
   // 生命周期 - 挂载完成（可以访问DOM元素）
-  mounted () {},
-  beforeCreate () {}, // 生命周期 - 创建之前
-  beforeMount () {}, // 生命周期 - 挂载之前
-  beforeUpdate () {}, // 生命周期 - 更新之前
-  updated () {}, // 生命周期 - 更新之后
-  beforeDestroy () {}, // 生命周期 - 销毁之前
-  destroyed () {}, // 生命周期 - 销毁完成
-  activated () {} // 如果页面有keep-alive缓存功能，这个函数会触发
+  mounted() {},
+  beforeCreate() {}, // 生命周期 - 创建之前
+  beforeMount() {}, // 生命周期 - 挂载之前
+  beforeUpdate() {}, // 生命周期 - 更新之前
+  updated() {}, // 生命周期 - 更新之后
+  beforeDestroy() {}, // 生命周期 - 销毁之前
+  destroyed() {}, // 生命周期 - 销毁完成
+  activated() {} // 如果页面有keep-alive缓存功能，这个函数会触发
 }
 </script>
 <style scoped>
@@ -290,8 +251,8 @@ export default {
   border-bottom: 2px solid #d8d8d8;
   font-size: 20px;
 }
-input[type="text"]:focus,
-input[type="password"]:focus {
+input[type='text']:focus,
+input[type='password']:focus {
   outline: none;
 }
 .el-button {

@@ -320,7 +320,7 @@ export default {
       centerDialogVisible: 0,
       headerText: '重置密码',
       textName: '确定重置密码，密码将变为初始密码：111111!',
-      changePwd: true,
+      changePwd: false,
       rowId: 0,
       s_show: false,
       a_show: false,
@@ -525,6 +525,7 @@ export default {
     },
     changePassword(index, row) {
       this.centerDialogVisible++
+      this.changePwd = true
       this.rowId = row.id
     },
     getRowKey(row) {

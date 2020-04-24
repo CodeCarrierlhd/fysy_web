@@ -280,6 +280,8 @@ export default {
       console.log('多个拆解')
     },
     searchEnterFun() {
+      console.log(888)
+
       this.initData()
     },
     getType() {

@@ -18,7 +18,11 @@
         <el-main>
           <router-view></router-view>
           <transition name="slide-fade">
-            <edit-user v-if="showEdit" id="edUser"></edit-user>
+            <edit-user
+              v-if="showEdit"
+              id="edUser"
+              @childFn="showBlock"
+            ></edit-user>
           </transition>
           <my-dialog
             :centerDialogVisible="centerDialogVisible"

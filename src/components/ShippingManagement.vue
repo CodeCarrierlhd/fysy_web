@@ -630,19 +630,6 @@ export default {
     },
     fnFilterChangeInit(filter) {
       console.log(filter)
-      // const reduceArray = this.tableData.reduce((acc, current) => {
-      //   // acc 是累计的值
-      //   // current 是当前遍历的值
-      //   console.log(current.productStatus === filter.productStatus[0])
-
-      //   if (current.productStatus === filter.productStatus[0]) {
-      //     acc.push(current)
-      //   }
-      //   // 相当于 acc = acc
-      //   // 最后 return 的就是 最终的acc的值
-      //   return acc
-      // }, [])
-      // this.tableData = reduceArray
     },
     fnFilterChangeInit1(filter) {
       console.log(filter)
@@ -804,7 +791,14 @@ export default {
       })
     },
     searchEnterFun() {
-      // this.initData()
+      console.log(this.key_index)
+      let a = 0
+      if (this.key_index === 3) {
+        a = 3
+      } else {
+        a = 0
+      }
+      this.changeTab(a, '')
     },
     getType() {
       this.getSums('/material/listAboutSelf').then(res => {
@@ -817,6 +811,8 @@ export default {
       })
     },
     changeTab(statu, uid) {
+      console.log(statu, uid)
+
       this.searchAll(
         this.currentPage,
         8,

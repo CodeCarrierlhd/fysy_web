@@ -8,6 +8,7 @@ import store from './store'
 import './plugins/element.js'
 import './commont/reset.css'
 import axios from 'axios'
+// import cookie from 'vue-cookie'
 
 import { encryptString, decodeString } from '@/utils/encrypt'
 import {
@@ -33,7 +34,12 @@ import { exportCompanyExcel, downloadFile } from '../src/utils/importCommon'
 import interceptor from './interceptor'
 
 // axios.defaults.timeout = 5000; // 请求超时
-axios.defaults.baseURL = '/api/'
+// axios.defaults.baseURL =
+//   process.env.NODE_ENV === 'production' ? process.env.VUE_APP_BASEURL : '/api'
+axios.defaults.baseURL = '/api'
+// 后端存入cookie 必须打开
+// axios.defaults.withCredentials = true
+// axios.defaults.headers
 axios.defaults.headers.post['Content-Type'] =
   'application/x-www-form-urlencoded'
 
@@ -57,6 +63,7 @@ Vue.prototype.sendId = sendId
 Vue.prototype.sendProducts = sendProducts
 Vue.prototype.exportCompanyExcel = exportCompanyExcel
 Vue.prototype.downloadFile = downloadFile
+// Vue.prototype.$cookie = cookie
 
 Vue.config.productionTip = false
 interceptor()
