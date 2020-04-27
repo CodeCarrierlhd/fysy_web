@@ -14,6 +14,9 @@ import ProductStorage from '../components/ProductStorage.vue'
 import ProductBack from '../components/ProductBack.vue'
 import InMa from '../components/InventoryManagement.vue'
 import GetProduct from '../components/GetProduct.vue'
+import AcSt from '../components/ActiveStatistics.vue'
+import FlSt from '../components/FlowStatistics.vue'
+import SaSt from '../components/SalesStatistics.vue'
 
 import us from '../services/users'
 
@@ -123,6 +126,30 @@ const routes = [
         path: '/GetProduct',
         name: 'GetProduct',
         component: GetProduct,
+        meta: {
+          auth: true
+        }
+      },
+      {
+        path: '/AcSt',
+        name: 'ActiveStatistics',
+        component: AcSt,
+        meta: {
+          auth: true
+        }
+      },
+      {
+        path: '/FlSt',
+        name: 'FlowStatistics',
+        component: FlSt,
+        meta: {
+          auth: true
+        }
+      },
+      {
+        path: '/SaSt',
+        name: 'SalesStatistics',
+        component: SaSt,
         meta: {
           auth: true
         }

@@ -8,6 +8,8 @@ import store from './store'
 import './plugins/element.js'
 import './commont/reset.css'
 import axios from 'axios'
+import echarts from 'echarts'
+
 // import cookie from 'vue-cookie'
 
 import { encryptString, decodeString } from '@/utils/encrypt'
@@ -63,7 +65,7 @@ Vue.prototype.sendId = sendId
 Vue.prototype.sendProducts = sendProducts
 Vue.prototype.exportCompanyExcel = exportCompanyExcel
 Vue.prototype.downloadFile = downloadFile
-// Vue.prototype.$cookie = cookie
+Vue.prototype.$echarts = echarts
 
 Vue.config.productionTip = false
 interceptor()

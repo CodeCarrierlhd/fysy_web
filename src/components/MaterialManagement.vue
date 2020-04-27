@@ -40,6 +40,7 @@
         :row-key="getRowKey"
         style="width: 100%;"
         border
+        height="600"
       >
         <el-table-column class-name="t_header">
           <el-table-column
@@ -126,10 +127,12 @@
             <template slot-scope="scope">
               <el-button
                 size="mini"
+                v-if="e_show"
                 @click="handleEdit(scope.$index, scope.row)"
                 >编辑</el-button
               >
               <el-button
+                v-if="d_show"
                 size="mini"
                 @click="handleDelete(scope.$index, scope.row)"
                 >删除</el-button
@@ -144,6 +147,7 @@
         :limit="limit"
         :small="true"
         @handleCurrentChange="handleCurrentChange"
+        style="margin:15px 50px;"
       />
 
       <el-dialog
@@ -318,11 +322,11 @@ export default {
       tableDataSelections: [],
       // 状态
       status: [
-        { text: '上市', value: 1 },
-        { text: '已下市', value: 0 }
+        { text: '上市', value: 0 },
+        { text: '已下市', value: 1 }
       ],
       currentPage: 1,
-      limit: 13,
+      limit: 10,
       total: 0,
       isCheck: true,
       s_show: false,
@@ -379,6 +383,7 @@ export default {
     },
     selectionChangeHandle(selections) {
       console.log(selections)
+      this.tableDataSelections = []
       for (let i = 0; i < selections.length; i++) {
         this.tableDataSelections.push(selections[i].id)
       }
@@ -473,6 +478,8 @@ export default {
     },
     initBtn() {
       const btnArr = JSON.parse(this.$route.query.btnRight)
+      console.log(btnArr)
+
       btnArr.forEach(item => {
         if (item.rightName === '新增') {
           // this.$set(this.btnArr, 'a_show', true)
@@ -689,6 +696,6 @@ export default {
 }
 .container {
   margin: 40px 60px;
-  width: 95%;
+  width: 100%;
 }
 </style>

@@ -11,11 +11,13 @@
             style="border-radius:4px;width:50%;height: 90%;margin-right:10px"
             placeholder="输入关键字搜索"
           />
-          <el-button @click="searchEnterFun()" type="primary">搜索</el-button>
+          <el-button @click="searchEnterFun()" type="primary"
+            ><i class="el-icon-search"></i>搜索</el-button
+          >
         </div>
         <el-button type="primary" @click="handleFilterClassify" v-if="a_show"
-          >新增<i class="el-icon-plus"></i
-        ></el-button>
+          ><i class="el-icon-plus"></i>新增</el-button
+        >
       </div>
       <el-table ref="singleTable" :data="tableData" @cell-click="hideInfo">
         <el-table-column type="index" width="50" align="center" label="序号">
@@ -27,14 +29,20 @@
         </el-table-column>
         <el-table-column label="权限设置" align="center" prop="u_power">
           <template slot-scope="scope">
-            <span class="editButton" @click="editRole(scope.row, scope.$index)"
-              >修改</span
+            <span
+              class="editButton"
+              @click="editRole(scope.row, scope.$index)"
+              v-if="e_show"
+              >编辑</span
             >
           </template>
         </el-table-column>
         <el-table-column label="角色删除" align="center">
           <template slot-scope="scope">
-            <span class="editButton" @click="deltRole(scope.row, scope.$index)"
+            <span
+              class="editButton"
+              @click="deltRole(scope.row, scope.$index)"
+              v-if="d_show"
               >删除</span
             >
           </template>
@@ -146,6 +154,7 @@
         :small="true"
         @handleCurrentChange="handleCurrentChange"
         @handleSizeChange="handleSizeChange"
+        style="margin:15px 50px;"
       />
     </div>
     <transition rightName="slide-fade">
@@ -566,7 +575,7 @@ export default {
           this.a_show = true
         } else if (item.rightName === '删除') {
           this.d_show = true
-        } else if (item.rightName === '修改') {
+        } else if (item.rightName === '编辑') {
           this.e_show = true
         } else if (item.rightName === '查询') {
           this.s_show = true

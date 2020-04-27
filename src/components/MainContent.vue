@@ -51,35 +51,31 @@ export default {
   methods: {
     initData() {
       us.getUserInfo().then(res => {
-        this.timer = this.formatTime(
-          res.data.object.loginLog.lastLoginTime.time,
-          'Y/M/D h:m:s'
+        console.log(res)
+
+        // this.timer = this.formatTime(
+        //   res.data.object.loginLog.lastLoginTime.time,
+        //   'Y/M/D h:m:s'
+        // )
+        this.timer = this.formatDate(
+          res.data.object.loginLog.lastLoginTime.time
         )
         this.ipAddress = res.data.object.loginLog.ipAddress
       })
     },
-    formatTime(number, format) {
-      var formateArr = ['Y', 'M', 'D', 'h', 'm', 's']
-      var returnArr = []
-
-      var date = new Date(number * 1000)
-      returnArr.push(date.getFullYear())
-      returnArr.push(this.formatNumber(date.getMonth() + 1))
-      returnArr.push(this.formatNumber(date.getDate()))
-
-      returnArr.push(this.formatNumber(date.getHours()))
-      returnArr.push(this.formatNumber(date.getMinutes()))
-      returnArr.push(this.formatNumber(date.getSeconds()))
-
-      for (var i in returnArr) {
-        format = format.replace(formateArr[i], returnArr[i])
-      }
-      return format
-    },
-
-    formatNumber(n) {
-      n = n.toString()
-      return n[1] ? n : '0' + n
+    formatDate(tim) {
+      var aa = new Date(tim)
+      var YY = aa.getFullYear() + '-'
+      var MM =
+        (aa.getMonth() + 1 < 10
+          ? '0' + (aa.getMonth() + 1)
+          : aa.getMonth() + 1) + '-'
+      var DD = aa.getDate() < 10 ? '0' + aa.getDate() : aa.getDate()
+      var hh = (aa.getHours() < 10 ? '0' + aa.getHours() : aa.getHours()) + ':'
+      var mm =
+        (aa.getMinutes() < 10 ? '0' + aa.getMinutes() : aa.getMinutes()) + ':'
+      var ss = aa.getSeconds() < 10 ? '0' + aa.getSeconds() : aa.getSeconds()
+      return YY + MM + DD + ' ' + hh + mm + ss
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
@@ -90,8 +86,8 @@ export default {
   mounted() {},
   beforeCreate() {}, // 生命周期 - 创建之前
   beforeMount() {}, // 生命周期 - 挂载之前
-  beforeUpdate() {}, // 生命周期 - 更新之前
-  updated() {}, // 生命周期 - 更新之后
+  beforeUpa() {}, // 生命周期 - 更新之前
+  upad() {}, // 生命周期 - 更新之后
   beforeDestroy() {}, // 生命周期 - 销毁之前
   destroyed() {}, // 生命周期 - 销毁完成
   activated() {} // 如果页面有keep-alive缓存功能，这个函数会触发

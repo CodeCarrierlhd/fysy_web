@@ -20,7 +20,9 @@
               style="border-radius:4px;width:400px;margin-right:10px"
               placeholder="输入关键字搜索"
             />
-            <el-button @click="searchEnterFun()" type="primary">搜索</el-button>
+            <el-button @click="searchEnterFun()" type="primary"
+              ><i class="el-icon-search"></i>搜索</el-button
+            >
           </div>
           <div>
             <el-button
@@ -28,7 +30,7 @@
               type="primary"
               size="medium"
               v-if="i_show"
-              >导出</el-button
+              ><i class="el-icon-download"></i>导出</el-button
             >
           </div>
         </div>
@@ -38,7 +40,7 @@
           @selection-change="selectionChangeHandle"
           @filter-change="fnFilterChangeInit"
           :row-key="getRowKey"
-          style="width: 100%; margin:10px 0"
+          style="width: 100%; margin:0 20px"
           border
           height="600"
         >
@@ -493,7 +495,7 @@ export default {
 }
 .container {
   margin: 40px 60px;
-  width: 95%;
+  width: 1560px;
 }
 .find {
   width: 100%;
@@ -502,7 +504,7 @@ export default {
 .btn_header {
   display: flex;
   justify-content: space-between;
-  margin: 10px 60px;
+  margin: 25px 20px;
 }
 .btngroups {
   text-align: center;

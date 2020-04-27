@@ -46,21 +46,21 @@
           :label="item.label"
         >
           <div
-            style="display: flex;width: 96%;justify-content: space-around;margin: 0 auto;"
+            style="display: flex;width: 96%;justify-content: space-around;margin:20px 25px;"
           >
             <div style="display:flex;width:100%;">
               <el-input
                 v-model="search"
-                style="border-radius:4px;width:50%;height: 90%;margin-right:10px"
+                style="border-radius:4px;width:400px;height: 90%;margin-right:10px"
                 placeholder="输入关键字搜索"
               />
               <el-button @click="searchEnterFun()" type="primary"
-                >搜索</el-button
+                ><i class="el-icon-search"></i>搜索</el-button
               >
             </div>
             <div>
               <el-button @click="importData()" type="primary" v-if="i_show"
-                >导入</el-button
+                ><i class="el-icon-upload2"></i> 导入</el-button
               >
             </div>
           </div>
@@ -69,9 +69,9 @@
             :data="
               tableData.slice((currentPage - 1) * limit, currentPage * limit)
             "
-            style="width: 96%;margin:20px;"
+            style="width: 96%;padding:0 20px;"
             border
-            height="400"
+            height="300"
           >
             <el-table-column class-name="t_header">
               <el-table-column
@@ -143,7 +143,7 @@ export default {
   data() {
     // 这里存放数据
     return {
-      activeName: '-1',
+      activeName: '0',
       tableData: [],
       currentPage: 1,
       limit: 100,
@@ -153,8 +153,7 @@ export default {
       s_show: false,
       i_show: false,
       tabNames: [
-        { label: '全部', name: '-1' },
-        { label: '库存', name: '0' },
+        { label: '未使用', name: '0' },
         { label: '已使用', name: '1' }
       ],
       imgs: {
@@ -184,11 +183,14 @@ export default {
         this.nowPage,
         ''
       ).then(res => {
+        console.log(res)
+
         for (let i = 0; i < res.data.object.list.length; i++) {
           this.tableData.push({
             code: res.data.object.list[i].code,
             createTime: res.data.object.list[i].createTime,
-            status: res.data.object.list[i].status
+            status: res.data.object.list[i].status,
+            queryCount: res.data.object.list[i].queryCount
           })
         }
         this.getDataList(res.data.object.total)
@@ -217,13 +219,10 @@ export default {
     },
     handleClick(tab, event) {
       if (tab.index === '1') {
-        this.nowPage = '0'
-      } else if (tab.index === '2') {
         this.nowPage = '1'
       } else {
-        this.nowPage = '-1'
+        this.nowPage = '0'
       }
-      console.log(this.nowPage)
       this.initData()
     },
     getDataList(total) {
@@ -256,7 +255,7 @@ export default {
         '',
         ''
       ).then(res => {
-        console.log(res)
+        this.tableData = []
 
         for (let i = 0; i < res.data.object.list.length; i++) {
           this.tableData.push({
@@ -328,8 +327,7 @@ export default {
 
 <style scoped>
 .container {
-  width: 100%;
-  padding: 40px 60px;
+  width: 1560px;
 }
 .text {
   font-size: 14px;
@@ -340,8 +338,8 @@ export default {
 }
 
 .box-card {
-  width: 700px;
-  height: 200px;
+  width: 765px;
+  height: 220px;
 }
 .header {
   display: flex;
@@ -370,5 +368,8 @@ export default {
 .sumForm {
   background-color: #fff;
   flex: 1;
+}
+.sendPro >>> .el-dialog__body {
+  display: flex !important;
 }
 </style>

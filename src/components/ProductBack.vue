@@ -22,7 +22,7 @@
                 placeholder="输入关键字搜索"
               />
               <el-button @click="searchEnterFun()" type="primary"
-                >搜索</el-button
+                ><i class="el-icon-search"></i>搜索</el-button
               >
             </div>
             <el-button
@@ -30,7 +30,7 @@
               type="primary"
               size="medium"
               v-if="e_show"
-              >导出</el-button
+              ><i class="el-icon-download"></i>导出</el-button
             >
           </div>
           <div v-if="add_show">
@@ -74,8 +74,8 @@
           @selection-change="selectionChangeHandle"
           @filter-change="fnFilterChangeInit"
           :row-key="getRowKey"
-          max-height="660"
-          style="width: 96%; margin:10px 60px"
+          height="600"
+          style="width: 100%; margin:10px 20px"
           border
         >
           <el-table-column class-name="t_header">
@@ -381,7 +381,11 @@
       <ul class="sendContainer">
         <li>
           <span>退货原因：</span>
-          <el-select v-model="reason" placeholder="请选择">
+          <el-select
+            v-model="reason"
+            placeholder="请选择"
+            @change="reasonChange"
+          >
             <el-option
               v-for="item in reasonGroup"
               :key="item.value"
@@ -495,7 +499,7 @@ export default {
       search: '',
       search1: '',
       tabNames: [
-        { label: '发货', name: 'one' },
+        { label: '退货', name: 'one' },
         { label: '待收货', name: 'two' },
         { label: '已完成', name: 'third' }
       ],
@@ -525,7 +529,9 @@ export default {
       s_show: false,
       e_show: false,
       loseReason: '',
-      key_index: '2'
+      key_index: '2',
+      uid: 0,
+      returnReasonType: 0
     }
   },
   // 监听属性 类似于data概念
@@ -536,6 +542,7 @@ export default {
   methods: {
     initData() {},
     initData1() {
+      this.tableData = []
       this.searchAll(
         this.currentPage1,
         this.limit1,
@@ -599,18 +606,18 @@ export default {
     },
     handleClick(tab, event) {
       if (tab.index === '2') {
-        this.key_index = '6'
+        this.key_index = '4'
         this.$nextTick(() => {
-          this.getUid()
+          this.changeTab('4', this.uid)
           this.show_role = true
           this.add_show = false
           this.a_statu = true
           this.wait_pro = false
         })
       } else if (tab.index === '1') {
-        this.key_index = '5'
+        this.key_index = '1'
         this.$nextTick(() => {
-          this.changeTab('0', '')
+          this.changeTab('1', '')
           this.show_role = false
           this.add_show = false
           this.a_statu = false
@@ -708,12 +715,14 @@ export default {
       this.sendProducts(ids, '', '', '', '/return/generateOrderInfo').then(
         res => {
           console.log(res.data.object)
+          this.reciveGroup = []
           for (let i = 0; i < res.data.object.receiverList.length; i++) {
             this.reciveGroup.push({
               value: res.data.object.receiverList[i].id,
-              label: res.data.object.receiverList[i].address
+              label: res.data.object.receiverList[i].username
             })
           }
+          this.reasonGroup = []
           for (let i = 0; i < res.data.object.returnReasonList.length; i++) {
             this.reasonGroup.push({
               value: res.data.object.returnReasonList[i].value,
@@ -730,6 +739,7 @@ export default {
 
           this.sender = res.data.object.sender
           this.order = res.data.object.order
+          this.gridData = []
           for (let j = 0; j < res.data.object.goodsList.list.length; j++) {
             this.gridData.push({
               materialType: res.data.object.goodsList.list[j].materialType,
@@ -753,7 +763,12 @@ export default {
     },
     quitSend() {
       this.newDialogTableVisible = false
+      this.$refs.sendProFilterTable[0].clearSelection()
       console.log('退出')
+    },
+    reasonChange(val) {
+      console.log(val)
+      this.returnReasonType = val
     },
     sendProduct() {
       this.newDialogTableVisible = false
@@ -764,8 +779,8 @@ export default {
           orderNo: this.order.orderNo,
           orderTime: this.order.orderTime.replace(/-/g, '/'),
           receiver: this.reciver.id,
-          returnReason: this.reasonList[0].value,
-          returnReasonType: this.reasonList[0].value
+          returnReason: this.loseReason,
+          returnReasonType: this.returnReasonType
         },
         '/return/sureReturn'
       ).then(res => {
@@ -778,6 +793,7 @@ export default {
                 this.tableData.splice(i, 1)
               }
             }
+            this.$refs.sendProFilterTable[0].clearSelection()
           }
           this.$refs.sendProFilterTable[0].clearSelection()
           this.$notify({
@@ -805,9 +821,9 @@ export default {
       console.log(this.key_index)
       let a = 0
       if (this.key_index === 3) {
-        a = 3
+        a = 4
       } else {
-        a = 0
+        a = 1
       }
       this.changeTab(a, '')
     },
@@ -825,7 +841,7 @@ export default {
       this.searchAll(
         this.currentPage,
         8,
-        '/deliver/listData',
+        '/return/listData',
         '&materialId=',
         '',
         '&status=',
@@ -849,7 +865,7 @@ export default {
             label: res.data.object[i].username
           })
         }
-        this.changeTab('3', res.data.object[0].id)
+        this.uid = res.data.object[0].id
       })
     },
     restart(row) {
@@ -884,6 +900,7 @@ export default {
   created() {
     this.initBtn()
     this.getType()
+    this.getUid()
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
@@ -911,7 +928,7 @@ export default {
 .btn_header {
   display: flex;
   justify-content: space-between;
-  margin: 10px 60px;
+  margin: 10px 20px;
 }
 .new_header {
   display: flex;

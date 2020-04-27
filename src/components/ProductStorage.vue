@@ -27,7 +27,7 @@
                 placeholder="输入关键字搜索"
               />
               <el-button @click="searchEnterFun()" type="primary"
-                >搜索</el-button
+                ><i class="el-icon-search"></i>搜索</el-button
               >
             </div>
             <el-button
@@ -35,10 +35,7 @@
               type="primary"
               size="medium"
               v-if="e_show"
-              >导出</el-button
-            >
-            <el-button @click="refreshData()" type="primary" size="medium"
-              >刷新</el-button
+              ><i class="el-icon-download"></i>导出</el-button
             >
           </div>
           <div v-if="i_show">
@@ -62,7 +59,7 @@
           @filter-change="fnFilterChangeInit"
           @selection-change="selectionChangeHandle"
           :row-key="getRowKey"
-          style="width: 100%;margin:10px 0;"
+          style="width: 100%;margin:10px 20px;"
           border
           height="600"
         >
@@ -334,12 +331,8 @@ export default {
       return row.opId
     },
     makeSure() {
-      this.$notify({
-        title: '已入库',
-        message: '产品入库成功',
-        position: 'top-right',
-        duration: 2000
-      })
+      console.log(this.key_index)
+
       const ids = this.tableDataSelections.join(',')
       let opStatu = ''
       if (this.key_index === '0') {
@@ -349,17 +342,23 @@ export default {
       }
       this.productDone(ids, opStatu, '/stock/sureOrReject').then(res => {
         console.log(res)
-        this.initData()
+        if (res.data.code === 200) {
+          this.$notify({
+            title: '已入库',
+            message: '产品入库成功',
+            position: 'top-right',
+            duration: 2000
+          })
+          this.initData()
+          if (this.key_index === '1') {
+            this.$refs.filterTable[1].clearSelection()
+          } else {
+            this.$refs.filterTable[0].clearSelection()
+          }
+        }
       })
-      // this.$refs.filterTable.clearSelection()
     },
     refusedProduct() {
-      this.$notify({
-        title: '已拒绝',
-        message: '产品入库失败',
-        position: 'top-right',
-        duration: 2000
-      })
       const ids = this.tableDataSelections.join(',')
       let opStatu = ''
       if (this.key_index === '0') {
@@ -368,7 +367,20 @@ export default {
         opStatu = '5'
       }
       this.productDone(ids, opStatu, '/stock/sureOrReject').then(res => {
-        this.initData()
+        if (res.data.code === 200) {
+          this.$notify({
+            title: '已拒绝',
+            message: '产品入库失败',
+            position: 'top-right',
+            duration: 2000
+          })
+          this.initData()
+          if (this.key_index === '1') {
+            this.$refs.filterTable[1].clearSelection()
+          } else {
+            this.$refs.filterTable[0].clearSelection()
+          }
+        }
       })
     },
     initBtn() {
@@ -425,10 +437,6 @@ export default {
 }
 </script>
 <style scoped>
-.container {
-  margin: 40px 60px;
-  width: 95%;
-}
 .find {
   width: 100%;
   background-color: #fff;
@@ -436,7 +444,7 @@ export default {
 .btn_header {
   display: flex;
   justify-content: space-between;
-  margin: 10px 60px;
+  margin: 10px 20px;
 }
 .btngroups {
   text-align: center;

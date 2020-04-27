@@ -46,21 +46,21 @@
           :label="item.label"
         >
           <div
-            style="display: flex;width: 96%;justify-content: space-around;margin: 0 auto;"
+            style="display: flex;width: 96%;justify-content: space-around;margin:25px 20px;"
           >
             <div style="display:flex;width:100%;">
               <el-input
                 v-model="search"
-                style="border-radius:4px;width:50%;height: 90%;margin-right:10px"
+                style="border-radius:4px;width:400px;height: 90%;margin-right:10px"
                 placeholder="输入关键字搜索"
               />
               <el-button @click="searchEnterFun()" type="primary"
-                >搜索</el-button
+                ><i class="el-icon-search"></i>搜索</el-button
               >
             </div>
             <div>
               <el-button @click="importData()" type="primary" v-if="i_show"
-                >生成并导出</el-button
+                ><i class="el-icon-download"></i>生成并导出</el-button
               >
             </div>
           </div>
@@ -68,9 +68,9 @@
             :data="
               tableData.slice((currentPage - 1) * limit, currentPage * limit)
             "
-            style="width: 96%;margin:20px"
+            style="width: 96%;margin:0 20px"
             border
-            height="400"
+            height="300"
             @filter-change="fnFilterChangeInit"
           >
             <el-table-column class-name="t_header">
@@ -103,6 +103,19 @@
               </el-table-column>
               <el-table-column prop="status" :label="statusName" align="center">
               </el-table-column>
+              <!-- <el-table-column
+                prop="status"
+                label="状态"
+                align="center"
+                v-if="sumCount"
+              >
+              </el-table-column>
+              <el-table-column
+                prop="queryCount"
+                label="激活次数"
+                align="center"
+                v-else
+              > -->
             </el-table-column>
           </el-table>
           <pagination
@@ -180,7 +193,8 @@ export default {
       c_number: 0,
       a_number: 0,
       newDialogTableVisible: false,
-      sums: 0
+      sums: 0,
+      sumCount: true
     }
   },
   // 监听属性 类似于data概念
@@ -200,7 +214,6 @@ export default {
         this.typeNumber
       ).then(res => {
         console.log(res)
-
         for (let i = 0; i < res.data.object.list.length; i++) {
           this.tableData.push({
             code: res.data.object.list[i].code,
@@ -252,8 +265,7 @@ export default {
           this.nowPage,
           this.typeNumber
         ).then(res => {
-          console.log(res)
-
+          this.tableData = []
           for (let i = 0; i < res.data.object.list.length; i++) {
             this.tableData.push({
               code: res.data.object.list[i].code,
@@ -319,6 +331,8 @@ export default {
         '',
         ''
       ).then(res => {
+        console.log(res)
+        this.tableData = []
         for (let i = 0; i < res.data.object.list.length; i++) {
           this.tableData.push({
             code: res.data.object.list[i].code,
@@ -342,6 +356,8 @@ export default {
           that.downloadFile(response.data, '卡片防伪码')
           this.newDialogTableVisible = false
           this.sums = 0
+          this.initSums()
+          this.initData()
         }
       })
     }
@@ -380,8 +396,7 @@ export default {
 
 <style scoped>
 .container {
-  width: 100%;
-  padding: 40px 60px;
+  width: 1560px;
 }
 .text {
   font-size: 14px;
@@ -392,8 +407,8 @@ export default {
 }
 
 .box-card {
-  width: 700px;
-  height: 200px;
+  width: 765px;
+  height: 220px;
 }
 .header {
   display: flex;

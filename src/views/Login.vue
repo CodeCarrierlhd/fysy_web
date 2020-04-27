@@ -167,6 +167,10 @@ export default {
                 this.$router.push({
                   path
                 })
+              } else {
+                this.$alert(res.data.msg, '错误', {
+                  confirmButtonText: '确定'
+                })
               }
             })
             .catch(error => {

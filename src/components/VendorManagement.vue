@@ -22,11 +22,13 @@
               v-model="search"
               prefix-icon="el-icon-search"
               clearable
-              style="width:600px;border-radius:4px;margin-right:8px"
+              style="width:400px;border-radius:4px;margin-right:8px"
               placeholder="输入关键字搜索"
               @clear="clearSearch"
             />
-            <el-button @click="searchEnterFun()" type="primary">搜索</el-button>
+            <el-button @click="searchEnterFun()" type="primary"
+              ><i class="el-icon-search"></i>搜索</el-button
+            >
           </div>
 
           <div>
@@ -219,7 +221,10 @@
               @click="handleSave(scope.$index, scope.row)"
               >保存</el-button
             >
-            <el-button size="mini" @click="handleDelete(scope.row)"
+            <el-button
+              size="mini"
+              @click="handleDelete(scope.row)"
+              v-if="d_show"
               >删除</el-button
             >
           </template>
@@ -330,8 +335,12 @@ export default {
         }
       })
     },
-    selectionChangeHandle(val) {
-      this.tableDataSelections = val
+    selectionChangeHandle(selection) {
+      this.tableDataSelections = []
+      // this.btnShow = false
+      for (let i = 0; i < selection.length; i++) {
+        this.tableDataSelections.push(selection[i].opId)
+      }
     },
     // table column 的方法，改写这个方法
     filterTag(value, row, column) {
@@ -346,7 +355,6 @@ export default {
       // do something
       if (filter.province) {
         console.log(filter.province[0])
-        this.getBeforeData()
         this.provinces.filter(item => {
           if (item.name === filter.province[0]) {
             this.cities = item.cities
@@ -368,12 +376,14 @@ export default {
       this.valueData(
         this.currentPage,
         this.limit,
-        '/user/listData',
+        '/producer/listData',
         this.search,
         this.options.proTag,
         this.options.cityTag,
         this.options.typeTag
       ).then(res => {
+        console.log(res)
+
         this.tableData = []
         const vdata = res.data.object.list
         for (let i = 0; i < vdata.length; i++) {
@@ -496,6 +506,7 @@ export default {
     },
     initBtn() {
       const btnArr = JSON.parse(this.$route.query.btnRight)
+      console.log(btnArr)
 
       btnArr.forEach(item => {
         if (item.rightName === '新增') {
@@ -503,7 +514,7 @@ export default {
           this.a_show = true
         } else if (item.rightName === '删除') {
           this.d_show = true
-        } else if (item.rightName === '修改') {
+        } else if (item.rightName === '编辑') {
           this.e_show = true
         } else if (item.rightName === '查询') {
           this.s_show = true
@@ -514,7 +525,6 @@ export default {
       this.searchData('producer/getSearchData').then(res => {
         this.provinces = res.data.object.provinces
         console.log(this.provinces)
-
         this.proviceGroup = []
         for (let index = 0; index < this.provinces.length; index++) {
           this.proviceGroup.push({

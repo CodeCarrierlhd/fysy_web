@@ -22,7 +22,7 @@
                 placeholder="输入关键字搜索"
               />
               <el-button @click="searchEnterFun()" type="primary"
-                >搜索</el-button
+                ><i class="el-icon-search"></i>搜索</el-button
               >
             </div>
             <el-button
@@ -30,7 +30,7 @@
               type="primary"
               size="medium"
               v-if="e_show"
-              >导出</el-button
+              ><i class="el-icon-download"></i>导出</el-button
             >
           </div>
           <div v-if="add_show">
@@ -68,15 +68,13 @@
         </div>
         <el-table
           ref="sendProFilterTable"
-          :data="
-            tableData.slice((currentPage - 1) * limit, currentPage * limit)
-          "
+          :data="tableData"
           @selection-change="selectionChangeHandle"
           @filter-change="fnFilterChangeInit"
           :row-key="getRowKey"
-          max-height="660"
-          style="width: 96%; margin:10px 0"
+          style="width: 100%; margin:10px 20px"
           border
+          height="600"
         >
           <el-table-column class-name="t_header">
             <el-table-column
@@ -402,7 +400,7 @@
         </li>
         <li>
           <span>联系人：</span>
-          <span>{{ reciver.username }}</span>
+          <span>{{ reciver.contact }}</span>
         </li>
         <li>
           <span>联系电话：</span>
@@ -487,7 +485,7 @@ export default {
     // 这里存放数据
     return {
       currentPage: 1,
-      limit: 100,
+      limit: 10,
       total: 0,
       currentPage1: 1,
       limit1: 100,
@@ -528,7 +526,8 @@ export default {
       recived: '',
       s_show: false,
       e_show: false,
-      key_index: '2'
+      key_index: '2',
+      uid: 0
     }
   },
   // 监听属性 类似于data概念
@@ -594,16 +593,22 @@ export default {
     },
     handleCurrentChange(val) {
       this.currentPage = val
+      this.search = ''
+      if (this.key_index === '3') {
+        this.changeTab('0', '')
+      } else if (this.key_index === '4') {
+        this.changeTab('3', this.uid)
+      }
     },
     handleCurrentChange1(val) {
       this.currentPage1 = val
       this.initData1()
     },
     handleClick(tab, event) {
-      this.key_index = '4'
       if (tab.index === '2') {
+        this.key_index = '4'
         this.$nextTick(() => {
-          this.getUid()
+          this.changeTab('3', this.uid)
           this.show_role = true
           this.add_show = false
           this.a_statu = true
@@ -658,8 +663,8 @@ export default {
       return row.opId
     },
     changRole(val) {
-      this.changeTab('3', val)
-      console.log('角色改变', val)
+      this.uid = val
+      this.changeTab('3', this.uid)
     },
     addData() {
       this.newTableData = []
@@ -714,7 +719,7 @@ export default {
           for (let i = 0; i < res.data.object.receiverList.length; i++) {
             this.reciveGroup.push({
               value: res.data.object.receiverList[i].id,
-              label: res.data.object.receiverList[i].address
+              label: res.data.object.receiverList[i].username
             })
           }
           this.receiverList = res.data.object.receiverList
@@ -794,9 +799,9 @@ export default {
       console.log(this.key_index)
       let a = 0
       if (this.key_index === 3) {
-        a = 3
-      } else {
         a = 0
+      } else if (this.key_index === 4) {
+        a = 3
       }
       this.changeTab(a, '')
     },
@@ -811,11 +816,10 @@ export default {
       })
     },
     changeTab(statu, uid) {
-      console.log(statu, uid)
-
+      this.tableData = []
       this.searchAll(
         this.currentPage,
-        8,
+        this.limit,
         '/deliver/listData',
         '&materialId=',
         '',
@@ -833,14 +837,13 @@ export default {
     },
     getUid() {
       this.getSums('/user/selfAndChild').then(res => {
-        console.log(res)
         for (let i = 0; i < res.data.object.length; i++) {
           this.roleGroups.push({
             value: res.data.object[i].id,
             label: res.data.object[i].username
           })
         }
-        this.changeTab('3', res.data.object[0].id)
+        this.uid = res.data.object[0].id
       })
     },
     restart(row) {
@@ -875,6 +878,7 @@ export default {
   created() {
     this.initBtn()
     this.getType()
+    this.getUid()
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
@@ -902,7 +906,7 @@ export default {
 .btn_header {
   display: flex;
   justify-content: space-between;
-  margin: 10px 60px;
+  margin: 10px 20px;
 }
 .new_header {
   display: flex;
