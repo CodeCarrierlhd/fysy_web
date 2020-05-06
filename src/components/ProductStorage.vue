@@ -1,4 +1,4 @@
-<!-- 产品入库 -->
+<!-- 入仓管理 -->
 <template>
   <div class="container">
     <el-tabs
@@ -15,14 +15,11 @@
       >
         <div class="btn_header">
           <div style="display:flex;">
-            <!-- <el-input
-              v-model="search"
-              style="width:300px;border-radius:4px;padding-right:15px"
-              placeholder="输入关键字搜索"
-            /> -->
             <div style="display:flex;margin-right:10px">
               <el-input
                 v-model="search"
+                prefix-icon="el-icon-search"
+                clearable
                 style="border-radius:4px;width:400px;margin-right:10px"
                 placeholder="输入关键字搜索"
               />
@@ -437,6 +434,10 @@ export default {
 }
 </script>
 <style scoped>
+.container {
+  margin: 40px 60px;
+  width: 95%;
+}
 .find {
   width: 100%;
   background-color: #fff;

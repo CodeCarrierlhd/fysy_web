@@ -17,6 +17,8 @@
           <div style="display:flex;margin-right:10px" v-if="s_show">
             <el-input
               v-model="search"
+              prefix-icon="el-icon-search"
+              clearable
               style="border-radius:4px;width:400px;margin-right:10px"
               placeholder="输入关键字搜索"
             />
@@ -227,30 +229,34 @@
         />
       </el-tab-pane>
     </el-tabs>
+
     <el-dialog
       title="追踪报告"
       :visible.sync="dialogVisible"
       center
       width="620px"
     >
-      <el-steps direction="vertical">
-        <el-step
-          v-for="(item, index) in stepGroups"
-          :title="item.stepName"
-          :icon="item.iconType"
-          :key="index"
-        >
-          <template slot="description">
-            <div>
-              <p>{{ item.stepContent }}</p>
-              <p>{{ item.stepTime }}</p>
-            </div>
-          </template>
-        </el-step>
-      </el-steps>
+      <div ref="cutImageBox" class="cutImg" style="display:block">
+        <el-steps direction="vertical">
+          <el-step
+            v-for="(item, index) in stepGroups"
+            :title="item.stepName"
+            :icon="item.iconType"
+            :key="index"
+          >
+            <template slot="description">
+              <div>
+                <p>{{ item.stepContent }}</p>
+                <p>{{ item.stepTime }}</p>
+              </div>
+            </template>
+          </el-step>
+        </el-steps>
+      </div>
+
       <div style="text-align: center;">
-        <el-button @click="saveImg" type="primary" plain>确定</el-button>
-        <el-button @click="quitNow" type="primary" plain>返回</el-button>
+        <el-button @click="saveImg" type="primary" plain>保存</el-button>
+        <el-button @click="quitNow" type="primary" plain>取消</el-button>
       </div>
     </el-dialog>
   </div>
@@ -260,6 +266,7 @@
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
 import pagination from '../components/Pagenation'
+import html2Canvas from 'html2canvas'
 
 export default {
   // import引入的组件需要注入到对象中才能使用
@@ -285,7 +292,8 @@ export default {
       i_show: false,
       r_show: false,
       key_index: '0',
-      unsed: false
+      unsed: false,
+      materialId: ''
     }
   },
   // 监听属性 类似于data概念
@@ -304,8 +312,8 @@ export default {
         this.key_index,
         '&value=',
         this.search,
-        '',
-        '',
+        '&materialId=',
+        this.materialId,
         '',
         ''
       ).then(res => {
@@ -347,13 +355,8 @@ export default {
     },
     fnFilterChangeInit(filter) {
       console.log(filter)
-      const arr = []
-      for (let i = 0; i < this.tableData.length; i++) {
-        if (this.tableData[i].materialModel === filter.materialModel[0]) {
-          arr.push(this.tableData[i])
-        }
-      }
-      this.tableData = arr
+      this.materialId = filter.materialModel[0]
+      this.initData()
     },
     getRowKey(row) {
       return row.productId
@@ -406,9 +409,92 @@ export default {
       })
     },
     saveImg() {
-      this.dialogVisible = false
-      console.log('保存图片')
+      this.$prompt(
+        '请输入图片名称',
+        { inputValue: '追踪报告' + Date.parse(new Date()) },
+        '提示',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          inputPattern: '', // 校验正则
+          inputErrorMessage: '' // 错误提示信息
+        }
+      )
+        .then(({ value }) => {
+          html2Canvas(this.$refs.cutImageBox, {
+            allowTaint: true,
+            taintTest: false,
+            backgroundColor: '#fff',
+            scale: 1.5 // 缩放
+          }).then(canvas => {
+            const image = canvas
+              .toDataURL('image/png')
+              .replace('image/png', 'image/octet-stream')
+            const userAgent = navigator.userAgent
+            // 兼容ie
+            if (userAgent.includes('Trident')) {
+              const arr = image.split(',')
+              const mime = arr[0].match(/:(.*?);/)[1]
+              const bstr = atob(arr[1])
+              let n = bstr.length
+              const u8arr = new Uint8Array(n)
+              while (n--) {
+                u8arr[n] = bstr.charCodeAt(n)
+              }
+              window.navigator.msSaveBlob(
+                new Blob([u8arr], { type: mime }),
+                `${value}.jpg`
+              )
+            } else {
+              const imgData = canvas.toDataURL('image/jpeg')
+              this.fileDownload(imgData, value)
+            }
+          })
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '取消输入'
+          })
+        })
+      // this.dialogVisible = false
     },
+    // 下载截图图片
+    fileDownload(downloadUrl, downloadName) {
+      const aLink = document.createElement('a')
+      aLink.style.display = 'none'
+      aLink.href = downloadUrl
+      aLink.download = `${downloadName}.jpg`
+      document.body.appendChild(aLink)
+      aLink.click()
+      document.body.removeChild(aLink)
+    },
+    // imgDown(downloadContent, opts) {
+    //   html2canvas(downloadContent, opts).then(canvas => {
+    //     var context = canvas.getContext('2d')
+    //     // 【重要】关闭抗锯齿
+    //     context.mozImageSmoothingEnabled = false
+    //     context.webkitImageSmoothingEnabled = false
+    //     context.msImageSmoothingEnabled = false
+    //     context.imageSmoothingEnabled = false
+
+    //     var img = Canvas2Image.convertToJPEG(
+    //       canvas,
+    //       canvas.width / 2,
+    //       canvas.height / 2
+    //     )
+
+    //     // const dataURL = img.getAttribute('src')
+
+    //     // 下载图片
+    //     const a = document.createElement('a')
+    //     document.body.appendChild(a)
+    //     a.href = img.src
+    //     // 设置下载标题
+    //     a.download = '排课计划'
+    //     a.click()
+    //   })
+    // },
     quitNow() {
       this.dialogVisible = false
       console.log('取消')

@@ -1,6 +1,37 @@
 <!-- 账号管理 -->
 <template>
-  <div style="width: 100%;">
+  <div class="container">
+    <div class="i_header">
+      <div
+        style="display:flex;justify-content: space-between;margin-bottom:20px"
+      >
+        <div v-if="s_show" style="display:flex">
+          <el-input
+            v-model="search"
+            prefix-icon="el-icon-search"
+            clearable
+            style="border-radius:4px;width:400px;margin-right:10px"
+            placeholder="输入关键字搜索"
+          />
+          <el-button @click="searchEnterFun()" type="primary"
+            ><i class="el-icon-search"></i>搜索</el-button
+          >
+        </div>
+
+        <div>
+          <el-button @click="addRow()" type="primary" v-if="a_show"
+            ><i class="el-icon-plus"></i> 新增</el-button
+          >
+          <el-button
+            @click="batchDelete(tableDataSelections)"
+            type="primary"
+            v-if="d_show"
+            ><i class="el-icon-delete"></i>删除</el-button
+          >
+        </div>
+      </div>
+    </div>
+
     <el-table
       ref="filterTable"
       :data="tableData"
@@ -8,265 +39,231 @@
       @selection-change="selectionChangeHandle"
       @cell-dblclick="celledit"
       :row-key="getRowKey"
-      style="width: 100%;margin:40px 60px;"
+      style="width: 100%;"
       border
     >
-      <el-table-column class-name="t_header">
-        <template
-          slot="header"
-          style="display:flex;justify-content: space-between;"
-          header-align="center"
-        >
-          <div v-if="s_show" style="display:flex">
-            <input
-              type="text"
-              class="newInput"
-              placeholder="输入关键字搜索"
-              v-model="search"
-            />
-            <el-button @click="searchEnterFun()" type="primary"
-              ><i class="el-icon-search"></i>搜索</el-button
-            >
-          </div>
-
-          <div>
-            <el-button @click="addRow()" type="primary" v-if="a_show"
-              ><i class="el-icon-plus"></i> 新增</el-button
-            >
-            <el-button
-              @click="batchDelete(tableDataSelections)"
-              type="primary"
-              v-if="d_show"
-              ><i class="el-icon-delete"></i>删除</el-button
-            >
-          </div>
+      <el-table-column
+        type="selection"
+        width="100"
+        align="center"
+        :reserve-selection="true"
+      ></el-table-column>
+      <el-table-column
+        prop="account"
+        label="登录账号"
+        edit="false"
+        align="center"
+        width="100"
+      >
+        <template slot-scope="scope">
+          <el-input
+            v-if="scope.row.account.edit"
+            ref="account"
+            v-model="scope.row.account.value"
+            @blur="scope.row.account.edit = false"
+          >
+          </el-input>
+          <span v-else>{{ scope.row.account.value }}</span>
         </template>
-        <el-table-column
-          type="selection"
-          width="100"
-          align="center"
-          :reserve-selection="true"
-        ></el-table-column>
-        <el-table-column
-          prop="account"
-          label="登录账号"
-          edit="false"
-          align="center"
-          width="100"
-        >
-          <template slot-scope="scope">
-            <el-input
-              v-if="scope.row.account.edit"
-              ref="account"
-              v-model="scope.row.account.value"
-              @blur="scope.row.account.edit = false"
-            >
-            </el-input>
-            <span v-else>{{ scope.row.account.value }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="username"
-          label="用户昵称"
-          width="100"
-          edit="false"
-          align="center"
-        >
-          <template slot-scope="scope">
-            <el-input
-              v-if="scope.row.username.edit"
-              ref="'username'"
-              v-model="scope.row.username.value"
-              @blur="scope.row.username.edit = false"
-            >
-            </el-input>
-            <span v-else>{{ scope.row.username.value }}</span>
-          </template>
-        </el-table-column>
+      </el-table-column>
+      <el-table-column
+        prop="username"
+        label="用户昵称"
+        width="100"
+        edit="false"
+        align="center"
+      >
+        <template slot-scope="scope">
+          <el-input
+            v-if="scope.row.username.edit"
+            ref="'username'"
+            v-model="scope.row.username.value"
+            @blur="scope.row.username.edit = false"
+          >
+          </el-input>
+          <span v-else>{{ scope.row.username.value }}</span>
+        </template>
+      </el-table-column>
 
-        <el-table-column
-          prop="roleType"
-          label="角色类型"
-          edit="false"
-          align="center"
-          width="160"
-          :filter-multiple="false"
-          :filters="roleTypeGroup"
-          :filter-method="filterTag"
-          column-key="roleType"
-          filter-placement="bottom-end"
-        >
-          <template slot-scope="scope">
-            <el-select
-              v-model="scope.row.roleType.value"
-              v-if="scope.row.roleType.edit"
-              placeholder="请选择"
-              @change="
-                value => {
-                  scope.row.roleType.edit = false
-                  changeCell(value, scope.row, scope.$index, 'roleType')
-                }
-              "
+      <el-table-column
+        prop="roleType"
+        label="角色类型"
+        edit="false"
+        align="center"
+        width="160"
+        :filter-multiple="false"
+        :filters="roleTypeGroup"
+        :filter-method="filterTag"
+        column-key="roleType"
+        filter-placement="bottom-end"
+      >
+        <template slot-scope="scope">
+          <el-select
+            v-model="scope.row.roleType.value"
+            v-if="scope.row.roleType.edit"
+            placeholder="请选择"
+            @change="
+              value => {
+                scope.row.roleType.edit = false
+                changeCell(value, scope.row, scope.$index, 'roleType')
+              }
+            "
+          >
+            <el-option
+              v-for="item in roleGroups"
+              :key="item.value"
+              :label="item.label"
+              :value="item.label"
             >
-              <el-option
-                v-for="item in roleGroups"
-                :key="item.value"
-                :label="item.label"
-                :value="item.label"
-              >
-              </el-option>
-            </el-select>
-            <span v-else>{{ scope.row.roleType.value }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="province"
-          label="省份"
-          edit="false"
-          align="center"
-          width="120"
-          :filter-multiple="false"
-          column-key="province"
-          :filters="proviceGroup"
-          :filter-method="filterTag"
-          filter-placement="bottom-end"
-        >
-          <template slot-scope="scope">
-            <el-select
-              v-model="scope.row.province.value"
-              v-if="scope.row.province.edit"
-              placeholder="请选择"
-              @change="
-                value => {
-                  scope.row.province.edit = false
-                  changeCell(value, scope.row, scope.$index, 'province')
-                }
-              "
+            </el-option>
+          </el-select>
+          <span v-else>{{ scope.row.roleType.value }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="province"
+        label="省份"
+        edit="false"
+        align="center"
+        width="120"
+        :filter-multiple="false"
+        column-key="province"
+        :filters="proviceGroup"
+        :filter-method="filterTag"
+        filter-placement="bottom-end"
+      >
+        <template slot-scope="scope">
+          <el-select
+            v-model="scope.row.province.value"
+            v-if="scope.row.province.edit"
+            placeholder="请选择"
+            @change="
+              value => {
+                scope.row.province.edit = false
+                changeCell(value, scope.row, scope.$index, 'province')
+              }
+            "
+          >
+            <!-- <el-option :key="''" :label="'全部'" :value="''"> </el-option> -->
+            <el-option
+              v-for="item in provinces"
+              :key="item.code"
+              :label="item.name"
+              :value="item.name"
             >
-              <!-- <el-option :key="''" :label="'全部'" :value="''"> </el-option> -->
-              <el-option
-                v-for="item in provinces"
-                :key="item.code"
-                :label="item.name"
-                :value="item.name"
-              >
-              </el-option>
-            </el-select>
-            <span v-else>{{ scope.row.province.value }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="city"
-          label="城市"
-          edit="false"
-          align="center"
-          width="120"
-          :filter-multiple="false"
-          column-key="city"
-          :filters="cityGroup"
-          :filter-method="filterTag"
-          filter-placement="bottom-end"
-        >
-          <template slot-scope="scope">
-            <el-select
-              v-model="scope.row.city.value"
-              v-if="scope.row.city.edit"
-              placeholder="请选择"
-              @change="
-                value => {
-                  scope.row.city.edit = false
-                  changeCell(value, scope.row, scope.$index, 'city')
-                }
-              "
+            </el-option>
+          </el-select>
+          <span v-else>{{ scope.row.province.value }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="city"
+        label="城市"
+        edit="false"
+        align="center"
+        width="120"
+        :filter-multiple="false"
+        column-key="city"
+        :filters="cityGroup"
+        :filter-method="filterTag"
+        filter-placement="bottom-end"
+      >
+        <template slot-scope="scope">
+          <el-select
+            v-model="scope.row.city.value"
+            v-if="scope.row.city.edit"
+            placeholder="请选择"
+            @change="
+              value => {
+                scope.row.city.edit = false
+                changeCell(value, scope.row, scope.$index, 'city')
+              }
+            "
+          >
+            <el-option :key="''" :label="'全部'" :value="''"> </el-option>
+            <el-option
+              v-for="item in cities"
+              :key="item.code"
+              :label="item.name"
+              :value="item.name"
             >
-              <el-option :key="''" :label="'全部'" :value="''"> </el-option>
-              <el-option
-                v-for="item in cities"
-                :key="item.code"
-                :label="item.name"
-                :value="item.name"
-              >
-              </el-option>
-            </el-select>
-            <span v-else>{{ scope.row.city.value }}</span>
-          </template>
-        </el-table-column>
+            </el-option>
+          </el-select>
+          <span v-else>{{ scope.row.city.value }}</span>
+        </template>
+      </el-table-column>
 
-        <el-table-column
-          prop="address"
-          label="详细地址"
-          align="center"
-          width="300"
-          edit="false"
-        >
-          <template slot-scope="scope">
-            <el-input
-              v-if="scope.row.address.edit"
-              ref="address"
-              v-model="scope.row.address.value"
-              @blur="scope.row.address.edit = false"
-            >
-            </el-input>
-            <span v-else>{{ scope.row.address.value }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="contact"
-          label="联系人"
-          edit="false"
-          width="120"
-          align="center"
-        >
-          <template slot-scope="scope">
-            <el-input
-              v-if="scope.row.contact.edit"
-              ref="contact"
-              v-model="scope.row.contact.value"
-              @blur="scope.row.contact.edit = false"
-            >
-            </el-input>
-            <span v-else>{{ scope.row.contact.value }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="mobile"
-          label="电话"
-          edit="false"
-          width="120"
-          align="center"
-        >
-          <template slot-scope="scope">
-            <el-input
-              v-if="scope.row.mobile.edit"
-              ref="mobile"
-              v-model="scope.row.mobile.value"
-              @blur="scope.row.mobile.edit = false"
-            >
-            </el-input>
-            <span v-else>{{ scope.row.mobile.value }}</span>
-          </template>
-        </el-table-column>
-        <el-table-column align="center" label="操作" width="260">
-          <template slot-scope="scope">
-            <el-button
-              v-if="scope.row.isSet"
-              size="mini"
-              @click="handleSave(scope.$index, scope.row)"
-              >保存</el-button
-            >
-            <el-button
-              size="mini"
-              @click="changePassword(scope.$index, scope.row)"
-              >密码重置</el-button
-            >
-            <el-button
-              size="mini"
-              @click="handleDelete(scope.row)"
-              v-if="d_show"
-              >删除</el-button
-            >
-          </template>
-        </el-table-column>
+      <el-table-column
+        prop="address"
+        label="详细地址"
+        align="center"
+        width="300"
+        edit="false"
+      >
+        <template slot-scope="scope">
+          <el-input
+            v-if="scope.row.address.edit"
+            ref="address"
+            v-model="scope.row.address.value"
+            @blur="scope.row.address.edit = false"
+          >
+          </el-input>
+          <span v-else>{{ scope.row.address.value }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="contact"
+        label="联系人"
+        edit="false"
+        width="120"
+        align="center"
+      >
+        <template slot-scope="scope">
+          <el-input
+            v-if="scope.row.contact.edit"
+            ref="contact"
+            v-model="scope.row.contact.value"
+            @blur="scope.row.contact.edit = false"
+          >
+          </el-input>
+          <span v-else>{{ scope.row.contact.value }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="mobile"
+        label="电话"
+        edit="false"
+        width="120"
+        align="center"
+      >
+        <template slot-scope="scope">
+          <el-input
+            v-if="scope.row.mobile.edit"
+            ref="mobile"
+            v-model="scope.row.mobile.value"
+            @blur="scope.row.mobile.edit = false"
+          >
+          </el-input>
+          <span v-else>{{ scope.row.mobile.value }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="操作" width="260">
+        <template slot-scope="scope">
+          <el-button
+            v-if="scope.row.isSet"
+            size="mini"
+            @click="handleSave(scope.$index, scope.row)"
+            >保存</el-button
+          >
+          <el-button
+            size="mini"
+            @click="changePassword(scope.$index, scope.row)"
+            >密码重置</el-button
+          >
+          <el-button size="mini" @click="handleDelete(scope.row)" v-if="d_show"
+            >删除</el-button
+          >
+        </template>
       </el-table-column>
     </el-table>
     <pagination
@@ -317,7 +314,7 @@ export default {
       total: 0,
       centerDialogVisible: 0,
       headerText: '重置密码',
-      textName: '确定重置密码，密码将变为初始密码：111111!',
+      textName: '确定重置密码，密码将变为初始密码',
       changePwd: false,
       rowId: 0,
       s_show: false,
@@ -392,12 +389,18 @@ export default {
           filter.roleType[0] === undefined ? '' : filter.roleType[0]
       } else if (filter.province) {
         console.log(filter.province[0])
-        this.getBeforeData()
-        this.provinces.filter(item => {
-          if (item.name === filter.province[0]) {
-            this.cities = item.cities
-          }
-        })
+        if (filter.province[0] === undefined) {
+          this.cities = []
+        } else {
+          this.getBeforeData()
+          this.provinces.filter(item => {
+            if (item.name === filter.province[0]) {
+              this.cities = item.cities
+            }
+          })
+        }
+        this.options.cityTag = ''
+        this.$refs.filterTable.clearFilter()
         this.options.proTag =
           filter.province[0] === undefined ? '' : filter.province[0]
       } else if (filter.city) {

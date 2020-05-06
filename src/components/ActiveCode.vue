@@ -7,7 +7,7 @@
     >
       <el-card class="box-card">
         <div class="header">
-          <img :src="imgs.a_img" />
+          <img :src="imgs.c_img" />
           <p style="margin-right:0">
             <span>{{ dataArr.useCarton }}</span
             ><span>/</span><span>{{ dataArr.unUseCarton }}</span>
@@ -20,7 +20,7 @@
       </el-card>
       <el-card class="box-card">
         <div class="header">
-          <img :src="imgs.c_img" />
+          <img :src="imgs.a_img" />
           <p style="margin-right:0">
             <span>{{ dataArr.useActiviate }}</span
             ><span>/</span><span>{{ dataArr.unUseActiviate }}</span>
@@ -51,6 +51,8 @@
             <div style="display:flex;width:100%;">
               <el-input
                 v-model="search"
+                prefix-icon="el-icon-search"
+                clearable
                 style="border-radius:4px;width:400px;height: 90%;margin-right:10px"
                 placeholder="输入关键字搜索"
               />
@@ -58,7 +60,7 @@
                 ><i class="el-icon-search"></i>搜索</el-button
               >
             </div>
-            <div>
+            <div v-if="unused_show">
               <el-button @click="importData()" type="primary" v-if="i_show"
                 ><i class="el-icon-upload2"></i> 导入</el-button
               >
@@ -66,9 +68,7 @@
           </div>
 
           <el-table
-            :data="
-              tableData.slice((currentPage - 1) * limit, currentPage * limit)
-            "
+            :data="tableData"
             style="width: 96%;padding:0 20px;"
             border
             height="300"
@@ -164,7 +164,8 @@ export default {
       c_number: 0,
       a_number: 0,
       radio: 0,
-      newDialogTableVisible: false
+      newDialogTableVisible: false,
+      unused_show: true
     }
   },
   // 监听属性 类似于data概念
@@ -220,8 +221,10 @@ export default {
     handleClick(tab, event) {
       if (tab.index === '1') {
         this.nowPage = '1'
+        this.unused_show = false
       } else {
         this.nowPage = '0'
+        this.unused_show = true
       }
       this.initData()
     },
@@ -230,6 +233,7 @@ export default {
     },
     handleCurrentChange(val) {
       this.currentPage = val
+      this.initData()
     },
     handleSizeChange(val) {
       this.limit = val

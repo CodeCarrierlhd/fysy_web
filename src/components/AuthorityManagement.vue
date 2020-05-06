@@ -8,6 +8,8 @@
         <div v-if="s_show" style="display:flex;width:100%;">
           <el-input
             v-model="search"
+            prefix-icon="el-icon-search"
+            clearable
             style="border-radius:4px;width:50%;height: 90%;margin-right:10px"
             placeholder="输入关键字搜索"
           />
@@ -603,6 +605,7 @@ export default {
 /* .el-table__row {
   height: 60px !important;
 } */
+
 .container {
   display: flex;
   width: 95%;
@@ -614,11 +617,12 @@ export default {
 }
 .contentRight {
   background-color: #2a426e;
-  margin-left: 180px;
+  margin-left: 120px;
   text-align: center;
-  flex: 1;
   padding-top: 33px;
-  min-height: 860px;
+  width: 600px;
+  max-height: 760px;
+  overflow-y: auto;
 }
 .editButton {
   font-family: SourceHanSansSC-Regular, SourceHanSansSC;
@@ -719,7 +723,7 @@ export default {
   display: inline-block;
   margin: 5px 0;
 }
-.el-checkbox {
+.checkboxGroups .el-checkbox {
   margin: 0;
   width: 35%;
 }

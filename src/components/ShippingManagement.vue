@@ -18,6 +18,8 @@
             <div style="display:flex;margin-right:10px">
               <el-input
                 v-model="search"
+                prefix-icon="el-icon-search"
+                clearable
                 style="border-radius:4px;width:400px;margin-right:10px"
                 placeholder="输入关键字搜索"
               />
@@ -79,7 +81,7 @@
           <el-table-column class-name="t_header">
             <el-table-column
               type="selection"
-              width="150"
+              width="100"
               align="center"
               :reserve-selection="true"
             ></el-table-column>
@@ -252,6 +254,8 @@
         <div style="display:flex;margin-right:10px">
           <el-input
             v-model="search1"
+            prefix-icon="el-icon-search"
+            clearable
             style="border-radius:4px;width:400px;margin-right:10px"
             placeholder="输入关键字搜索"
           />
@@ -798,9 +802,9 @@ export default {
     searchEnterFun() {
       console.log(this.key_index)
       let a = 0
-      if (this.key_index === 3) {
+      if (this.key_index === '3') {
         a = 0
-      } else if (this.key_index === 4) {
+      } else if (this.key_index === '4') {
         a = 3
       }
       this.changeTab(a, '')
@@ -816,6 +820,8 @@ export default {
       })
     },
     changeTab(statu, uid) {
+      console.log(statu)
+
       this.tableData = []
       this.searchAll(
         this.currentPage,

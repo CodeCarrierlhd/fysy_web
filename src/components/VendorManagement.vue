@@ -355,11 +355,18 @@ export default {
       // do something
       if (filter.province) {
         console.log(filter.province[0])
-        this.provinces.filter(item => {
-          if (item.name === filter.province[0]) {
-            this.cities = item.cities
-          }
-        })
+        if (filter.province[0] === undefined) {
+          this.cities = []
+        } else {
+          this.getBeforeData()
+          this.provinces.filter(item => {
+            if (item.name === filter.province[0]) {
+              this.cities = item.cities
+            }
+          })
+        }
+        this.options.cityTag = ''
+        this.$refs.filterTable.clearFilter()
         this.options.proTag =
           filter.province[0] === undefined ? '' : filter.province[0]
       } else if (filter.city) {

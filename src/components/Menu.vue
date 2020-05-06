@@ -67,7 +67,6 @@ export default {
   watch: {
     rightLists() {
       this.r_list = this.rightLists
-      // console.log(this.r_list)
       this.initData(this.r_list)
     }
   },

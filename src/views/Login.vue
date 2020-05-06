@@ -14,7 +14,7 @@
       <el-form-item prop="username">
         <el-input
           type="text"
-          @keyup.enter="handleLogin"
+          @keyup.enter.native="keyEnter"
           v-model="loginForm.username"
           placeholder="请输入用户名"
           class="n_input"
@@ -22,7 +22,7 @@
       </el-form-item>
       <el-form-item prop="password">
         <el-input
-          @keyup.enter="handleLogin"
+          @keyup.enter.native="keyEnter"
           :type="passwordType"
           v-model="loginForm.password"
           placeholder="请输入密码"
@@ -49,6 +49,7 @@
             v-model="loginForm.verifyCode"
             placeholder="请输入验证码"
             class="identifyinput"
+            @keyup.enter.native="keyEnter"
           ></el-input>
           <div>
             <div @click="refreshCode">
@@ -66,7 +67,7 @@
         <el-button
           type="primary"
           size="small"
-          @click.native.prevent="handleLogin"
+          @click="handleLogin"
           class="login-submit"
           >登录</el-button
         >
@@ -147,6 +148,9 @@ export default {
         ? (this.passwordType = 'password')
         : (this.passwordType = '')
     },
+    keyEnter() {
+      this.handleLogin()
+    },
     // 点击登入按钮
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
@@ -168,6 +172,7 @@ export default {
                   path
                 })
               } else {
+                this.getIdentifyCode()
                 this.$alert(res.data.msg, '错误', {
                   confirmButtonText: '确定'
                 })

@@ -7,6 +7,8 @@
           <div style="display:flex;margin-right:10px" v-if="s_show">
             <el-input
               v-model="search"
+              prefix-icon="el-icon-search"
+              clearable
               style="border-radius:4px;width:400px;margin-right:10px"
               placeholder="输入关键字搜索"
             />
@@ -140,7 +142,11 @@
           >
           </el-table-column>
           <el-table-column label="操作" align="center" v-if="b_show">
-            <span class="loseContro">拆解</span>
+            <template slot-scope="scope">
+              <span class="loseContro" @click="loseContro(scope.row)"
+                >拆解</span
+              >
+            </template>
           </el-table-column>
         </el-table-column>
       </el-table>
@@ -243,28 +249,29 @@ export default {
     getRowKey(row) {
       return row.opId
     },
-    loseContro() {
-      console.log('解绑')
+    loseContro(row) {
+      this.productDone(row.opId, '', '/inventory/dismantle').then(res => {
+        if (res.data.code === 200) {
+          this.initData()
+          this.$refs.filterTable.clearSelection()
+          this.$notify({
+            title: '状态',
+            message: '产品拆解成功',
+            position: 'top-right',
+            duration: 2000
+          })
+        }
+      })
     },
     loseData() {
       const ids = this.tableDataSelections.join(',')
-      console.log(ids)
-
       this.productDone(ids, '', '/inventory/dismantle').then(res => {
-        console.log(res)
-
         if (res.data.code === 200) {
-          for (let i = 0; i < this.tableData.length; i++) {
-            for (let j = 0; j < this.tableDataSelections.length; j++) {
-              if (this.tableDataSelections[j] === this.tableData[i].opId) {
-                this.tableData.splice(i, 1)
-              }
-            }
-          }
+          this.initData()
           this.$refs.filterTable.clearSelection()
           this.$notify({
-            title: '发货状态',
-            message: '产品发货成功',
+            title: '状态',
+            message: '产品拆解成功',
             position: 'top-right',
             duration: 2000
           })

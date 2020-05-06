@@ -87,10 +87,7 @@
         >
       </el-form-item>
       <el-form-item>
-        <el-button
-          size="midle"
-          @click.native.prevent="cancleEdit"
-          class="edit-cancle"
+        <el-button size="midle" @click="cancleEdit" class="edit-cancle"
           >取消并返回</el-button
         >
       </el-form-item>
@@ -111,10 +108,8 @@ export default {
     const validatePwd = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请再次输入新密码'))
+        this.getIdentifyCode()
       } else if (value !== this.loginForm.newPwd) {
-        console.log(value, this.loginForm.newPwd)
-
-        console.log('nt_pwd:', value, this.loginForm.newPwdAgain)
         callback(new Error('两次密码不一致请重新输入!'))
       } else {
         callback()
@@ -183,10 +178,9 @@ export default {
         : (this.newPwdAgain = '')
     },
     editUserInfo() {
-      console.log(this.loginForm)
       this.dataChange(this.loginForm, '/user/updatePwd').then(res => {
-        console.log(res)
         if (res.data.code === 200) {
+          this.$refs.loginForm.resetFields()
           this.$emit('childFn', '')
         }
       })
@@ -199,6 +193,11 @@ export default {
     getIdentifyCode() {
       var timestamp = new Date().getTime()
       this.identifyCode = us.identifyCode() + '?' + timestamp
+    },
+    cancleEdit() {
+      console.log(1)
+      this.$emit('childFn', '')
+      this.$refs.loginForm.resetFields()
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）

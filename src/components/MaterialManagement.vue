@@ -8,6 +8,8 @@
         <div v-if="s_show">
           <el-input
             v-model="search"
+            prefix-icon="el-icon-search"
+            clearable
             style="border-radius:4px;width:400px;margin-right:10px"
             placeholder="输入关键字搜索"
           />
@@ -352,13 +354,21 @@ export default {
         description: '',
         imageUrls: []
       },
-      editPro: false
+      editPro: false,
+      countMark: 0
     }
   },
   // 监听属性 类似于data概念
   computed: {},
   // 监控data中的数据变化
-  watch: {},
+  watch: {
+    countMark: {
+      handler(newValue, oldValue) {
+        this.$route.go(0)
+        console.log(1)
+      }
+    }
+  },
   // 方法集合
   methods: {
     makeData() {
@@ -406,6 +416,12 @@ export default {
         }
       } else if (filter.producerName) {
         if (filter.producerName.length > 0) {
+          this.producerId = filter.producerName[0]
+        } else {
+          this.producerId = ''
+        }
+      } else if (filter.status) {
+        if (filter.status.length > 0) {
           this.producerId = filter.producerName[0]
         } else {
           this.producerId = ''
@@ -479,7 +495,7 @@ export default {
     initBtn() {
       const btnArr = JSON.parse(this.$route.query.btnRight)
       console.log(btnArr)
-
+      // this.countMark = this.$route.query.countMark
       btnArr.forEach(item => {
         if (item.rightName === '新增') {
           // this.$set(this.btnArr, 'a_show', true)

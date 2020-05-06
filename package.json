@@ -20,6 +20,7 @@
     "element-ui": "^2.4.5",
     "eslint-plugin-html": "^6.0.0",
     "file-saver": "^2.0.2",
+    "html2canvas": "^1.0.0-rc.5",
     "js-base64": "^2.5.2",
     "qs": "^6.9.3",
     "script-loader": "^0.7.2",

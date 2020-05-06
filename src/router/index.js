@@ -188,4 +188,12 @@ router.beforeEach((to, from, next) => {
     next()
   }
 })
+
+// 此VueRouter是自己自定义引入暴露出来的，即是自定义的，以下的VueRouter同样是这样
+// 解决两次访问相同路由地址报错
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
+
 export default router

@@ -16,7 +16,7 @@
           ></Header>
         </el-header>
         <el-main>
-          <router-view></router-view>
+          <router-view :key="$route.path + $route.query.t"></router-view>
           <transition name="slide-fade">
             <edit-user
               v-if="showEdit"
@@ -79,9 +79,12 @@ export default {
       }
     },
     handleRouterChange(sonmenu) {
+      console.log(sonmenu)
       this.$router.push({
         path: '/' + sonmenu.uri,
+        // name: sonmenu.uri,
         query: {
+          t: Date.now(),
           btnRight: JSON.stringify(sonmenu.sonRight)
         }
       })

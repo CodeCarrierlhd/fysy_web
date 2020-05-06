@@ -18,6 +18,8 @@
             <div style="display:flex;margin-right:10px">
               <el-input
                 v-model="search"
+                prefix-icon="el-icon-search"
+                clearable
                 style="border-radius:4px;width:400px;margin-right:10px"
                 placeholder="输入关键字搜索"
               />
@@ -254,6 +256,8 @@
         <div style="display:flex;margin-right:10px">
           <el-input
             v-model="search1"
+            prefix-icon="el-icon-search"
+            clearable
             style="border-radius:4px;width:400px;margin-right:10px"
             placeholder="输入关键字搜索"
           />

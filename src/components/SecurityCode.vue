@@ -51,6 +51,8 @@
             <div style="display:flex;width:100%;">
               <el-input
                 v-model="search"
+                prefix-icon="el-icon-search"
+                clearable
                 style="border-radius:4px;width:400px;height: 90%;margin-right:10px"
                 placeholder="输入关键字搜索"
               />
@@ -65,9 +67,7 @@
             </div>
           </div>
           <el-table
-            :data="
-              tableData.slice((currentPage - 1) * limit, currentPage * limit)
-            "
+            :data="tableData"
             style="width: 96%;margin:0 20px"
             border
             height="300"
@@ -289,6 +289,7 @@ export default {
     handleCurrentChange(val) {
       this.currentPage = val
       // this.getDataList();
+      this.initData()
     },
     handleSizeChange(val) {
       this.limit = val
@@ -391,6 +392,10 @@ export default {
 }
 .el-tabs--card > .el-tabs__header .el-tabs__item.is-active {
   border-top: 3px solid #2a426e;
+}
+::-webkit-scrollbar {
+  width: 10px !important;
+  height: 10px !important;
 }
 </style>
 
