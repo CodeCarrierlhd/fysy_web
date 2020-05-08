@@ -4,7 +4,7 @@
     <el-dialog
       :title="headerText"
       :visible.sync="show"
-      width="380px"
+      width="400px"
       top="35vh"
       center
       custom-class="dialogFont"
@@ -90,24 +90,6 @@ export default {
           })
         }
       })
-      // if (!this.changePwd) {
-      //   this.$cookieStore.getCookie('name')
-      //   this.$cookieStore.delCookie('name')
-      //   this.$router.push('/login')
-      //   history.pushState(null, null, document.URL)
-      //   window.addEventListener(
-      //     'popstate',
-      //     function(e) {
-      //       history.pushState(null, null, document.URL)
-      //     },
-      //     false
-      //   )
-      // } else {
-      //   this.resetPassword(this.id, 'user/resetPwd').then(res => {
-      //     console.log(res)
-      //   })
-      //   this.show = false
-      // }
     },
     rebackStatu() {
       this.show = false
@@ -117,6 +99,12 @@ export default {
       this.dataChange({ id: this.keyId }, '/user/resetPwd').then(res => {
         if (res.data.code === 200) {
           this.show = false
+          this.$notify({
+            title: '成功',
+            message: '密码重置成功',
+            position: 'top-right',
+            duration: 2000
+          })
         }
       })
     }

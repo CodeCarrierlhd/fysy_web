@@ -1,9 +1,9 @@
 <!-- 物料管理 -->
 <template>
   <div class="container">
-    <div class="i_header">
+    <div style="padding: 25px 20px;">
       <div
-        style="display:flex;justify-content: space-between;margin-bottom:20px"
+        style="display:flex;justify-content: space-between;margin-bottom:25px"
       >
         <div v-if="s_show">
           <el-input
@@ -40,107 +40,109 @@
         @filter-change="fnFilterChangeInit"
         @selection-change="selectionChangeHandle"
         :row-key="getRowKey"
-        style="width: 100%;"
+        :header-cell-style="{
+          fontSize: '15px',
+          color: '#000',
+          fontWeight: 800,
+          background: '#eef1f6'
+        }"
         border
         height="600"
       >
-        <el-table-column class-name="t_header">
-          <el-table-column
-            type="selection"
-            width="100"
-            align="center"
-            :reserve-selection="true"
-          ></el-table-column>
-          <el-table-column
-            prop="materialCode"
-            label="产品编号"
-            edit="false"
-            align="center"
-            width="130"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="materialTypeName"
-            label="产品类别"
-            edit="false"
-            align="center"
-            width="180"
-            :filter-multiple="false"
-            :filters="materialTypeNameGroup"
-            :filter-method="filterTag"
-            column-key="materialTypeName"
-            filter-placement="bottom-end"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="materialModel"
-            label="产品型号"
-            width="180"
-            edit="false"
-            align="center"
-          >
-          </el-table-column>
+        <el-table-column
+          type="selection"
+          width="100"
+          align="center"
+          :reserve-selection="true"
+        ></el-table-column>
+        <el-table-column
+          prop="materialCode"
+          label="产品编号"
+          edit="false"
+          align="center"
+          width="180"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="materialTypeName"
+          label="产品类别"
+          edit="false"
+          align="center"
+          width="180"
+          :filter-multiple="false"
+          :filters="materialTypeNameGroup"
+          :filter-method="filterTag"
+          column-key="materialTypeName"
+          filter-placement="bottom-end"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="materialModel"
+          label="产品型号"
+          width="180"
+          edit="false"
+          align="center"
+        >
+        </el-table-column>
 
-          <el-table-column
-            prop="spec"
-            label="规格 "
-            align="center"
-            width="120"
-            edit="false"
-          >
-          </el-table-column>
+        <el-table-column
+          prop="spec"
+          label="规格 "
+          align="center"
+          width="160"
+          edit="false"
+        >
+        </el-table-column>
 
-          <el-table-column
-            prop="producerName"
-            label="生产商"
-            edit="false"
-            align="center"
-            width="280"
-            :filter-multiple="false"
-            :filters="producerNameGroup"
-            :filter-method="filterTag"
-            column-key="producerName"
-            filter-placement="bottom-end"
-          >
-          </el-table-column>
+        <el-table-column
+          prop="producerName"
+          label="生产商"
+          edit="false"
+          align="center"
+          :filter-multiple="false"
+          :filters="producerNameGroup"
+          :filter-method="filterTag"
+          column-key="producerName"
+          filter-placement="bottom-end"
+        >
+        </el-table-column>
 
-          <el-table-column
-            prop="status"
-            align="center"
-            label="状态"
-            width="85"
-            :filter-multiple="false"
-            :column-key="'status'"
-            :filters="status"
-            :filter-method="filterTag"
-          >
-            <template slot-scope="scope">
-              <el-checkbox v-model="scope.row.isCheck" disabled></el-checkbox>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="marketDate"
-            label="上市日期"
-            align="center"
-            width="180"
-          >
-          </el-table-column>
-          <el-table-column align="center" label="操作" width="180">
-            <template slot-scope="scope">
-              <el-button
-                size="mini"
-                v-if="e_show"
-                @click="handleEdit(scope.$index, scope.row)"
-                >编辑</el-button
-              >
-              <el-button
-                v-if="d_show"
-                size="mini"
-                @click="handleDelete(scope.$index, scope.row)"
-                >删除</el-button
-              >
-            </template>
-          </el-table-column>
+        <el-table-column
+          prop="status"
+          align="center"
+          label="状态"
+          width="85"
+          :filter-multiple="false"
+          :column-key="'status'"
+          :filters="status"
+          :filter-method="filterTag"
+        >
+          <template slot-scope="scope">
+            <el-checkbox v-model="scope.row.isCheck" disabled></el-checkbox>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="marketDate"
+          label="上市日期"
+          align="center"
+          width="180"
+        >
+        </el-table-column>
+        <el-table-column align="center" label="操作" width="180">
+          <template slot-scope="scope">
+            <el-button
+              size="mini"
+              v-if="e_show"
+              @click="handleEdit(scope.$index, scope.row)"
+              >编辑</el-button
+            >
+            <el-button
+              v-if="d_show"
+              size="mini"
+              @click="handleDelete(scope.$index, scope.row)"
+              >删除</el-button
+            >
+          </template>
         </el-table-column>
       </el-table>
       <pagination
@@ -193,10 +195,10 @@
           </el-form-item>
           <el-form-item label="产品规格" prop="spec">
             <el-col :span="13">
-              <el-input v-model="form.spec"></el-input>
+              <el-input v-model="form.spec" readonly></el-input>
             </el-col>
           </el-form-item>
-          <el-form-item label="生产厂家" prop="producerId">
+          <el-form-item label="生产商" prop="producerId">
             <el-col :span="13">
               <el-select
                 v-model="form.producerId"
@@ -301,6 +303,15 @@
           </el-form-item>
         </el-form>
       </el-dialog>
+      <del-dialog
+        :keyNumber="changeKey"
+        @onLoadData="onLoadData"
+        :headerTitle="`删除物料`"
+        :ids="delArr"
+        :delPath="`/material/delete`"
+        :delContent="`确定删除物料,数据无法找回!`"
+      >
+      </del-dialog>
     </div>
   </div>
 </template>
@@ -310,10 +321,11 @@
 // 例如：import 《组件名称》 from '《组件路径》';
 import pagination from '../components/Pagenation'
 import axios from 'axios'
+import DelDialog from './DelDialog'
 
 export default {
   // import引入的组件需要注入到对象中才能使用
-  components: { pagination },
+  components: { pagination, DelDialog },
   data() {
     // 这里存放数据
     return {
@@ -355,7 +367,9 @@ export default {
         imageUrls: []
       },
       editPro: false,
-      countMark: 0
+      countMark: 0,
+      changeKey: 0,
+      delArr: ''
     }
   },
   // 监听属性 类似于data概念
@@ -365,7 +379,6 @@ export default {
     countMark: {
       handler(newValue, oldValue) {
         this.$route.go(0)
-        console.log(1)
       }
     }
   },
@@ -444,6 +457,7 @@ export default {
       for (const key in this.form) {
         this.form[key] = ''
       }
+      this.form.spec = '1个'
       this.imageUrl = ''
       this.imageUrl1 = ''
       this.imageUrl2 = ''
@@ -452,12 +466,14 @@ export default {
     },
     // 删除选中数据（单纯实现前端删除）
     batchDelete(selections) {
-      const ids = this.tableDataSelections.join(',')
-      this.delItem(ids, '/material/delete').then(res => {
-        if (res.data.code === 200) {
-          this.makeData()
-        }
-      })
+      // const ids = this.tableDataSelections.join(',')
+      this.changeKey++
+      this.delArr = this.tableDataSelections.join(',')
+      // this.delItem(ids, '/material/delete').then(res => {
+      //   if (res.data.code === 200) {
+      //     this.makeData()
+      //   }
+      // })
     },
     getStatu() {
       this.tableData.map(item => {
@@ -534,9 +550,6 @@ export default {
           this.editPro = false
         }
       })
-    },
-    materialTypeChange(val) {
-      console.log(val)
     },
     handleChange(param) {
       const fd = new FormData()
@@ -636,18 +649,24 @@ export default {
       })
     },
     handleDelete(index, row) {
-      this.delItem(row.id, '/material/delete').then(res => {
-        console.log(res)
+      this.changeKey++
+      this.delArr = row.id.toString()
+      // this.delItem(row.id, '/material/delete').then(res => {
+      //   console.log(res)
 
-        if (res.data.code === 200) {
-          this.makeData()
-        }
-      })
+      //   if (res.data.code === 200) {
+      //     this.makeData()
+      //   }
+      // })
     },
     clearForm(form) {
       this.$refs[form].resetFields()
       this.newDialogTableVisible = false
       this.editPro = false
+    },
+    onLoadData() {
+      this.$refs.filterTable.clearSelection()
+      this.makeData()
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
@@ -671,6 +690,7 @@ export default {
 <style>
 .el-table__header .el-table-column--selection .cell .el-checkbox:after {
   content: '全选';
+  font-size: 15px;
 }
 .avatar-uploader .el-upload {
   border: 1px dashed #d9d9d9;
@@ -705,10 +725,6 @@ export default {
 }
 .materialform {
   text-align: center;
-}
-.i_header {
-  padding: 25px 60px;
-  background-color: #fff;
 }
 .container {
   margin: 40px 60px;

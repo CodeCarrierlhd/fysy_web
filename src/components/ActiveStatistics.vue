@@ -1,37 +1,39 @@
 <!-- 激活统计 -->
 <template>
-  <div class="container">
+  <div class="saleContainer">
     <div class="slects">
-      <span class="fontStyle" style="margin-right:10px">时间</span>
-      <el-select v-model="dateValue" placeholder="请选择">
-        <el-option
-          v-for="item in timeList"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        >
-        </el-option>
-      </el-select>
-      <span class="fontStyle" style="margin:0 10px 0 20px">地区</span>
-      <el-select v-model="province" placeholder="请选择">
-        <el-option
-          v-for="item in activateProvinceList"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        >
-        </el-option>
-      </el-select>
-      <span class="fontStyle" style="margin:0 10px 0 20px">型号</span>
-      <el-select v-model="material" placeholder="请选择">
-        <el-option
-          v-for="item in materialList"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-        >
-        </el-option>
-      </el-select>
+      <div style="width:100%;display:flex">
+        <span class="fontStyle" style="margin-right:10px;">时间</span>
+        <el-select v-model="dateValue" placeholder="请选择">
+          <el-option
+            v-for="item in timeList"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
+        <span class="fontStyle" style="margin:0 10px 0 20px">地区</span>
+        <el-select v-model="province" placeholder="请选择">
+          <el-option
+            v-for="item in activateProvinceList"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
+        <span class="fontStyle" style="margin:0 10px 0 20px">型号</span>
+        <el-select v-model="material" placeholder="请选择">
+          <el-option
+            v-for="item in materialList"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          >
+          </el-option>
+        </el-select>
+      </div>
     </div>
     <div class="dataAnalysis">
       <div class="graph">
@@ -43,7 +45,7 @@
             <span class="title">单位：人</span>
           </div>
           <!-- <div id="mixCharts"></div> -->
-          <div id="echartContainer" style="width:100%; height:300px"></div>
+          <div id="echartContainer" style="width:100%; height:280px"></div>
         </div>
 
         <div style="margin-top:20px;background-color: #fff;width:719px">
@@ -60,7 +62,7 @@
         <el-table
           :data="tableData"
           border
-          style="height:600px;overflow: scroll;"
+          style="height:600px;overflow: scroll;overflow-x: hidden;"
         >
           <el-table-column
             prop="dateTime"
@@ -147,8 +149,8 @@ export default {
           backgroundColor: 'rgba(255,255,255,1)',
           textStyle: {
             color: '#031D1F'
-          }
-          // formatter: '{b}：{c}人'
+          },
+          formatter: '{b}<br/>{a}：{c}人'
         },
 
         legend: {
@@ -230,17 +232,10 @@ export default {
 
       myChart.setOption(option)
     },
-    initLoop(data) {
+    initLoop(data, totalCounts) {
+      console.log(data)
+
       var myChart = echarts.init(document.getElementById('loopChart'))
-      // var data = [
-      //   { value: 335, name: '直接访问' },
-
-      //
-      // ]
-
-      // 这里才是关键整去掉下半部分的关键，
-
-      // 计算data中value的总和
 
       var a = 0
       for (var i = 0; i < data.length; i++) {
@@ -263,6 +258,24 @@ export default {
           trigger: 'item',
           formatter: '{a} <br/>{b} : {c} ({d}%)'
         },
+        graphic: [
+          {
+            // 环形图中间添加文字
+            type: 'text', // 通过不同top值可以设置上下显示
+            left: 'center',
+            top: '68%',
+            style: {
+              text: totalCounts + '人',
+              textAlign: 'center',
+              fill: '#777777', // 文字的颜色
+              width: 30,
+              height: 30,
+              fontSize: 24,
+              color: '#777777',
+              fontFamily: 'Microsoft YaHei'
+            }
+          }
+        ],
         series: [
           {
             name: '用户年龄分布',
@@ -325,7 +338,7 @@ export default {
           for (let j = 0; j < peoples.length; j++) {
             pdatas.push({ value: peoples[j].amount, name: peoples[j].ageLot })
           }
-          this.initLoop(pdatas)
+          this.initLoop(pdatas, res.data.object.sector.totalCount)
         })
     },
     getType() {
@@ -375,13 +388,6 @@ export default {
 }
 </script>
 <style scope>
-.fontStyle {
-  font-size: 24px;
-  font-family: SourceHanSansSC-Medium, SourceHanSansSC;
-  font-weight: 500;
-  color: rgba(51, 51, 51, 1);
-  line-height: 36px;
-}
 .graph {
   width: 1020px;
   margin-top: 40px;

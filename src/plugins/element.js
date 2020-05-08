@@ -36,7 +36,9 @@ import {
   Step,
   Upload,
   RadioGroup,
-  Radio
+  Radio,
+  Carousel,
+  CarouselItem
 } from 'element-ui'
 
 Vue.use(Button)
@@ -73,6 +75,8 @@ Vue.use(Step)
 Vue.use(Upload)
 Vue.use(RadioGroup)
 Vue.use(Radio)
+Vue.use(Carousel)
+Vue.use(CarouselItem)
 Vue.prototype.$message = Message
 Vue.prototype.$notify = Notification
 Vue.prototype.$msgbox = MessageBox

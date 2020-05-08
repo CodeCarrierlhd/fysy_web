@@ -1,11 +1,11 @@
 <!-- 激活码管理 -->
 <template>
-  <div class="container">
+  <div style="margin:40px 60px;width:93%">
     <div
       style="display:flex;justify-content: space-between;margin-bottom:45px"
       v-if="s_show"
     >
-      <el-card class="box-card">
+      <el-card class="box-card" style="margin-right:30px">
         <div class="header">
           <img :src="imgs.c_img" />
           <p style="margin-right:0">
@@ -69,28 +69,28 @@
 
           <el-table
             :data="tableData"
-            style="width: 96%;padding:0 20px;"
+            style="width: 100%;padding:0 20px;"
+            :header-cell-style="{
+              fontSize: '15px',
+              color: '#000',
+              fontWeight: 800,
+              background: '#eef1f6'
+            }"
             border
-            height="300"
+            height="280"
           >
-            <el-table-column class-name="t_header">
-              <el-table-column
-                label="序号"
-                type="index"
-                align="center"
-                width="150"
-              >
-              </el-table-column>
-              <el-table-column prop="code" label="激活码" align="center">
-              </el-table-column>
-              <el-table-column
-                prop="createTime"
-                label="生成日期"
-                align="center"
-              >
-              </el-table-column>
-              <el-table-column prop="status" label="状态" align="center">
-              </el-table-column>
+            <el-table-column
+              label="序号"
+              type="index"
+              align="center"
+              width="150"
+            >
+            </el-table-column>
+            <el-table-column prop="code" label="激活码" align="center">
+            </el-table-column>
+            <el-table-column prop="createTime" label="生成日期" align="center">
+            </el-table-column>
+            <el-table-column prop="status" label="状态" align="center">
             </el-table-column>
           </el-table>
           <pagination
@@ -113,19 +113,24 @@
       center
       width="620px"
     >
-      <el-radio-group v-model="radio">
-        <el-radio :label="0">激活码</el-radio>
-        <el-radio :label="1">箱码</el-radio>
-      </el-radio-group>
-      <el-upload
-        :multiple="false"
-        :show-file-list="false"
-        :http-request="handleChange"
-        accept=".xls,.xlsx"
-        action="string"
-      >
-        <el-button size="medium" type="primary">上传文件</el-button>
-      </el-upload>
+      <div style="display: flex;justify-content: space-between;">
+        <div style="line-height: 36px;">
+          <span>选择导入类型：</span>
+          <el-radio-group v-model="radio">
+            <el-radio :label="0">激活码</el-radio>
+            <el-radio :label="1">箱码</el-radio>
+          </el-radio-group>
+        </div>
+        <el-upload
+          :multiple="false"
+          :show-file-list="false"
+          :http-request="handleChange"
+          accept=".xls,.xlsx"
+          action="string"
+        >
+          <el-button size="medium" type="primary">上传文件</el-button>
+        </el-upload>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -149,7 +154,7 @@ export default {
       limit: 100,
       total: 0,
       search: '',
-      nowPage: '-1',
+      nowPage: '0',
       s_show: false,
       i_show: false,
       tabNames: [

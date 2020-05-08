@@ -1,9 +1,9 @@
 <!-- 账号管理 -->
 <template>
   <div class="container">
-    <div class="i_header">
+    <div style="padding: 25px 20px;">
       <div
-        style="display:flex;justify-content: space-between;margin-bottom:20px"
+        style="display:flex;justify-content: space-between;margin-bottom:25px"
       >
         <div v-if="s_show" style="display:flex">
           <el-input
@@ -30,256 +30,272 @@
           >
         </div>
       </div>
+      <el-table
+        ref="filterTable"
+        :data="tableData"
+        @filter-change="fnFilterChangeInit"
+        @selection-change="selectionChangeHandle"
+        @cell-dblclick="celledit"
+        :row-key="getRowKey"
+        :header-cell-style="{
+          fontSize: '15px',
+          color: '#000',
+          fontWeight: 800,
+          background: '#eef1f6'
+        }"
+        height="600"
+        border
+      >
+        <el-table-column
+          type="selection"
+          width="100"
+          align="center"
+          :reserve-selection="true"
+        ></el-table-column>
+        <el-table-column
+          prop="account"
+          label="登录账号"
+          edit="false"
+          align="center"
+          width="100"
+        >
+          <template slot-scope="scope">
+            <el-input
+              v-if="scope.row.account.edit"
+              ref="account"
+              v-model="scope.row.account.value"
+              @blur="scope.row.account.edit = false"
+            >
+            </el-input>
+            <span v-else>{{ scope.row.account.value }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="username"
+          label="用户昵称"
+          width="100"
+          edit="false"
+          align="center"
+        >
+          <template slot-scope="scope">
+            <el-input
+              v-if="scope.row.username.edit"
+              ref="'username'"
+              v-model="scope.row.username.value"
+              @blur="scope.row.username.edit = false"
+            >
+            </el-input>
+            <span v-else>{{ scope.row.username.value }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column
+          prop="roleType"
+          label="角色类型"
+          edit="false"
+          align="center"
+          width="160"
+          :filter-multiple="false"
+          :filters="roleTypeGroup"
+          :filter-method="filterTag"
+          column-key="roleType"
+          filter-placement="bottom-end"
+        >
+          <template slot-scope="scope">
+            <el-select
+              v-model="scope.row.roleType.value"
+              v-if="scope.row.roleType.edit"
+              placeholder="请选择"
+              @change="
+                value => {
+                  scope.row.roleType.edit = false
+                  changeCell(value, scope.row, scope.$index, 'roleType')
+                }
+              "
+            >
+              <el-option
+                v-for="item in roleGroups"
+                :key="item.value"
+                :label="item.label"
+                :value="item.label"
+              >
+              </el-option>
+            </el-select>
+            <span v-else>{{ scope.row.roleType.value }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="province"
+          label="省份"
+          edit="false"
+          align="center"
+          width="120"
+          :filter-multiple="false"
+          column-key="province"
+          :filters="proviceGroup"
+          :filter-method="filterTag"
+          filter-placement="bottom-end"
+        >
+          <template slot-scope="scope">
+            <el-select
+              v-model="scope.row.province.value"
+              v-if="scope.row.province.edit"
+              placeholder="请选择"
+              @change="
+                value => {
+                  scope.row.province.edit = false
+                  changeCell(value, scope.row, scope.$index, 'province')
+                }
+              "
+            >
+              <!-- <el-option :key="''" :label="'全部'" :value="''"> </el-option> -->
+              <el-option
+                v-for="item in provinces"
+                :key="item.code"
+                :label="item.name"
+                :value="item.name"
+              >
+              </el-option>
+            </el-select>
+            <span v-else>{{ scope.row.province.value }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="city"
+          label="城市"
+          edit="false"
+          align="center"
+          width="120"
+          :filter-multiple="false"
+          column-key="city"
+          :filters="cityGroup"
+          :filter-method="filterTag"
+          filter-placement="bottom-end"
+        >
+          <template slot-scope="scope">
+            <el-select
+              v-model="scope.row.city.value"
+              v-if="scope.row.city.edit"
+              placeholder="请选择"
+              @change="
+                value => {
+                  scope.row.city.edit = false
+                  changeCell(value, scope.row, scope.$index, 'city')
+                }
+              "
+            >
+              <el-option :key="''" :label="'全部'" :value="''"> </el-option>
+              <el-option
+                v-for="item in cities"
+                :key="item.code"
+                :label="item.name"
+                :value="item.name"
+              >
+              </el-option>
+            </el-select>
+            <span v-else>{{ scope.row.city.value }}</span>
+          </template>
+        </el-table-column>
+
+        <el-table-column
+          prop="address"
+          label="详细地址"
+          align="center"
+          edit="false"
+        >
+          <template slot-scope="scope">
+            <el-input
+              v-if="scope.row.address.edit"
+              ref="address"
+              v-model="scope.row.address.value"
+              @blur="scope.row.address.edit = false"
+            >
+            </el-input>
+            <span v-else>{{ scope.row.address.value }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="contact"
+          label="联系人"
+          edit="false"
+          width="120"
+          align="center"
+        >
+          <template slot-scope="scope">
+            <el-input
+              v-if="scope.row.contact.edit"
+              ref="contact"
+              v-model="scope.row.contact.value"
+              @blur="scope.row.contact.edit = false"
+            >
+            </el-input>
+            <span v-else>{{ scope.row.contact.value }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="mobile"
+          label="电话"
+          edit="false"
+          width="120"
+          align="center"
+        >
+          <template slot-scope="scope">
+            <el-input
+              v-if="scope.row.mobile.edit"
+              ref="mobile"
+              v-model="scope.row.mobile.value"
+              @blur="scope.row.mobile.edit = false"
+            >
+            </el-input>
+            <span v-else>{{ scope.row.mobile.value }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="操作" width="260">
+          <template slot-scope="scope">
+            <el-button
+              v-if="scope.row.isSet"
+              size="mini"
+              @click="handleSave(scope.$index, scope.row)"
+              >保存</el-button
+            >
+            <el-button
+              size="mini"
+              @click="changePassword(scope.$index, scope.row)"
+              >密码重置</el-button
+            >
+            <el-button
+              size="mini"
+              @click="handleDelete(scope.row)"
+              v-if="d_show"
+              >删除</el-button
+            >
+          </template>
+        </el-table-column>
+      </el-table>
+      <pagination
+        :currentPage="currentPage"
+        :total="total"
+        :limit="limit"
+        :small="true"
+        @handleCurrentChange="handleCurrentChange"
+      />
+      <my-dialog
+        :centerDialogVisible="centerDialogVisible"
+        :headerText="headerText"
+        :textName="textName"
+        :changePwd="changePwd"
+        :id="rowId"
+      ></my-dialog>
+      <del-dialog
+        :keyNumber="changeKey"
+        @onLoadData="onLoadData"
+        :headerTitle="`删除账号`"
+        :ids="delArr"
+        :delPath="`user/delete`"
+        :delContent="`确定删除账号，数据无法找回！`"
+      >
+      </del-dialog>
     </div>
-
-    <el-table
-      ref="filterTable"
-      :data="tableData"
-      @filter-change="fnFilterChangeInit"
-      @selection-change="selectionChangeHandle"
-      @cell-dblclick="celledit"
-      :row-key="getRowKey"
-      style="width: 100%;"
-      border
-    >
-      <el-table-column
-        type="selection"
-        width="100"
-        align="center"
-        :reserve-selection="true"
-      ></el-table-column>
-      <el-table-column
-        prop="account"
-        label="登录账号"
-        edit="false"
-        align="center"
-        width="100"
-      >
-        <template slot-scope="scope">
-          <el-input
-            v-if="scope.row.account.edit"
-            ref="account"
-            v-model="scope.row.account.value"
-            @blur="scope.row.account.edit = false"
-          >
-          </el-input>
-          <span v-else>{{ scope.row.account.value }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="username"
-        label="用户昵称"
-        width="100"
-        edit="false"
-        align="center"
-      >
-        <template slot-scope="scope">
-          <el-input
-            v-if="scope.row.username.edit"
-            ref="'username'"
-            v-model="scope.row.username.value"
-            @blur="scope.row.username.edit = false"
-          >
-          </el-input>
-          <span v-else>{{ scope.row.username.value }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column
-        prop="roleType"
-        label="角色类型"
-        edit="false"
-        align="center"
-        width="160"
-        :filter-multiple="false"
-        :filters="roleTypeGroup"
-        :filter-method="filterTag"
-        column-key="roleType"
-        filter-placement="bottom-end"
-      >
-        <template slot-scope="scope">
-          <el-select
-            v-model="scope.row.roleType.value"
-            v-if="scope.row.roleType.edit"
-            placeholder="请选择"
-            @change="
-              value => {
-                scope.row.roleType.edit = false
-                changeCell(value, scope.row, scope.$index, 'roleType')
-              }
-            "
-          >
-            <el-option
-              v-for="item in roleGroups"
-              :key="item.value"
-              :label="item.label"
-              :value="item.label"
-            >
-            </el-option>
-          </el-select>
-          <span v-else>{{ scope.row.roleType.value }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="province"
-        label="省份"
-        edit="false"
-        align="center"
-        width="120"
-        :filter-multiple="false"
-        column-key="province"
-        :filters="proviceGroup"
-        :filter-method="filterTag"
-        filter-placement="bottom-end"
-      >
-        <template slot-scope="scope">
-          <el-select
-            v-model="scope.row.province.value"
-            v-if="scope.row.province.edit"
-            placeholder="请选择"
-            @change="
-              value => {
-                scope.row.province.edit = false
-                changeCell(value, scope.row, scope.$index, 'province')
-              }
-            "
-          >
-            <!-- <el-option :key="''" :label="'全部'" :value="''"> </el-option> -->
-            <el-option
-              v-for="item in provinces"
-              :key="item.code"
-              :label="item.name"
-              :value="item.name"
-            >
-            </el-option>
-          </el-select>
-          <span v-else>{{ scope.row.province.value }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="city"
-        label="城市"
-        edit="false"
-        align="center"
-        width="120"
-        :filter-multiple="false"
-        column-key="city"
-        :filters="cityGroup"
-        :filter-method="filterTag"
-        filter-placement="bottom-end"
-      >
-        <template slot-scope="scope">
-          <el-select
-            v-model="scope.row.city.value"
-            v-if="scope.row.city.edit"
-            placeholder="请选择"
-            @change="
-              value => {
-                scope.row.city.edit = false
-                changeCell(value, scope.row, scope.$index, 'city')
-              }
-            "
-          >
-            <el-option :key="''" :label="'全部'" :value="''"> </el-option>
-            <el-option
-              v-for="item in cities"
-              :key="item.code"
-              :label="item.name"
-              :value="item.name"
-            >
-            </el-option>
-          </el-select>
-          <span v-else>{{ scope.row.city.value }}</span>
-        </template>
-      </el-table-column>
-
-      <el-table-column
-        prop="address"
-        label="详细地址"
-        align="center"
-        width="300"
-        edit="false"
-      >
-        <template slot-scope="scope">
-          <el-input
-            v-if="scope.row.address.edit"
-            ref="address"
-            v-model="scope.row.address.value"
-            @blur="scope.row.address.edit = false"
-          >
-          </el-input>
-          <span v-else>{{ scope.row.address.value }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="contact"
-        label="联系人"
-        edit="false"
-        width="120"
-        align="center"
-      >
-        <template slot-scope="scope">
-          <el-input
-            v-if="scope.row.contact.edit"
-            ref="contact"
-            v-model="scope.row.contact.value"
-            @blur="scope.row.contact.edit = false"
-          >
-          </el-input>
-          <span v-else>{{ scope.row.contact.value }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="mobile"
-        label="电话"
-        edit="false"
-        width="120"
-        align="center"
-      >
-        <template slot-scope="scope">
-          <el-input
-            v-if="scope.row.mobile.edit"
-            ref="mobile"
-            v-model="scope.row.mobile.value"
-            @blur="scope.row.mobile.edit = false"
-          >
-          </el-input>
-          <span v-else>{{ scope.row.mobile.value }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" label="操作" width="260">
-        <template slot-scope="scope">
-          <el-button
-            v-if="scope.row.isSet"
-            size="mini"
-            @click="handleSave(scope.$index, scope.row)"
-            >保存</el-button
-          >
-          <el-button
-            size="mini"
-            @click="changePassword(scope.$index, scope.row)"
-            >密码重置</el-button
-          >
-          <el-button size="mini" @click="handleDelete(scope.row)" v-if="d_show"
-            >删除</el-button
-          >
-        </template>
-      </el-table-column>
-    </el-table>
-    <pagination
-      :currentPage="currentPage"
-      :total="total"
-      :limit="limit"
-      :small="true"
-      @handleCurrentChange="handleCurrentChange"
-    />
-    <my-dialog
-      :centerDialogVisible="centerDialogVisible"
-      :headerText="headerText"
-      :textName="textName"
-      :changePwd="changePwd"
-      :id="rowId"
-    ></my-dialog>
   </div>
 </template>
 
@@ -289,10 +305,11 @@
 import provinceCity from '../commont/js/cities.json'
 import pagination from '../components/Pagenation'
 import MyDialog from '../components/Dialog'
+import DelDialog from './DelDialog'
 
 export default {
   // import引入的组件需要注入到对象中才能使用
-  components: { pagination, MyDialog },
+  components: { pagination, MyDialog, DelDialog },
   data() {
     // 这里存放数据
     return {
@@ -322,7 +339,9 @@ export default {
       d_show: false,
       e_show: false,
       edit: false,
-      tableDataSelections: []
+      tableDataSelections: [],
+      changeKey: 0,
+      delArr: ''
     }
   },
   // 监听属性 类似于data概念
@@ -485,12 +504,14 @@ export default {
       for (let i = 0; i < this.tableDataSelections.length; i++) {
         ids.push(this.tableDataSelections[i].id)
       }
-      const idArr = ids.join(',')
-      this.delItem(idArr, 'user/delete').then(res => {
-        if (res.data.code === 200) {
-          this.makeData()
-        }
-      })
+      // const idArr = ids.join(',')
+      this.changeKey++
+      this.delArr = ids.join(',')
+      // this.delItem(idArr, 'user/delete').then(res => {
+      //   if (res.data.code === 200) {
+      //     this.makeData()
+      //   }
+      // })
     },
     pwdChange(row, index) {
       console.log(row, index)
@@ -550,12 +571,13 @@ export default {
     },
     handleDelete(row) {
       console.log(row)
-
-      this.delItem(row.id, 'user/delete').then(res => {
-        if (res.data.code === 200) {
-          this.makeData()
-        }
-      })
+      this.changeKey++
+      this.delArr = row.id.toString()
+      // this.delItem(row.id, 'user/delete').then(res => {
+      //   if (res.data.code === 200) {
+      //     this.makeData()
+      //   }
+      // })
     },
     getBeforeData() {
       this.searchData('user/getSearchData').then(res => {
@@ -624,6 +646,10 @@ export default {
       }
       this.formatData()
       this.getDataList(res.data.object.total)
+    },
+    onLoadData() {
+      this.$refs.filterTable.clearSelection()
+      this.makeData()
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
@@ -644,16 +670,12 @@ export default {
 }
 </script>
 <style scope>
-.cell {
-  /* display: flex !important;
-  justify-content: space-between; */
-  /* padding: 25px 20px; */
-  max-height: 110px !important;
+.container {
+  margin: 40px 60px;
+  width: 93%;
+  background-color: #fff;
 }
-.t_header > .cell {
-  display: flex !important;
-  justify-content: space-between;
-}
+
 .el-table-filter {
   max-height: 400px;
   overflow: auto;

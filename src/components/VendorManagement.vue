@@ -1,48 +1,50 @@
 <!-- 生产商管理 -->
 <template>
-  <div style="width: 100%;">
-    <el-table
-      ref="filterTable"
-      :data="tableData.slice((currentPage - 1) * limit, currentPage * limit)"
-      @filter-change="fnFilterChangeInit"
-      @selection-change="selectionChangeHandle"
-      @cell-dblclick="celledit"
-      :row-key="getRowKey"
-      style="width: 95%;margin:40px 60px;"
-      border
-    >
-      <el-table-column class-name="t_header">
-        <template
-          slot="header"
-          style="display:flex;justify-content: space-between;"
-          header-align="center"
-        >
-          <div v-if="s_show">
-            <el-input
-              v-model="search"
-              prefix-icon="el-icon-search"
-              clearable
-              style="width:400px;border-radius:4px;margin-right:8px"
-              placeholder="输入关键字搜索"
-              @clear="clearSearch"
-            />
-            <el-button @click="searchEnterFun()" type="primary"
-              ><i class="el-icon-search"></i>搜索</el-button
-            >
-          </div>
+  <div class="container">
+    <div style="padding: 25px 20px;">
+      <div class="t_header">
+        <div v-if="s_show" style="display:flex;margin-right:10px">
+          <el-input
+            v-model="search"
+            prefix-icon="el-icon-search"
+            clearable
+            style="width:400px;border-radius:4px;margin-right:8px"
+            placeholder="输入关键字搜索"
+            @clear="clearSearch"
+          />
+          <el-button @click="searchEnterFun()" type="primary"
+            ><i class="el-icon-search"></i>搜索</el-button
+          >
+        </div>
 
-          <div>
-            <el-button @click="addRow()" type="primary" v-if="a_show"
-              ><i class="el-icon-plus"></i> 新增</el-button
-            >
-            <el-button
-              @click="batchDelete(tableDataSelections)"
-              type="primary"
-              v-if="d_show"
-              ><i class="el-icon-delete"></i>删除</el-button
-            >
-          </div>
-        </template>
+        <div>
+          <el-button @click="addRow()" type="primary" v-if="a_show"
+            ><i class="el-icon-plus"></i> 新增</el-button
+          >
+          <el-button
+            @click="batchDelete(tableDataSelections)"
+            type="primary"
+            v-if="d_show"
+            ><i class="el-icon-delete"></i>删除</el-button
+          >
+        </div>
+      </div>
+
+      <el-table
+        ref="filterTable"
+        :data="tableData.slice((currentPage - 1) * limit, currentPage * limit)"
+        @filter-change="fnFilterChangeInit"
+        @selection-change="selectionChangeHandle"
+        @cell-dblclick="celledit"
+        :row-key="getRowKey"
+        :header-cell-style="{
+          fontSize: '15px',
+          color: '#000',
+          fontWeight: 800,
+          background: '#eef1f6'
+        }"
+        border
+      >
         <el-table-column
           type="selection"
           width="100"
@@ -163,7 +165,6 @@
           prop="address"
           label="详细地址"
           align="center"
-          width="220"
           edit="false"
         >
           <template slot-scope="scope">
@@ -229,16 +230,25 @@
             >
           </template>
         </el-table-column>
-      </el-table-column>
-    </el-table>
-    <pagination
-      :currentPage="currentPage"
-      :total="total"
-      :limit="limit"
-      :small="true"
-      @handleCurrentChange="handleCurrentChange"
-      @handleSizeChange="handleSizeChange"
-    />
+      </el-table>
+      <pagination
+        :currentPage="currentPage"
+        :total="total"
+        :limit="limit"
+        :small="true"
+        @handleCurrentChange="handleCurrentChange"
+        @handleSizeChange="handleSizeChange"
+      />
+      <del-dialog
+        :keyNumber="changeKey"
+        @onLoadData="onLoadData"
+        :headerTitle="`删除生产商`"
+        :ids="delArr"
+        :delPath="`producer/delete`"
+        :delContent="`确定删除生产商，数据无法找回！`"
+      >
+      </del-dialog>
+    </div>
   </div>
 </template>
 
@@ -247,10 +257,11 @@
 // 例如：import 《组件名称》 from '《组件路径》';
 import provinceCity from '../commont/js/cities.json'
 import pagination from '../components/Pagenation'
+import DelDialog from './DelDialog'
 
 export default {
   // import引入的组件需要注入到对象中才能使用
-  components: { pagination },
+  components: { pagination, DelDialog },
   data() {
     // 这里存放数据
     return {
@@ -273,7 +284,9 @@ export default {
       d_show: false,
       e_show: false,
       tableDataSelections: [],
-      edit: false
+      edit: false,
+      changeKey: 0,
+      delArr: ''
     }
   },
   // 监听属性 类似于data概念
@@ -336,10 +349,12 @@ export default {
       })
     },
     selectionChangeHandle(selection) {
+      console.log(selection)
+
       this.tableDataSelections = []
       // this.btnShow = false
       for (let i = 0; i < selection.length; i++) {
-        this.tableDataSelections.push(selection[i].opId)
+        this.tableDataSelections.push(selection[i].id)
       }
     },
     // table column 的方法，改写这个方法
@@ -377,8 +392,6 @@ export default {
       this.init(this.options)
     },
     init(options) {
-      console.log(options)
-      console.log(this.tableData)
       // 筛选时 应请求一次数据接口拿到表单数据将以前的数据清空再进行条件筛选
       this.valueData(
         this.currentPage,
@@ -453,7 +466,7 @@ export default {
     // 表格新增行
     addRow() {
       this.provinces = provinceCity.provinces
-      // const id = this.tableData[this.tableData.length - 1].id + 1
+      const id = this.tableData[this.tableData.length - 1].id + 1
       this.tableData.push({
         producerCode: { value: '', edit: true },
         producerName: { value: '', edit: true },
@@ -462,22 +475,24 @@ export default {
         mobile: { value: '', edit: true },
         province: { value: '', edit: true },
         city: { value: '', edit: true },
-        id: 0,
+        id: id,
         isSet: true
       })
     },
     // 删除选中数据（单纯实现前端删除）
     batchDelete(selections) {
-      const ids = []
-      for (let i = 0; i < this.tableDataSelections.length; i++) {
-        ids.push(this.tableDataSelections[i].id)
-      }
-      const idArr = ids.join(',')
-      this.delItem(idArr, 'producer/delete').then(res => {
-        if (res.data.code === 200) {
-          this.makeData()
-        }
-      })
+      // const ids = []
+      // for (let i = 0; i < this.tableDataSelections.length; i++) {
+      //   ids.push(this.tableDataSelections[i].id)
+      // }
+      // const idArr = ids.join(',')
+      this.changeKey++
+      this.delArr = this.tableDataSelections.join(',')
+      // this.delItem(idArr, 'producer/delete').then(res => {
+      //   if (res.data.code === 200) {
+      //     this.makeData()
+      //   }
+      // })
     },
     pwdChange(row, index) {
       console.log(row, index)
@@ -542,11 +557,13 @@ export default {
       })
     },
     handleDelete(row) {
-      this.delItem(row.id, 'producer/delete').then(res => {
-        if (res.data.code === 200) {
-          this.makeData()
-        }
-      })
+      this.changeKey++
+      this.delArr = row.id.toString()
+      // this.delItem(row.id, 'producer/delete').then(res => {
+      //   if (res.data.code === 200) {
+      //     this.makeData()
+      //   }
+      // })
     },
     searchEnterFun() {
       this.valueData(
@@ -580,6 +597,10 @@ export default {
     },
     clearSearch() {
       this.makeData()
+    },
+    onLoadData() {
+      this.$refs.filterTable.clearSelection()
+      this.makeData()
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
@@ -601,20 +622,29 @@ export default {
 }
 </script>
 <style scope>
+.container {
+  margin: 40px 60px;
+  width: 93%;
+  background-color: #fff;
+}
 .cell {
   /* display: flex !important;
   justify-content: space-between; */
   /* padding: 25px 20px; */
   max-height: 110px !important;
 }
-.t_header > .cell {
-  display: flex !important;
-  justify-content: space-between;
-}
 .el-table-filter {
   max-height: 400px;
   overflow: auto;
 }
+.t_header {
+  display: flex;
+  justify-content: space-between;
+  background-color: #fff;
+  width: 100%;
+  margin-bottom: 25px;
+}
+
 /* .el-table__row {
   height: 60px !important;
 } */

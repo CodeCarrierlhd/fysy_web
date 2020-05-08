@@ -1,6 +1,6 @@
 <!-- 流水统计 -->
 <template>
-  <div class="container">
+  <div class="saleContainer">
     <div class="slects">
       <span class="fontStyle" style="margin-right:10px">时间</span>
       <el-select v-model="dateValue" placeholder="请选择">
@@ -14,6 +14,7 @@
       </el-select>
       <span class="fontStyle" style="margin:0 10px 0 20px">型号</span>
       <el-select v-model="material" placeholder="请选择">
+        <el-option label="全选" value="0"> </el-option>
         <el-option
           v-for="item in materialList"
           :key="item.value"
@@ -70,27 +71,29 @@
         <p class="font_title" style="margin-bottom:30px">
           各型号产品进销存情况
         </p>
-        <el-table
-          :data="tableData"
-          border
-          style="height:600px;overflow: scroll;"
-        >
-          <el-table-column
-            prop="materialModel"
-            label="型号"
-            width="100"
-            align="center"
+        <div>
+          <el-table
+            :data="tableData"
+            border
+            style="height:600px;overflow: scroll;overflow-x:hidden;"
           >
-          </el-table-column>
-          <el-table-column prop="inventoryCount" label="进货" align="center">
-          </el-table-column>
-          <el-table-column prop="salesCount" label="销售" align="center">
-          </el-table-column>
-          <el-table-column prop="instockCount" label="库存" align="center">
-          </el-table-column>
-          <el-table-column prop="returnCount" label="退货" align="center">
-          </el-table-column>
-        </el-table>
+            <el-table-column
+              prop="materialModel"
+              label="型号"
+              width="100"
+              align="center"
+            >
+            </el-table-column>
+            <el-table-column prop="instockCount" label="进货" align="center">
+            </el-table-column>
+            <el-table-column prop="salesCount" label="销售" align="center">
+            </el-table-column>
+            <el-table-column prop="inventoryCount" label="库存" align="center">
+            </el-table-column>
+            <el-table-column prop="returnCount" label="退货" align="center">
+            </el-table-column>
+          </el-table>
+        </div>
       </div>
     </div>
   </div>
@@ -126,12 +129,16 @@ export default {
   watch: {
     dateValue: {
       handler(newName, oldName) {
-        this.getAllData()
+        this.$nextTick(() => {
+          this.getAllData()
+        })
       }
     },
     material: {
       handler(newName, oldName) {
-        this.getMaterial()
+        this.$nextTick(() => {
+          this.getAllData()
+        })
       }
     }
   },
@@ -324,12 +331,12 @@ export default {
       this.pieChar.clear()
       this.pieChar.changeData(data)
 
-      this.pieChar.scale('count', {
-        formatter: val => {
-          // val = val * 100 + '%'
-          return val
-        }
-      })
+      // this.pieChar.scale('count', {
+      //   formatter: val => {
+      //     val = val * 100 + '%'
+      //     return val
+      //   }
+      // })
       this.pieChar.legend({
         visible: false
       })
@@ -349,24 +356,24 @@ export default {
         .annotation()
         .text({
           position: ['50%', '50%'],
-          content: conunts,
-          style: {
-            fontSize: 20,
-            fill: '#8c8c8c',
-            textAlign: 'center'
-          },
-          offsetX: -5,
-          offsetY: 20
-        })
-        .text({
-          position: ['50%', '50%'],
           content: '总库存量/个',
           style: {
-            fontSize: 14,
+            fontSize: 12,
             fill: '#8c8c8c',
             textAlign: 'center'
           },
           offsetY: -20
+        })
+        .text({
+          position: ['50%', '50%'],
+          content: conunts.amount,
+          style: {
+            fontSize: 24,
+            fill: '#8c8c8c',
+            textAlign: 'center'
+          },
+          offsetX: -5,
+          offsetY: 10
         })
 
       this.pieChar
@@ -407,12 +414,14 @@ export default {
           this.lineChart = new Chart({
             container: 'lineChart',
             autoFit: true,
-            height: 260
+            height: 260,
+            padding: [40, 60]
           })
           this.barChar = new Chart({
             container: 'barChart',
             autoFit: true,
-            height: 260
+            height: 260,
+            padding: [40, 60]
           })
           this.pieChar = new Chart({
             container: 'pieChart',
@@ -431,7 +440,7 @@ export default {
             lineData.push({
               timer: graphx[i],
               title: '进货',
-              datas: inventory[i]
+              datas: instock[i]
             })
             lineData.push({
               timer: graphx[i],
@@ -441,7 +450,7 @@ export default {
             lineData.push({
               timer: graphx[i],
               title: '库存',
-              datas: instock[i]
+              datas: inventory[i]
             })
             lineData.push({
               timer: graphx[i],
@@ -466,6 +475,7 @@ export default {
             })
           }
           this.initLine(lineData)
+
           this.initPie(pieData, res.data.object.totalInventory)
           this.initBar(barData)
           this.tableData = res.data.object.modelDataList
@@ -513,6 +523,7 @@ export default {
       this.dateValue = 0
       this.material = ''
       this.getAllData()
+      this.getType(val)
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
@@ -531,13 +542,6 @@ export default {
 }
 </script>
 <style scope>
-.fontStyle {
-  font-size: 24px;
-  font-family: SourceHanSansSC-Medium, SourceHanSansSC;
-  font-weight: 500;
-  color: rgba(51, 51, 51, 1);
-  line-height: 36px;
-}
 .graph {
   width: 1020px;
   margin-top: 40px;

@@ -7,11 +7,11 @@
     </p>
     <p>
       <img :src="user_img" alt />
-      <span style="margin:0 35px">{{ userInfo.username }}</span>
+      <span style="margin:0 40px 0 10px">{{ userInfo.username }}</span>
       <img
         :src="lock_img"
         alt
-        style="margin-right:10px"
+        style="margin-right:20px"
         @click.stop="getUser()"
       />
       <img :src="quit_img" alt @click="clearUser()" />

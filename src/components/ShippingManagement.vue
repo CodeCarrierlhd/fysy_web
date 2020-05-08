@@ -13,72 +13,77 @@
         :key="index"
         :label="item.label"
       >
-        <div class="btn_header">
-          <div style="display:flex">
-            <div style="display:flex;margin-right:10px">
-              <el-input
-                v-model="search"
-                prefix-icon="el-icon-search"
-                clearable
-                style="border-radius:4px;width:400px;margin-right:10px"
-                placeholder="输入关键字搜索"
-              />
-              <el-button @click="searchEnterFun()" type="primary"
-                ><i class="el-icon-search"></i>搜索</el-button
+        <div style="margin:10px 20px">
+          <div class="btn_header">
+            <div style="display:flex">
+              <div style="display:flex;margin-right:10px">
+                <el-input
+                  v-model="search"
+                  prefix-icon="el-icon-search"
+                  clearable
+                  style="border-radius:4px;width:400px;margin-right:10px"
+                  placeholder="输入关键字搜索"
+                />
+                <el-button @click="searchEnterFun()" type="primary"
+                  ><i class="el-icon-search"></i>搜索</el-button
+                >
+              </div>
+              <el-button
+                @click="exportClientInfoExcel()"
+                type="primary"
+                size="medium"
+                v-if="e_show"
+                ><i class="el-icon-download"></i>导出</el-button
               >
             </div>
-            <el-button
-              @click="exportClientInfoExcel()"
-              type="primary"
-              size="medium"
-              v-if="e_show"
-              ><i class="el-icon-download"></i>导出</el-button
-            >
-          </div>
-          <div v-if="add_show">
-            <el-button
-              @click="addData"
-              v-if="btnShow"
-              type="primary"
-              v-show="s_show"
-              ><i class="el-icon-plus"></i> 新增</el-button
-            >
-            <div v-else>
-              <el-button @click="delData" type="primary"
-                ><i class="el-icon-delete"></i>删除</el-button
+            <div v-if="add_show">
+              <el-button
+                @click="addData"
+                v-if="btnShow"
+                type="primary"
+                v-show="s_show"
+                ><i class="el-icon-plus"></i> 新增</el-button
               >
-              <el-button @click="sendPro" type="primary"
-                ><i class="el-icon-thumb"></i>确认发货</el-button
-              >
+              <div v-else>
+                <el-button @click="delData" type="primary"
+                  ><i class="el-icon-delete"></i>删除</el-button
+                >
+                <el-button @click="sendPro" type="primary"
+                  ><i class="el-icon-thumb"></i>确认发货</el-button
+                >
+              </div>
             </div>
+            <el-select
+              v-model="p_role"
+              placeholder="请选择账号"
+              v-if="show_role"
+              label="账号"
+              @change="changRole"
+            >
+              <el-option
+                v-for="item in roleGroups"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              >
+              </el-option>
+            </el-select>
           </div>
-          <el-select
-            v-model="p_role"
-            placeholder="请选择账号"
-            v-if="show_role"
-            label="账号"
-            @change="changRole"
+          <el-table
+            ref="sendProFilterTable"
+            :data="tableData"
+            @selection-change="selectionChangeHandle"
+            @filter-change="fnFilterChangeInit"
+            :row-key="getRowKey"
+            :header-cell-style="{
+              fontSize: '15px',
+              color: '#000',
+              fontWeight: 800,
+              background: '#eef1f6'
+            }"
+            border
+            height="600"
           >
-            <el-option
-              v-for="item in roleGroups"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            >
-            </el-option>
-          </el-select>
-        </div>
-        <el-table
-          ref="sendProFilterTable"
-          :data="tableData"
-          @selection-change="selectionChangeHandle"
-          @filter-change="fnFilterChangeInit"
-          :row-key="getRowKey"
-          style="width: 100%; margin:10px 20px"
-          border
-          height="600"
-        >
-          <el-table-column class-name="t_header">
             <el-table-column
               type="selection"
               width="100"
@@ -184,19 +189,6 @@
               width="150"
             >
             </el-table-column>
-            <!-- <el-table-column
-              v-if="wait_pro"
-              prop="productStatus"
-              label="状态"
-              align="center"
-              width="150"
-              :filter-multiple="false"
-              :filters="p_statuGroup"
-              :filter-method="filterTag"
-              column-key="productStatus"
-              key="p_statu"
-              filter-placement="bottom-end"
-            ></el-table-column> -->
             <el-table-column
               v-if="wait_pro"
               prop="productStatus"
@@ -230,17 +222,17 @@
             <!-- <el-table-column label="取消关联" align="center">
               <span class="loseContro">解绑</span>
             </el-table-column> -->
-          </el-table-column>
-        </el-table>
+          </el-table>
 
-        <pagination
-          :currentPage="currentPage"
-          :total="total"
-          :limit="limit"
-          :small="true"
-          @handleCurrentChange="handleCurrentChange"
-          style="margin:15px 50px;"
-        />
+          <pagination
+            :currentPage="currentPage"
+            :total="total"
+            :limit="limit"
+            :small="true"
+            @handleCurrentChange="handleCurrentChange"
+            style="margin:15px 50px;"
+          />
+        </div>
       </el-tab-pane>
     </el-tabs>
     <el-dialog
@@ -259,12 +251,12 @@
             style="border-radius:4px;width:400px;margin-right:10px"
             placeholder="输入关键字搜索"
           />
-          <el-button @click="searchEnterFun1()" type="primary">搜索</el-button>
+          <el-button @click="searchEnterFun1()" type="primary"
+            ><i class="el-icon-search"></i>搜索</el-button
+          >
         </div>
 
-        <el-button @click="chosePro" type="primary"
-          ><i class="el-icon-plus"></i> 添加</el-button
-        >
+        <el-button @click="chosePro" type="primary"> 添加</el-button>
       </div>
       <el-table
         ref="getProducts"
@@ -273,95 +265,89 @@
         @selection-change="selectionChangeHandle1"
         :row-key="getRowKey"
         height="600"
-        style="margin:10px 0;width:100%"
+        style="width: 100%;margin:10px 20px;"
         border
       >
-        <el-table-column class-name="t_header">
-          <el-table-column
-            type="selection"
-            width="100"
-            align="center"
-            :reserve-selection="true"
-          ></el-table-column>
-          <el-table-column
-            prop="materialType"
-            label="产品类别"
-            align="center"
-            width="100"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="materialCode"
-            label="产品编号"
-            align="center"
-            width="200"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="materialModel"
-            label="产品型号"
-            align="center"
-            width="150"
-            :filter-multiple="false"
-            :filters="materialModelGroup"
-            :filter-method="filterTag"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="productNo"
-            label="序列号 "
-            align="center"
-            width="200"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="batchNo"
-            label="产品批号 "
-            align="center"
-            width="200"
-          >
-          </el-table-column>
-          <el-table-column prop="spec" label="规格 " align="center" width="80">
-          </el-table-column>
-          <el-table-column
-            prop="produceDate"
-            label="生产日期 "
-            align="center"
-            width="100"
-          >
-          </el-table-column>
+        <el-table-column
+          type="selection"
+          width="100"
+          align="center"
+          :reserve-selection="true"
+        ></el-table-column>
+        <el-table-column
+          prop="materialType"
+          label="产品类别"
+          align="center"
+          width="100"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="materialCode"
+          label="产品编号"
+          align="center"
+          width="180"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="materialModel"
+          label="产品型号"
+          align="center"
+          width="150"
+          :filter-multiple="false"
+          :filters="materialModelGroup"
+          :filter-method="filterTag"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="productNo"
+          label="序列号 "
+          align="center"
+          width="200"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="batchNo"
+          label="产品批号 "
+          align="center"
+          width="200"
+        >
+        </el-table-column>
+        <el-table-column prop="spec" label="规格 " align="center" width="80">
+        </el-table-column>
+        <el-table-column
+          prop="produceDate"
+          label="生产日期 "
+          align="center"
+          width="160"
+        >
+        </el-table-column>
 
-          <el-table-column
-            prop="expiryDate"
-            label="失效日期"
-            align="center"
-            width="100"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="cartonCode"
-            label="箱码"
-            align="center"
-            width="200"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="activateCode"
-            label="激活码"
-            align="center"
-            width="200"
-          ></el-table-column>
-          <el-table-column
-            prop="producer"
-            label="生产厂家"
-            align="center"
-            width="150"
-          >
-          </el-table-column>
-
-          <!-- <el-table-column label="取消关联" align="center">
-              <span class="loseContro">解绑</span>
-            </el-table-column> -->
+        <el-table-column
+          prop="expiryDate"
+          label="失效日期"
+          align="center"
+          width="160"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="cartonCode"
+          label="箱码"
+          align="center"
+          width="200"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="activateCode"
+          label="激活码"
+          align="center"
+          width="200"
+        ></el-table-column>
+        <el-table-column
+          prop="producer"
+          label="生产厂家"
+          align="center"
+          width="150"
+        >
         </el-table-column>
       </el-table>
       <pagination
@@ -489,7 +475,7 @@ export default {
     // 这里存放数据
     return {
       currentPage: 1,
-      limit: 10,
+      limit: 100,
       total: 0,
       currentPage1: 1,
       limit1: 100,
@@ -553,12 +539,10 @@ export default {
         '&uid=',
         '',
         '&value=',
-        this.search
+        this.search1
       ).then(res => {
         this.newTableData = []
         this.newTableData = res.data.object.list
-        console.log(res.data.object.total)
-
         this.getDataList1(res.data.object.total)
       })
     },
@@ -672,6 +656,7 @@ export default {
     },
     addData() {
       this.newTableData = []
+      this.search1 = ''
       this.initData1()
       this.dialogVisibleClassify = true
     },
@@ -807,7 +792,47 @@ export default {
       } else if (this.key_index === '4') {
         a = 3
       }
-      this.changeTab(a, '')
+      const ids = this.tableDataSelections.join(',')
+      this.searchAll(
+        this.currentPage,
+        this.limit,
+        '/inventory/listData',
+        '&materialId=',
+        '',
+        '&selectedOpIds=',
+        ids,
+        '&uid=',
+        '',
+        '&value=',
+        this.search,
+        '&pageType=',
+        a
+      ).then(res => {
+        this.tableData = res.data.object.list
+        this.getDataList(res.data.object.total)
+      })
+      // this.changeTab(a, '')
+    },
+    searchEnterFun1() {
+      this.searchAll(
+        this.currentPage1,
+        this.limit1,
+        '/inventory/listData',
+        '&materialId=',
+        '',
+        '&selectedOpIds=',
+        '',
+        '&uid=',
+        this.uid,
+        '&value=',
+        this.search1,
+        '&pageType=',
+        '1'
+      ).then(res => {
+        this.newTableData = res.data.object.list
+        this.getDataList1(res.data.object.total)
+      })
+      // this.changeTab(a, '')
     },
     getType() {
       this.getSums('/material/listAboutSelf').then(res => {
@@ -903,7 +928,7 @@ export default {
 }
 .container {
   margin: 40px 60px;
-  width: 95%;
+  width: 93%;
 }
 .find {
   width: 100%;
@@ -912,7 +937,7 @@ export default {
 .btn_header {
   display: flex;
   justify-content: space-between;
-  margin: 10px 20px;
+  margin-bottom: 25px;
 }
 .new_header {
   display: flex;
@@ -937,4 +962,7 @@ export default {
 .sendContainer li {
   margin-bottom: 24px;
 }
+/* .el-tabs >>> .el-tabs__content {
+  width: 96% !important;
+} */
 </style>

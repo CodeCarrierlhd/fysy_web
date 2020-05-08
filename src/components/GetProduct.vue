@@ -13,43 +13,48 @@
         :key="index"
         :label="item.label"
       >
-        <div class="btn_header">
-          <div style="display:flex;margin-right:10px" v-if="s_show">
-            <el-input
-              v-model="search"
-              prefix-icon="el-icon-search"
-              clearable
-              style="border-radius:4px;width:400px;margin-right:10px"
-              placeholder="输入关键字搜索"
-            />
-            <el-button @click="searchEnterFun()" type="primary"
-              ><i class="el-icon-search"></i>搜索</el-button
-            >
+        <div style="margin:10px 20px">
+          <div class="btn_header">
+            <div style="display:flex;margin-right:10px" v-if="s_show">
+              <el-input
+                v-model="search"
+                prefix-icon="el-icon-search"
+                clearable
+                style="border-radius:4px;width:400px;margin-right:10px"
+                placeholder="输入关键字搜索"
+              />
+              <el-button @click="searchEnterFun()" type="primary"
+                ><i class="el-icon-search"></i>搜索</el-button
+              >
+            </div>
+            <div>
+              <el-button
+                @click="exportClientInfoExcel()"
+                type="primary"
+                size="medium"
+                v-if="i_show"
+                ><i class="el-icon-download"></i>导出</el-button
+              >
+            </div>
           </div>
-          <div>
-            <el-button
-              @click="exportClientInfoExcel()"
-              type="primary"
-              size="medium"
-              v-if="i_show"
-              ><i class="el-icon-download"></i>导出</el-button
-            >
-          </div>
-        </div>
-        <el-table
-          ref="filterTable"
-          :data="tableData"
-          @selection-change="selectionChangeHandle"
-          @filter-change="fnFilterChangeInit"
-          :row-key="getRowKey"
-          style="width: 100%; margin:0 20px"
-          border
-          height="600"
-        >
-          <el-table-column class-name="t_header">
+          <el-table
+            ref="filterTable"
+            :data="tableData"
+            @selection-change="selectionChangeHandle"
+            @filter-change="fnFilterChangeInit"
+            :row-key="getRowKey"
+            :header-cell-style="{
+              fontSize: '15px',
+              color: '#000',
+              fontWeight: 800,
+              background: '#eef1f6'
+            }"
+            border
+            height="600"
+          >
             <el-table-column
               type="selection"
-              width="150"
+              width="100"
               align="center"
               :reserve-selection="true"
             ></el-table-column>
@@ -216,17 +221,17 @@
                 >
               </template>
             </el-table-column>
-          </el-table-column>
-        </el-table>
+          </el-table>
 
-        <pagination
-          :currentPage="currentPage"
-          :total="total"
-          :limit="limit"
-          :small="true"
-          @handleCurrentChange="handleCurrentChange"
-          style="margin:15px 50px;"
-        />
+          <pagination
+            :currentPage="currentPage"
+            :total="total"
+            :limit="limit"
+            :small="true"
+            @handleCurrentChange="handleCurrentChange"
+            style="margin:15px 50px;"
+          />
+        </div>
       </el-tab-pane>
     </el-tabs>
 
@@ -469,32 +474,6 @@ export default {
       aLink.click()
       document.body.removeChild(aLink)
     },
-    // imgDown(downloadContent, opts) {
-    //   html2canvas(downloadContent, opts).then(canvas => {
-    //     var context = canvas.getContext('2d')
-    //     // 【重要】关闭抗锯齿
-    //     context.mozImageSmoothingEnabled = false
-    //     context.webkitImageSmoothingEnabled = false
-    //     context.msImageSmoothingEnabled = false
-    //     context.imageSmoothingEnabled = false
-
-    //     var img = Canvas2Image.convertToJPEG(
-    //       canvas,
-    //       canvas.width / 2,
-    //       canvas.height / 2
-    //     )
-
-    //     // const dataURL = img.getAttribute('src')
-
-    //     // 下载图片
-    //     const a = document.createElement('a')
-    //     document.body.appendChild(a)
-    //     a.href = img.src
-    //     // 设置下载标题
-    //     a.download = '排课计划'
-    //     a.click()
-    //   })
-    // },
     quitNow() {
       this.dialogVisible = false
       console.log('取消')
@@ -581,7 +560,7 @@ export default {
 }
 .container {
   margin: 40px 60px;
-  width: 1560px;
+  width: 93%;
 }
 .find {
   width: 100%;
@@ -590,7 +569,7 @@ export default {
 .btn_header {
   display: flex;
   justify-content: space-between;
-  margin: 25px 20px;
+  margin-bottom: 25px;
 }
 .btngroups {
   text-align: center;

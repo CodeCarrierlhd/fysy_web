@@ -1,11 +1,11 @@
 <!-- 激活码管理 -->
 <template>
-  <div class="container">
+  <div style="margin:40px 60px;width:93%">
     <div
-      style="display:flex;justify-content: space-between;margin-bottom:45px"
+      style="display:flex;justify-content: space-between;margin-bottom:45px;"
       v-if="s_show"
     >
-      <el-card class="box-card">
+      <el-card class="box-card" style="margin-right:30px">
         <div class="header">
           <img :src="imgs.a_img" />
           <p style="margin-right:0">
@@ -68,42 +68,43 @@
           </div>
           <el-table
             :data="tableData"
-            style="width: 96%;margin:0 20px"
+            style="width: 100%;margin:0 20px"
+            :header-cell-style="{
+              fontSize: '15px',
+              color: '#000',
+              fontWeight: 800,
+              background: '#eef1f6'
+            }"
             border
-            height="300"
+            height="280"
             @filter-change="fnFilterChangeInit"
           >
-            <el-table-column class-name="t_header">
-              <el-table-column
-                label="序号"
-                type="index"
-                align="center"
-                width="150"
-              >
-              </el-table-column>
-              <el-table-column prop="code" label="防伪码" align="center">
-              </el-table-column>
-              <el-table-column
-                prop="codeType"
-                label="类型"
-                align="center"
-                width="160"
-                :filter-multiple="false"
-                :filters="codeTypeGroup"
-                :filter-method="filterTag"
-                column-key="codeType"
-                filter-placement="bottom-end"
-              >
-              </el-table-column>
-              <el-table-column
-                prop="createTime"
-                :label="dateName"
-                align="center"
-              >
-              </el-table-column>
-              <el-table-column prop="status" :label="statusName" align="center">
-              </el-table-column>
-              <!-- <el-table-column
+            <el-table-column
+              label="序号"
+              type="index"
+              align="center"
+              width="150"
+            >
+            </el-table-column>
+            <el-table-column prop="code" label="防伪码" align="center">
+            </el-table-column>
+            <el-table-column
+              prop="codeType"
+              label="类型"
+              align="center"
+              width="160"
+              :filter-multiple="false"
+              :filters="codeTypeGroup"
+              :filter-method="filterTag"
+              column-key="codeType"
+              filter-placement="bottom-end"
+            >
+            </el-table-column>
+            <el-table-column prop="createTime" :label="dateName" align="center">
+            </el-table-column>
+            <el-table-column prop="status" :label="statusName" align="center">
+            </el-table-column>
+            <!-- <el-table-column
                 prop="status"
                 label="状态"
                 align="center"
@@ -116,7 +117,6 @@
                 align="center"
                 v-else
               > -->
-            </el-table-column>
           </el-table>
           <pagination
             :currentPage="currentPage"
@@ -138,16 +138,27 @@
       center
       width="620px"
     >
-      <p>类型：卡片防伪码</p>
-      <div>
-        <span>导出数量：</span>
-        <el-input
-          v-model="sums"
-          style="width:300px;margin:20px 15px"
-        ></el-input>
-        <el-button @click="exportClientInfoExcel()" type="primary"
-          >确认导出</el-button
-        >
+      <div class="fileContent">
+        <p>类型：卡片防伪码</p>
+        <div>
+          <span>导出数量：</span>
+          <el-input
+            v-model="sums"
+            style="width:300px;margin:20px 15px"
+          ></el-input>
+        </div>
+        <div style="margin-bottom:30px">
+          <span>导出文件：</span>
+          <el-input
+            v-model="exportFileName"
+            style="width:300px;margin:20px 15px"
+          ></el-input>
+        </div>
+        <div style="text-align: center;">
+          <el-button @click="exportClientInfoExcel()" type="primary"
+            >确认导出</el-button
+          >
+        </div>
       </div>
     </el-dialog>
   </div>
@@ -194,7 +205,8 @@ export default {
       a_number: 0,
       newDialogTableVisible: false,
       sums: 0,
-      sumCount: true
+      sumCount: true,
+      exportFileName: ''
     }
   },
   // 监听属性 类似于data概念
@@ -346,6 +358,8 @@ export default {
     },
     importData() {
       this.newDialogTableVisible = true
+      this.exportFileName = '卡片防伪码' + Date.parse(new Date())
+      this.sums = 1
     },
     exportClientInfoExcel() {
       const that = this
@@ -354,7 +368,7 @@ export default {
         '/serveCode/fwCode/createAndExport'
       ).then(response => {
         if (response.status === 200) {
-          that.downloadFile(response.data, '卡片防伪码')
+          that.downloadFile(response.data, this.exportFileName)
           this.newDialogTableVisible = false
           this.sums = 0
           this.initSums()
@@ -442,5 +456,8 @@ export default {
 .sumForm {
   background-color: #fff;
   flex: 1;
+}
+.fileContent {
+  padding: 40px 60px;
 }
 </style>

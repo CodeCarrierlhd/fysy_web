@@ -1,6 +1,6 @@
 <!-- 销售统计 -->
 <template>
-  <div class="container">
+  <div class="saleContainer">
     <div class="slects">
       <span class="fontStyle" style="margin-right:10px">时间</span>
       <el-select v-model="dateValue" placeholder="请选择">
@@ -27,7 +27,8 @@
         </el-option>
       </el-select>
       <span class="fontStyle" style="margin:0 10px 0 20px">型号</span>
-      <el-select v-model="material" placeholder="请选择">
+      <el-select v-model="material" placeholder="请选择" @change="typeChange">
+        <el-option label="全选" value="0"> </el-option>
         <el-option
           v-for="item in materialList"
           :key="item.value"
@@ -53,7 +54,7 @@
           <div
             style="display:flex;width:100%;justify-content: space-between;border-bottom: 1px solid #BEBBBA;"
           >
-            <span class="title">销售总数统计+1</span>
+            <span class="title">销售总数统计</span>
             <span class="title">单位：个</span>
           </div>
           <div id="lineChart" style="height:260px;width:100%"></div>
@@ -72,7 +73,11 @@
               </p>
             </div>
           </div>
-          <div id="pieChart" style="height:260px;width:40%"></div>
+          <div
+            style="border:1px solid rgba(190,187,186,1);flex:1;margin:10px;box-shadow:0px 2px 4px 0px rgba(0,0,0,0.5);border-radius:4px;"
+          >
+            <div id="pieChart" style="height:260px;width:100%;"></div>
+          </div>
         </div>
 
         <div
@@ -82,7 +87,7 @@
           <div
             style="display:flex;width:100%;justify-content: space-between;border-bottom: 1px solid #BEBBBA;"
           >
-            <span class="title">全国各省份销售排行+1</span>
+            <span class="title">全国各省份销售排行</span>
             <span class="title">单位：个</span>
           </div>
           <div id="barChart" style="height:260px;width:100%"></div>
@@ -97,11 +102,11 @@
           <div id="cityLineChart" style="height:260px;width:100%"></div>
         </div>
       </div>
-      <div class="progressBar">
+      <div class="progressBar" v-if="p_info">
         <p class="font_title" style="margin-bottom:30px">
           各型号销售概况
         </p>
-        <ul style="height: 600px;overflow: scroll;">
+        <ul style="height: 600px;overflow: scroll;overflow-x:hidden">
           <li
             v-for="(item, index) in materialLists"
             :key="index"
@@ -123,6 +128,40 @@
             </div>
           </li>
         </ul>
+      </div>
+      <div v-else class="progressBar">
+        <p class="font_title" style="margin-bottom:30px">
+          {{ choseMaterial.materialModel }}销售概况
+        </p>
+        <div>
+          <p class="p_groups">
+            <span class="p_title">{{ choseMaterial.materialModel }}</span>
+            <span class="p_title">{{ choseMaterial.amount }}个</span>
+          </p>
+          <div style="background:rgba(255,255,255,1);padding:25px 21px">
+            <el-progress
+              :percentage="
+                Number(((choseMaterial.amount / choseTotal) * 100).toFixed(0))
+              "
+              :show-text="true"
+            ></el-progress>
+          </div>
+        </div>
+        <div v-if="imgExit">
+          <div class="carouselBlock">
+            <el-carousel height="250px">
+              <el-carousel-item v-for="(item, index) in imgList" :key="index">
+                <img :src="item.image" alt="" />
+              </el-carousel-item>
+            </el-carousel>
+          </div>
+          <div class="type_block">
+            <p class="type_title" style="margin-bottom:30px">
+              {{ choseMaterial.materialModel }}型号参数
+            </p>
+            <p class="type_desc">{{ typeDesc }}</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -191,7 +230,13 @@ export default {
       pieChart: {},
       myChart: {},
       provienceChange: true,
-      provienceDesc: ''
+      provienceDesc: '',
+      p_info: true,
+      choseMaterial: [],
+      choseTotal: 0,
+      imgList: [],
+      typeDesc: '',
+      imgExit: false
     }
   },
   // 监听属性 类似于data概念
@@ -200,12 +245,16 @@ export default {
   watch: {
     dateValue: {
       handler(newName, oldName) {
-        this.initData(this.uid)
+        this.$nextTick(() => {
+          this.initData(this.uid)
+        })
       }
     },
     material: {
       handler(newName, oldName) {
-        this.initData(this.uid)
+        this.$nextTick(() => {
+          this.initData(this.uid)
+        })
       }
     }
   },
@@ -216,10 +265,9 @@ export default {
       this.accountProvinceList = []
       this.materialList = []
       axios.get('/statistics/getSearchData?uid=' + uid).then(res => {
-        console.log(res)
-
         if (res.data.code === 200) {
           const datas = res.data.object
+          console.log(datas)
           for (let i = 0; i < datas.timeList.length; i++) {
             this.timeList.push({
               value: datas.timeList[i].value,
@@ -245,6 +293,13 @@ export default {
       })
     },
     initData(uid) {
+      console.log(uid)
+
+      if (this.material === 0) {
+        this.$nextTick(() => {
+          this.p_info = true
+        })
+      }
       axios
         .get(
           '/statistics/sales?materialId=' +
@@ -260,8 +315,22 @@ export default {
           console.log(res)
           this.materialLists = res.data.object.scale.materialList
           this.totalSales = res.data.object.scale.totalSales
-
+          if (res.data.object.scale.materialList.length === 1) {
+            this.choseMaterial = res.data.object.scale.materialList[0]
+            this.choseTotal = res.data.object.scale.totalSales
+            if (res.data.object.scale.materialList[0].imageUrls.length > 0) {
+              this.imgExit = true
+              this.imgList = []
+              this.imgList = JSON.parse(
+                res.data.object.scale.materialList[0].imageUrls
+              )
+              this.typeDesc = res.data.object.scale.materialList[0].description
+            } else {
+              this.imgExit = false
+            }
+          }
           const lineData = res.data.object.graph
+          const barData = res.data.object.histogram
           // const barData = res.data.object.histogram
           this.initLineChart(
             lineData.x,
@@ -269,7 +338,7 @@ export default {
             this.lineChart,
             'lineChart'
           )
-          this.initBarChart()
+          this.initBarChart(barData.histogram_x, barData.histogram_y)
         })
     },
 
@@ -352,7 +421,7 @@ export default {
         ]
       })
     },
-    initBarChart(data) {
+    initBarChart(xData, yData) {
       this.barChart = echarts.init(document.getElementById('barChart'))
       const option = {
         color: ['#3398DB'],
@@ -372,7 +441,7 @@ export default {
         xAxis: [
           {
             type: 'category',
-            data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            data: xData,
             axisTick: {
               alignWithLabel: true
             }
@@ -388,7 +457,7 @@ export default {
             name: '直接访问',
             type: 'bar',
             barWidth: '60%',
-            data: [10, 52, 200, 334, 390, 330, 220]
+            data: yData
           }
         ]
       }
@@ -403,9 +472,9 @@ export default {
         },
         series: [
           {
-            name: '广东',
+            name: provience,
             type: 'map',
-            mapType: '广东',
+            mapType: provience,
             itemStyle: {
               // 地图区域的多边形 图形样式
               color: 'transparent',
@@ -427,9 +496,10 @@ export default {
       }
       this.myChart.setOption(option)
     },
-    initPie() {
+    initPie(datas) {
       this.pieChart = echarts.init(document.getElementById('pieChart'))
       const option = {
+        color: ['#2A426E', '#435E93'],
         tooltip: {
           trigger: 'item',
           formatter: '{a} <br/>{b}: {c} ({d}%)'
@@ -452,7 +522,7 @@ export default {
         },
         series: [
           {
-            name: '访问来源',
+            name: '销售数量统计',
             type: 'pie',
             radius: ['50%', '70%'],
             center: ['50%', '60%'],
@@ -461,13 +531,7 @@ export default {
             labelLine: {
               show: false
             },
-            data: [
-              { value: 335, name: '直接访问' },
-              { value: 310, name: '邮件营销' },
-              { value: 234, name: '联盟广告' },
-              { value: 135, name: '视频广告' },
-              { value: 1548, name: '搜索引擎' }
-            ]
+            data: datas
           }
         ]
       }
@@ -505,9 +569,11 @@ export default {
       this.dateValue = 0
       this.material = ''
       this.province = ''
-      this.getLineData()
-      this.getBarData()
-      this.getPressCrd()
+      // this.pieChart.dispose()
+      // this.myChart.dispose()
+      this.provienceChange = true
+      this.initData(val)
+      this.getType(val)
     },
     getCityData() {
       axios
@@ -525,7 +591,8 @@ export default {
           console.log(res)
           this.materialLists = res.data.object.scale.materialList
           this.totalSales = res.data.object.scale.totalSales
-          this.initProvice(this.province)
+
+          this.initProvice(res.data.object.map.province)
           const lineData = res.data.object.graph
           this.initLineChart(
             lineData.x,
@@ -534,30 +601,47 @@ export default {
             'cityLineChart'
           )
           this.provienceDesc = res.data.object.map.content
-          this.initPie()
+          // { value: 335, name: '直接访问' }
+          const pieData = [
+            {
+              value: res.data.object.map.provinceSales,
+              name: this.province
+            },
+            {
+              value:
+                res.data.object.map.totalSales -
+                res.data.object.map.provinceSales,
+              name: '其他'
+            }
+          ]
+          this.initPie(pieData)
         })
     },
     provienceChangeFun(val) {
       this.province = val
       if (val === '全国') {
-        //  this.myChart = echarts.init(document.getElementById('cityChart'))
-        //   this.pieChart = echarts.init(document.getElementById('pieChart'))
-        this.pieChart.dispose()
-        this.myChart.dispose()
-        this.provienceChange = true
+        if (!this.provienceChange) {
+          this.provienceChange = true
+          // this.pieChart.dispose()
+          // this.myChart.dispose()
+        }
         this.initData(this.uid)
       } else {
-        this.provienceChange = false
-        const oldLine = echarts.init(document.getElementById('lineChart'))
-        oldLine.dispose()
+        if (this.provienceChange) {
+          this.provienceChange = false
+          const oldLine = echarts.init(document.getElementById('lineChart'))
+          oldLine.dispose()
+        }
+
         this.getCityData()
       }
-
-      // this.barChar.clear()
-      // this.lineChart.clear()
-
-      // this.getPieData()
-      // this.initProvice()
+    },
+    typeChange(val) {
+      if (val === '0') {
+        this.p_info = true
+      } else {
+        this.p_info = false
+      }
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
@@ -575,17 +659,24 @@ export default {
   activated() {} // 如果页面有keep-alive缓存功能，这个函数会触发
 }
 </script>
-<style scoped>
-.container {
-  max-height: 100%;
+<style>
+.saleContainer {
+  margin: 60px 50px;
+  width: 100%;
+}
+.slects {
+  display: flex;
+  justify-content: space-around;
 }
 .fontStyle {
   font-size: 24px;
   font-family: SourceHanSansSC-Medium, SourceHanSansSC;
   font-weight: 500;
   color: rgba(51, 51, 51, 1);
-  line-height: 36px;
+  line-height: 40px;
 }
+</style>
+<style scoped>
 .graph {
   width: 1020px;
   margin-top: 40px;
@@ -623,6 +714,26 @@ export default {
   line-height: 30px;
   padding: 20px;
 }
+.type_block {
+  margin-top: 20px;
+  background: rgba(255, 255, 255, 1);
+  border-radius: 4px;
+  padding: 13px 20px;
+}
+.type_title {
+  font-size: 20px;
+  font-family: SourceHanSansSC-Regular, SourceHanSansSC;
+  font-weight: 400;
+  color: rgba(51, 51, 51, 1);
+  line-height: 30px;
+}
+.type_desc {
+  font-size: 16px;
+  font-family: SourceHanSansSC-Regular, SourceHanSansSC;
+  font-weight: 400;
+  color: rgba(119, 119, 119, 1);
+  line-height: 24px;
+}
 .p_groups {
   display: flex;
   justify-content: space-between;
@@ -640,5 +751,16 @@ export default {
   color: rgba(119, 119, 119, 1);
   line-height: 30px;
   width: 262px;
+}
+.carouselBlock {
+  margin-top: 20px;
+}
+.el-carousel__item img {
+  width: 100%;
+  opacity: 0.75;
+  height: 100%;
+}
+.el-carousel {
+  overflow-y: hidden;
 }
 </style>

@@ -13,54 +13,59 @@
         :key="index"
         :label="item.label"
       >
-        <div class="btn_header">
-          <div style="display:flex;">
-            <div style="display:flex;margin-right:10px">
-              <el-input
-                v-model="search"
-                prefix-icon="el-icon-search"
-                clearable
-                style="border-radius:4px;width:400px;margin-right:10px"
-                placeholder="输入关键字搜索"
-              />
-              <el-button @click="searchEnterFun()" type="primary"
-                ><i class="el-icon-search"></i>搜索</el-button
+        <div style="margin:10px 20px">
+          <div class="btn_header">
+            <div style="display:flex;">
+              <div style="display:flex;margin-right:10px">
+                <el-input
+                  v-model="search"
+                  prefix-icon="el-icon-search"
+                  clearable
+                  style="border-radius:4px;width:400px;margin-right:10px"
+                  placeholder="输入关键字搜索"
+                />
+                <el-button @click="searchEnterFun()" type="primary"
+                  ><i class="el-icon-search"></i>搜索</el-button
+                >
+              </div>
+              <el-button
+                @click="exportClientInfoExcel()"
+                type="primary"
+                size="medium"
+                v-if="e_show"
+                ><i class="el-icon-download"></i>导出</el-button
               >
             </div>
-            <el-button
-              @click="exportClientInfoExcel()"
-              type="primary"
-              size="medium"
-              v-if="e_show"
-              ><i class="el-icon-download"></i>导出</el-button
-            >
+            <div v-if="i_show">
+              <el-button
+                @click="makeSure"
+                :type="defaultColr"
+                :disabled="btnStatu"
+                >确认入库</el-button
+              >
+              <el-button
+                @click="refusedProduct"
+                :type="defaultColr"
+                :disabled="btnStatu"
+                >拒绝入库</el-button
+              >
+            </div>
           </div>
-          <div v-if="i_show">
-            <el-button
-              @click="makeSure"
-              :type="defaultColr"
-              :disabled="btnStatu"
-              >确认入库</el-button
-            >
-            <el-button
-              @click="refusedProduct"
-              :type="defaultColr"
-              :disabled="btnStatu"
-              >拒绝入库</el-button
-            >
-          </div>
-        </div>
-        <el-table
-          ref="filterTable"
-          :data="tableData"
-          @filter-change="fnFilterChangeInit"
-          @selection-change="selectionChangeHandle"
-          :row-key="getRowKey"
-          style="width: 100%;margin:10px 20px;"
-          border
-          height="600"
-        >
-          <el-table-column class-name="t_header">
+          <el-table
+            ref="filterTable"
+            :data="tableData"
+            @filter-change="fnFilterChangeInit"
+            @selection-change="selectionChangeHandle"
+            :row-key="getRowKey"
+            :header-cell-style="{
+              fontSize: '15px',
+              color: '#000',
+              fontWeight: 800,
+              background: '#eef1f6'
+            }"
+            border
+            height="600"
+          >
             <el-table-column
               type="selection"
               width="100"
@@ -78,7 +83,7 @@
               prop="materialCode"
               label="产品编号"
               align="center"
-              width="200"
+              width="180"
             >
             </el-table-column>
             <el-table-column
@@ -118,7 +123,7 @@
               prop="produceDate"
               label="生产日期 "
               align="center"
-              width="100"
+              width="160"
             >
             </el-table-column>
 
@@ -126,7 +131,7 @@
               prop="expiryDate"
               label="失效日期"
               align="center"
-              width="100"
+              width="160"
             >
             </el-table-column>
             <el-table-column
@@ -188,18 +193,18 @@
             <!-- <el-table-column label="取消关联" align="center">
               <span class="loseContro">解绑</span>
             </el-table-column> -->
-          </el-table-column>
-        </el-table>
+          </el-table>
 
-        <pagination
-          :currentPage="currentPage"
-          :total="total"
-          :limit="limit"
-          :small="true"
-          @handleCurrentChange="handleCurrentChange"
-          @handleSizeChange="handleSizeChange"
-          style="margin:15px 50px;"
-        />
+          <pagination
+            :currentPage="currentPage"
+            :total="total"
+            :limit="limit"
+            :small="true"
+            @handleCurrentChange="handleCurrentChange"
+            @handleSizeChange="handleSizeChange"
+            style="margin:15px 50px;"
+          />
+        </div>
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -436,7 +441,7 @@ export default {
 <style scoped>
 .container {
   margin: 40px 60px;
-  width: 95%;
+  width: 93%;
 }
 .find {
   width: 100%;
@@ -445,7 +450,7 @@ export default {
 .btn_header {
   display: flex;
   justify-content: space-between;
-  margin: 10px 20px;
+  margin-bottom: 25px;
 }
 .btngroups {
   text-align: center;
@@ -459,4 +464,7 @@ export default {
   color: rgba(30, 114, 247, 1);
   cursor: pointer;
 }
+/* .el-tabs >>> .el-tabs__content {
+  width: 96% !important;
+} */
 </style>

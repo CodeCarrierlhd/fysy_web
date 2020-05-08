@@ -1,10 +1,10 @@
 <!-- 库存管理 -->
 <template>
-  <div style="width:1560px">
-    <div class="container">
+  <div class="container">
+    <div style="padding:20px 25px">
       <div class="t_header">
         <div style="display:flex">
-          <div style="display:flex;margin-right:10px" v-if="s_show">
+          <div style="display:flex;margin-right:40px" v-if="s_show">
             <el-input
               v-model="search"
               prefix-icon="el-icon-search"
@@ -22,6 +22,9 @@
             size="medium"
             v-if="e_show"
             ><i class="el-icon-download"></i>导出</el-button
+          >
+          <el-button @click="loseData" type="primary" v-if="b_show"
+            >拆解</el-button
           >
         </div>
         <div style="display:flex">
@@ -41,10 +44,6 @@
               </el-option>
             </el-select>
           </div>
-
-          <el-button @click="loseData" type="primary" v-if="b_show"
-            >拆解</el-button
-          >
         </div>
       </div>
       <el-table
@@ -53,101 +52,102 @@
         @filter-change="fnFilterChangeInit"
         @selection-change="selectionChangeHandle"
         :row-key="getRowKey"
-        style="width: 100%;padding:0 20px"
+        :header-cell-style="{
+          fontSize: '15px',
+          color: '#000',
+          fontWeight: 800,
+          background: '#eef1f6'
+        }"
         border
         height="600"
       >
-        <el-table-column>
-          <el-table-column
-            type="selection"
-            width="100"
-            align="center"
-            :reserve-selection="true"
-          ></el-table-column>
-          <el-table-column
-            prop="materialType"
-            label="产品类别"
-            align="center"
-            width="100"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="materialCode"
-            label="产品编号"
-            align="center"
-            width="200"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="materialModel"
-            label="产品型号"
-            align="center"
-            width="150"
-            :filter-multiple="false"
-            :filters="materialModelGroup"
-            :filter-method="filterTag"
-            column-key="p_model"
-            filter-placement="bottom-end"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="productNo"
-            label="序列号 "
-            align="center"
-            width="200"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="batchNo"
-            label="产品批号 "
-            align="center"
-            width="200"
-          >
-          </el-table-column>
-          <el-table-column prop="spec" label="规格 " align="center" width="80">
-          </el-table-column>
-          <el-table-column
-            prop="produceDate"
-            label="生产日期 "
-            align="center"
-            width="100"
-          >
-          </el-table-column>
+        <el-table-column
+          type="selection"
+          width="100"
+          align="center"
+          :reserve-selection="true"
+        ></el-table-column>
+        <el-table-column
+          prop="materialType"
+          label="产品类别"
+          align="center"
+          width="100"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="materialCode"
+          label="产品编号"
+          align="center"
+          width="200"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="materialModel"
+          label="产品型号"
+          align="center"
+          width="150"
+          :filter-multiple="false"
+          :filters="materialModelGroup"
+          :filter-method="filterTag"
+          column-key="p_model"
+          filter-placement="bottom-end"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="productNo"
+          label="序列号 "
+          align="center"
+          width="200"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="batchNo"
+          label="产品批号 "
+          align="center"
+          width="200"
+        >
+        </el-table-column>
+        <el-table-column prop="spec" label="规格 " align="center" width="80">
+        </el-table-column>
+        <el-table-column
+          prop="produceDate"
+          label="生产日期 "
+          align="center"
+          width="160"
+        >
+        </el-table-column>
 
-          <el-table-column
-            prop="expiryDate"
-            label="失效日期"
-            align="center"
-            width="100"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="cartonCode"
-            label="箱码"
-            align="center"
-            width="200"
-          >
-          </el-table-column>
-          <el-table-column
-            prop="activateCode"
-            label="激活码"
-            align="center"
-            width="200"
-          ></el-table-column>
-          <el-table-column
-            prop="producer"
-            label="生产厂家"
-            align="center"
-            width="150"
-          >
-          </el-table-column>
-          <el-table-column label="操作" align="center" v-if="b_show">
-            <template slot-scope="scope">
-              <span class="loseContro" @click="loseContro(scope.row)"
-                >拆解</span
-              >
-            </template>
-          </el-table-column>
+        <el-table-column
+          prop="expiryDate"
+          label="失效日期"
+          align="center"
+          width="160"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="cartonCode"
+          label="箱码"
+          align="center"
+          width="200"
+        >
+        </el-table-column>
+        <el-table-column
+          prop="activateCode"
+          label="激活码"
+          align="center"
+          width="200"
+        ></el-table-column>
+        <el-table-column
+          prop="producer"
+          label="生产厂家"
+          align="center"
+          width="150"
+        >
+        </el-table-column>
+        <el-table-column label="操作" align="center" v-if="b_show">
+          <template slot-scope="scope">
+            <span class="loseContro" @click="loseContro(scope.row)">拆解</span>
+          </template>
         </el-table-column>
       </el-table>
 
@@ -157,8 +157,21 @@
         :limit="limit"
         :small="true"
         @handleCurrentChange="handleCurrentChange"
-        style="padding:15px 50px;"
       />
+      <el-dialog
+        title="拆解编码"
+        :visible.sync="dialogVisible"
+        :before-close="handleClose"
+        center
+        top="35vh"
+        width="620px"
+      >
+        <div style="text-align:center">
+          <p style="padding:0 0 45px 0">确定拆解编码，数据将无法找回！</p>
+          <el-button @click="dialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="breakPro">确 定</el-button>
+        </div>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -181,7 +194,8 @@ export default {
       tableData: [],
       search: '',
       tableDataSelections: [],
-
+      dialogVisible: false,
+      getId: 0,
       acounts: [],
       a_acount: '',
       btnShow: true,
@@ -250,7 +264,11 @@ export default {
       return row.opId
     },
     loseContro(row) {
-      this.productDone(row.opId, '', '/inventory/dismantle').then(res => {
+      this.dialogVisible = true
+      this.getId = row.opId
+    },
+    breakPro() {
+      this.productDone(this.getId, '', '/inventory/dismantle').then(res => {
         if (res.data.code === 200) {
           this.initData()
           this.$refs.filterTable.clearSelection()
@@ -260,8 +278,12 @@ export default {
             position: 'top-right',
             duration: 2000
           })
+          this.dialogVisible = false
         }
       })
+    },
+    handleClose() {
+      this.dialogVisible = false
     },
     loseData() {
       const ids = this.tableDataSelections.join(',')
@@ -353,10 +375,11 @@ export default {
   activated() {} // 如果页面有keep-alive缓存功能，这个函数会触发
 }
 </script>
+
 <style scoped>
 .container {
   margin: 40px 60px;
-  width: 100%;
+  width: 93%;
   background-color: #fff;
 }
 
@@ -370,7 +393,5 @@ export default {
   display: flex;
   justify-content: space-between;
   background-color: #fff;
-  padding: 25px 20px;
-  width: 97%;
 }
 </style>

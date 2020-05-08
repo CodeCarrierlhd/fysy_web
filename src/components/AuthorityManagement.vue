@@ -3,7 +3,7 @@
   <div class="container">
     <div class="powerContain">
       <div
-        style="display: flex;justify-content: space-between;width:100%;margin:20px 0"
+        style="display: flex;justify-content: space-between;width:100%;margin-bottom: 25px;"
       >
         <div v-if="s_show" style="display:flex;width:100%;">
           <el-input
@@ -21,8 +21,14 @@
           ><i class="el-icon-plus"></i>新增</el-button
         >
       </div>
-      <el-table ref="singleTable" :data="tableData" @cell-click="hideInfo">
-        <el-table-column type="index" width="50" align="center" label="序号">
+      <el-table
+        ref="singleTable"
+        :data="tableData"
+        @cell-click="hideInfo"
+        style="width: 100%;"
+        border
+      >
+        <el-table-column type="index" width="100" align="center" label="序号">
         </el-table-column>
         <el-table-column prop="roleType" label="角色类型" align="center">
           <template slot-scope="scope">
@@ -60,7 +66,7 @@
       >
         <div style="margin-bottom:35px">
           <span>角色类型选择：</span>
-          <el-select v-model="roleValue" placeholder="请选择">
+          <el-select v-model="roleValue" placeholder="请选择" :disabled="edit">
             <el-option
               v-for="item in roleOptions"
               :key="item.value"
@@ -180,6 +186,15 @@
         </div>
       </div>
     </transition>
+    <del-dialog
+      :keyNumber="changeKey"
+      @onLoadData="onLoadData"
+      :headerTitle="`删除账号`"
+      :ids="delArr"
+      :delPath="`/role/delete`"
+      :delContent="`确定删除账号，数据无法找回！`"
+    >
+    </del-dialog>
   </div>
 </template>
 
@@ -187,10 +202,11 @@
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
 import pagination from '../components/Pagenation'
+import DelDialog from './DelDialog'
 
 export default {
   // import引入的组件需要注入到对象中才能使用
-  components: { pagination },
+  components: { pagination, DelDialog },
   data() {
     // 这里存放数据
     return {
@@ -217,7 +233,9 @@ export default {
       a_show: false,
       d_show: false,
       e_show: false,
-      edit: false
+      edit: false,
+      changeKey: 0,
+      delArr: ''
     }
   },
   // 监听属性 类似于data概念
@@ -279,6 +297,7 @@ export default {
       this.options = []
       // this.funrightName = false
       this.dialogVisibleClassify = true
+      this.edit = false
       this.initStatu()
     },
     unique(arr) {
@@ -292,6 +311,7 @@ export default {
       this.showTitle = '编辑用户角色'
       this.roleValue = row.roleType
       this.keyId = row.roleId
+      this.edit = true
       this.rightList(row.roleId, 'right/listData').then(res => {
         let arr = []
         for (let i = 0; i < res.data.object.rightList.length; i++) {
@@ -503,11 +523,13 @@ export default {
       })
     },
     deltRole(row, index) {
-      this.delItem(row.roleId, '/role/delete').then(res => {
-        if (res.status === 200) {
-          this.initData()
-        }
-      })
+      this.changeKey++
+      this.delArr = row.roleId.toString()
+      // this.delItem(row.roleId, '/role/delete').then(res => {
+      //   if (res.status === 200) {
+      //     this.initData()
+      //   }
+      // })
     },
     getIds() {
       const middleArr = []
@@ -583,6 +605,9 @@ export default {
           this.s_show = true
         }
       })
+    },
+    onLoadData() {
+      this.initTableData()
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
@@ -612,7 +637,7 @@ export default {
 }
 .powerContain {
   width: 50%;
-  padding: 10px 30px;
+  padding: 25px 20px;
   background-color: #fff;
 }
 .contentRight {
@@ -623,6 +648,7 @@ export default {
   width: 600px;
   max-height: 760px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 .editButton {
   font-family: SourceHanSansSC-Regular, SourceHanSansSC;
