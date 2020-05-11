@@ -786,31 +786,66 @@ export default {
     },
     searchEnterFun() {
       console.log(this.key_index)
+      console.log(this.uid)
       let a = 0
       if (this.key_index === '3') {
         a = 0
+        this.searchAll(
+          this.currentPage,
+          this.limit,
+          '/deliver/listData',
+          '&materialId=',
+          '',
+          '&uid=',
+          '',
+          '&value=',
+          this.search,
+          '&status=',
+          a
+        ).then(res => {
+          this.tableData = res.data.object.list
+          this.getDataList(res.data.object.total)
+        })
       } else if (this.key_index === '4') {
         a = 3
+        this.searchAll(
+          this.currentPage,
+          this.limit,
+          '/deliver/listData',
+          '&materialId=',
+          '',
+          '&uid=',
+          this.uid,
+          '&value=',
+          this.search,
+          '&status=',
+          a
+        ).then(res => {
+          this.tableData = res.data.object.list
+          this.getDataList(res.data.object.total)
+        })
+      } else {
+        const ids = this.tableDataSelections.join(',')
+        this.searchAll(
+          this.currentPage,
+          this.limit,
+          '/inventory/listData',
+          '&materialId=',
+          '',
+          '&selectedOpIds=',
+          ids,
+          '&uid=',
+          '',
+          '&value=',
+          this.search,
+          '&pageType=',
+          a
+        ).then(res => {
+          this.tableData = res.data.object.list
+          this.getDataList(res.data.object.total)
+        })
       }
-      const ids = this.tableDataSelections.join(',')
-      this.searchAll(
-        this.currentPage,
-        this.limit,
-        '/inventory/listData',
-        '&materialId=',
-        '',
-        '&selectedOpIds=',
-        ids,
-        '&uid=',
-        '',
-        '&value=',
-        this.search,
-        '&pageType=',
-        a
-      ).then(res => {
-        this.tableData = res.data.object.list
-        this.getDataList(res.data.object.total)
-      })
+
       // this.changeTab(a, '')
     },
     searchEnterFun1() {
@@ -846,7 +881,7 @@ export default {
     },
     changeTab(statu, uid) {
       console.log(statu)
-
+      this.search = ''
       this.tableData = []
       this.searchAll(
         this.currentPage,
@@ -875,6 +910,7 @@ export default {
           })
         }
         this.uid = res.data.object[0].id
+        this.p_role = res.data.object[0].username
       })
     },
     restart(row) {

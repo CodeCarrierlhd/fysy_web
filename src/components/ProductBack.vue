@@ -607,6 +607,7 @@ export default {
       this.initData1()
     },
     handleClick(tab, event) {
+      this.search = ''
       if (tab.index === '2') {
         this.key_index = '4'
         this.$nextTick(() => {
@@ -671,9 +672,6 @@ export default {
       this.search1 = ''
       this.initData1()
       this.dialogVisibleClassify = true
-    },
-    n_addPro() {
-      console.log('重新发货')
     },
     delData() {
       console.log('删除', this.tableDataSelections)
@@ -821,31 +819,68 @@ export default {
     },
     searchEnterFun() {
       console.log(this.key_index)
+      console.log(this.uid)
+
       let a = 0
-      if (this.key_index === 3) {
+      if (this.key_index === '4') {
         a = 4
-      } else {
+        this.searchAll(
+          this.currentPage,
+          this.limit,
+          '/return/listData',
+          '&materialId=',
+          '',
+          '&uid=',
+          this.uid,
+          '&value=',
+          this.search,
+          '&status=',
+          a
+        ).then(res => {
+          console.log(res)
+
+          this.tableData = res.data.object.list
+          this.getDataList(res.data.object.total)
+        })
+      } else if (this.key_index === '1') {
         a = 1
+        this.searchAll(
+          this.currentPage,
+          this.limit,
+          '/return/listData',
+          '&materialId=',
+          '',
+          '&uid=',
+          '',
+          '&value=',
+          this.search,
+          '&status=',
+          a
+        ).then(res => {
+          this.tableData = res.data.object.list
+          this.getDataList(res.data.object.total)
+        })
+      } else {
+        const ids = this.tableDataSelections.join(',')
+        this.searchAll(
+          this.currentPage,
+          this.limit,
+          '/inventory/listData',
+          '&materialId=',
+          '',
+          '&selectedOpIds=',
+          ids,
+          '&uid=',
+          '',
+          '&value=',
+          this.search,
+          '&pageType=',
+          a
+        ).then(res => {
+          this.tableData = res.data.object.list
+          this.getDataList(res.data.object.total)
+        })
       }
-      const ids = this.tableDataSelections.join(',')
-      this.searchAll(
-        this.currentPage,
-        this.limit,
-        '/inventory/listData',
-        '&materialId=',
-        '',
-        '&selectedOpIds=',
-        ids,
-        '&uid=',
-        '',
-        '&value=',
-        this.search,
-        '&pageType=',
-        a
-      ).then(res => {
-        this.tableData = res.data.object.list
-        this.getDataList(res.data.object.total)
-      })
     },
     searchEnterFun1() {
       this.searchAll(
@@ -907,6 +942,7 @@ export default {
           })
         }
         this.uid = res.data.object[0].id
+        this.p_role = res.data.object[0].username
       })
     },
     restart(row) {
