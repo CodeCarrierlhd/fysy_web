@@ -51,6 +51,7 @@
             }"
             border
             height="600"
+            v-loading="loading"
           >
             <el-table-column
               type="selection"
@@ -298,7 +299,8 @@ export default {
       r_show: false,
       key_index: '0',
       unsed: false,
-      materialId: ''
+      materialId: '',
+      loading: true
     }
   },
   // 监听属性 类似于data概念

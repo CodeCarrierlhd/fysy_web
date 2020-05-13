@@ -30,7 +30,8 @@
               </div>
               <el-button
                 @click="exportClientInfoExcel()"
-                type="primary"
+                :type="defaultColr"
+                :disabled="btnStatu"
                 size="medium"
                 v-if="e_show"
                 ><i class="el-icon-download"></i>导出</el-button
@@ -71,9 +72,7 @@
           </div>
           <el-table
             ref="sendProFilterTable"
-            :data="
-              tableData.slice((currentPage - 1) * limit, currentPage * limit)
-            "
+            :data="tableData"
             @selection-change="selectionChangeHandle"
             @filter-change="fnFilterChangeInit"
             :row-key="getRowKey"
@@ -84,6 +83,7 @@
               background: '#eef1f6'
             }"
             height="600"
+            v-loading="loading"
             border
           >
             <el-table-column
@@ -191,19 +191,6 @@
               width="150"
             >
             </el-table-column>
-            <!-- <el-table-column
-              v-if="wait_pro"
-              prop="productStatus"
-              label="状态"
-              align="center"
-              width="150"
-              :filter-multiple="false"
-              :filters="p_statuGroup"
-              :filter-method="filterTag"
-              column-key="productStatus"
-              key="p_statu"
-              filter-placement="bottom-end"
-            ></el-table-column> -->
             <el-table-column
               v-if="wait_pro"
               prop="productStatus"
@@ -280,6 +267,7 @@
         @selection-change="selectionChangeHandle1"
         :row-key="getRowKey"
         height="600"
+        v-loading="loading"
         style="margin:10px 0;width:100%"
       >
         <el-table-column
@@ -502,7 +490,7 @@ export default {
       search1: '',
       tabNames: [
         { label: '退货', name: 'one' },
-        { label: '待收货', name: 'two' },
+        { label: '待退货', name: 'two' },
         { label: '已完成', name: 'third' }
       ],
       roleGroups: [],
@@ -533,7 +521,10 @@ export default {
       loseReason: '',
       key_index: '2',
       uid: 0,
-      returnReasonType: 0
+      defaultColr: 'info',
+      btnStatu: true,
+      returnReasonType: 0,
+      loading: true
     }
   },
   // 监听属性 类似于data概念
@@ -575,8 +566,12 @@ export default {
       }
       if (selection.length > 0) {
         this.btnShow = false
+        this.defaultColr = 'primary'
+        this.btnStatu = false
       } else {
         this.btnShow = true
+        this.defaultColr = 'info'
+        this.btnStatu = true
       }
       console.log(this.tableDataSelections)
     },
@@ -600,10 +595,10 @@ export default {
     },
     handleCurrentChange(val) {
       this.currentPage = val
+      this.changeTab(this.key_index, this.uid)
     },
     handleCurrentChange1(val) {
       this.currentPage1 = val
-      console.log(this.currentPage1)
       this.initData1()
     },
     handleClick(tab, event) {
@@ -757,9 +752,6 @@ export default {
           this.reciver = this.receiverList[index]
         }
       }
-    },
-    refreshData() {
-      console.log('刷新')
     },
     quitSend() {
       this.newDialogTableVisible = false
@@ -916,7 +908,7 @@ export default {
     changeTab(statu, uid) {
       this.searchAll(
         this.currentPage,
-        8,
+        this.limit,
         '/return/listData',
         '&materialId=',
         '',

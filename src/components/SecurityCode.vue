@@ -75,6 +75,7 @@
               fontWeight: 800,
               background: '#eef1f6'
             }"
+            v-loading="loading"
             border
             height="280"
             @filter-change="fnFilterChangeInit"
@@ -206,7 +207,8 @@ export default {
       newDialogTableVisible: false,
       sums: 0,
       sumCount: true,
-      exportFileName: ''
+      exportFileName: '',
+      loading: true
     }
   },
   // 监听属性 类似于data概念

@@ -4,7 +4,7 @@
     <div style="padding:20px 25px">
       <div class="t_header">
         <div style="display:flex">
-          <div style="display:flex;margin-right:40px" v-if="s_show">
+          <div style="display:flex;margin-right:10px" v-if="s_show">
             <el-input
               v-model="search"
               prefix-icon="el-icon-search"
@@ -18,12 +18,17 @@
           </div>
           <el-button
             @click="exportClientInfoExcel()"
-            type="primary"
+            :type="defaultColr"
+            :disabled="btnStatu"
             size="medium"
             v-if="e_show"
             ><i class="el-icon-download"></i>导出</el-button
           >
-          <el-button @click="loseData" type="primary" v-if="b_show"
+          <el-button
+            @click="loseData"
+            :type="defaultColr"
+            :disabled="btnStatu"
+            v-if="b_show"
             >拆解</el-button
           >
         </div>
@@ -60,6 +65,7 @@
         }"
         border
         height="600"
+        v-loading="loading"
       >
         <el-table-column
           type="selection"
@@ -199,9 +205,12 @@ export default {
       acounts: [],
       a_acount: '',
       btnShow: true,
+      defaultColr: 'info',
+      btnStatu: true,
       s_show: false,
       b_show: false,
-      e_show: false
+      e_show: false,
+      loading: true
     }
   },
   // 监听属性 类似于data概念
@@ -236,6 +245,13 @@ export default {
       console.log(selection)
       for (let i = 0; i < selection.length; i++) {
         this.tableDataSelections.push(selection[i].opId)
+      }
+      if (selection.length > 0) {
+        this.defaultColr = 'primary'
+        this.btnStatu = false
+      } else {
+        this.defaultColr = 'info'
+        this.btnStatu = true
       }
     },
     // table column 的方法，改写这个方法

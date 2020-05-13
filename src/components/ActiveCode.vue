@@ -78,6 +78,7 @@
             }"
             border
             height="280"
+            v-loading="loading"
           >
             <el-table-column
               label="序号"
@@ -170,7 +171,8 @@ export default {
       a_number: 0,
       radio: 0,
       newDialogTableVisible: false,
-      unused_show: true
+      unused_show: true,
+      loading: true
     }
   },
   // 监听属性 类似于data概念

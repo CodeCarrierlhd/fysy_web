@@ -30,7 +30,8 @@
               </div>
               <el-button
                 @click="exportClientInfoExcel()"
-                type="primary"
+                :type="defaultColr"
+                :disabled="btnStatu"
                 size="medium"
                 v-if="e_show"
                 ><i class="el-icon-download"></i>导出</el-button
@@ -71,6 +72,7 @@
           </div>
           <el-table
             ref="sendProFilterTable"
+            v-loading="loading"
             :data="tableData"
             @selection-change="selectionChangeHandle"
             @filter-change="fnFilterChangeInit"
@@ -261,6 +263,7 @@
       <el-table
         ref="getProducts"
         :data="newTableData"
+        v-loading="loading"
         @filter-change="fnFilterChangeInit1"
         @selection-change="selectionChangeHandle1"
         :row-key="getRowKey"
@@ -517,7 +520,10 @@ export default {
       s_show: false,
       e_show: false,
       key_index: '2',
-      uid: 0
+      defaultColr: 'info',
+      btnStatu: true,
+      uid: 0,
+      loading: true
     }
   },
   // 监听属性 类似于data概念
@@ -567,6 +573,13 @@ export default {
       this.tableDataSelections1 = []
       for (let i = 0; i < selection.length; i++) {
         this.tableDataSelections1.push(selection[i].opId)
+      }
+      if (selection.length > 0) {
+        this.defaultColr = 'primary'
+        this.btnStatu = false
+      } else {
+        this.defaultColr = 'info'
+        this.btnStatu = true
       }
     },
     // table column 的方法，改写这个方法

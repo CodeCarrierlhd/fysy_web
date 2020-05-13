@@ -27,8 +27,9 @@
           >
           <el-button
             @click="batchDelete(tableDataSelections)"
-            type="primary"
+            :type="defaultColr"
             v-if="d_show"
+            :disabled="btnStatu"
             ><i class="el-icon-delete"></i>删除</el-button
           >
         </div>
@@ -37,6 +38,7 @@
       <el-table
         ref="filterTable"
         :data="tableData"
+        v-loading="loading"
         @filter-change="fnFilterChangeInit"
         @selection-change="selectionChangeHandle"
         :row-key="getRowKey"
@@ -155,7 +157,7 @@
       />
 
       <el-dialog
-        title="发货信息"
+        title="物料编辑"
         :visible.sync="newDialogTableVisible"
         custom-class="sendPro"
         center
@@ -313,6 +315,20 @@
       >
       </del-dialog>
     </div>
+    <el-dialog
+      title="错误提示"
+      :visible.sync="errorVisible"
+      width="400px"
+      :before-close="handleClose"
+    >
+      <span>{{ infoTitle }}</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="errorVisible = false">取 消</el-button>
+        <el-button type="primary" @click="errorVisible = false"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -369,7 +385,12 @@ export default {
       editPro: false,
       countMark: 0,
       changeKey: 0,
-      delArr: ''
+      delArr: '',
+      btnStatu: true,
+      defaultColr: 'info',
+      infoTitle: '',
+      errorVisible: false,
+      loading: true
     }
   },
   // 监听属性 类似于data概念
@@ -409,6 +430,13 @@ export default {
       this.tableDataSelections = []
       for (let i = 0; i < selections.length; i++) {
         this.tableDataSelections.push(selections[i].id)
+      }
+      if (selections.length > 0) {
+        this.defaultColr = 'primary'
+        this.btnStatu = false
+      } else {
+        this.defaultColr = 'info'
+        this.btnStatu = true
       }
     },
     // table column 的方法，改写这个方法
@@ -466,14 +494,8 @@ export default {
     },
     // 删除选中数据（单纯实现前端删除）
     batchDelete(selections) {
-      // const ids = this.tableDataSelections.join(',')
       this.changeKey++
       this.delArr = this.tableDataSelections.join(',')
-      // this.delItem(ids, '/material/delete').then(res => {
-      //   if (res.data.code === 200) {
-      //     this.makeData()
-      //   }
-      // })
     },
     getStatu() {
       this.tableData.map(item => {
@@ -526,30 +548,47 @@ export default {
       })
     },
     submitForm(form) {
-      console.log(this.editPro)
-      let url = ''
-      if (this.editPro) {
-        url = '/material/update'
-      } else {
-        url = '/material/insert'
-      }
       console.log(this.imageUrls)
 
-      this.form.imageUrls = JSON.stringify(this.imageUrls)
-      this.dataChange(this.form, url).then(res => {
-        console.log(res)
-        if (res.data.code === 200) {
-          this.imageUrl = ''
-          this.imageUrl1 = ''
-          this.imageUrl2 = ''
-          this.imageUrl3 = ''
-          this.imageUrls = []
-          this.$refs[form].resetFields()
-          this.makeData()
-          this.newDialogTableVisible = false
-          this.editPro = false
+      if (this.imageUrls.length === 4) {
+        for (const key in this.form) {
+          if (key !== 'imageUrls') {
+            if (this.form[key] === '') {
+              this.errorVisible = true
+              this.infoTitle = '所有内容不能为空'
+            }
+          }
         }
-      })
+        if (!this.errorVisible) {
+          this.newDialogTableVisible = false
+          let url = ''
+          if (this.editPro) {
+            url = '/material/update'
+          } else {
+            url = '/material/insert'
+          }
+          this.form.imageUrls = JSON.stringify(this.imageUrls)
+          this.dataChange(this.form, url).then(res => {
+            console.log(res)
+            if (res.data.code === 200) {
+              this.imageUrl = ''
+              this.imageUrl1 = ''
+              this.imageUrl2 = ''
+              this.imageUrl3 = ''
+              this.imageUrls = []
+              this.$refs[form].resetFields()
+              this.makeData()
+              this.editPro = false
+            } else {
+              this.errorVisible = true
+              this.infoTitle = res.data.msg
+            }
+          })
+        }
+      } else {
+        this.errorVisible = true
+        this.infoTitle = '所有内容不能为空'
+      }
     },
     handleChange(param) {
       const fd = new FormData()
@@ -651,13 +690,6 @@ export default {
     handleDelete(index, row) {
       this.changeKey++
       this.delArr = row.id.toString()
-      // this.delItem(row.id, '/material/delete').then(res => {
-      //   console.log(res)
-
-      //   if (res.data.code === 200) {
-      //     this.makeData()
-      //   }
-      // })
     },
     clearForm(form) {
       this.$refs[form].resetFields()
@@ -667,6 +699,9 @@ export default {
     onLoadData() {
       this.$refs.filterTable.clearSelection()
       this.makeData()
+    },
+    handleClose(done) {
+      this.errorVisible = false
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）

@@ -30,7 +30,8 @@
               </div>
               <el-button
                 @click="exportClientInfoExcel()"
-                type="primary"
+                :type="defaultColr"
+                :disabled="btnStatu"
                 size="medium"
                 v-if="e_show"
                 ><i class="el-icon-download"></i>导出</el-button
@@ -53,6 +54,7 @@
           </div>
           <el-table
             ref="filterTable"
+            v-loading="loading"
             :data="tableData"
             @filter-change="fnFilterChangeInit"
             @selection-change="selectionChangeHandle"
@@ -239,7 +241,8 @@ export default {
       mark: false,
       i_show: false,
       e_show: false,
-      key_index: '0'
+      key_index: '0',
+      loading: true
     }
   },
   // 监听属性 类似于data概念
