@@ -30,7 +30,8 @@
               </div>
               <el-button
                 @click="exportClientInfoExcel()"
-                type="primary"
+                :type="defaultColr"
+                :disabled="btnStatu"
                 size="medium"
                 v-if="e_show"
                 ><i class="el-icon-download"></i>导出</el-button
@@ -53,6 +54,7 @@
           </div>
           <el-table
             ref="filterTable"
+            v-loading="loading"
             :data="tableData"
             @filter-change="fnFilterChangeInit"
             @selection-change="selectionChangeHandle"
@@ -239,7 +241,8 @@ export default {
       mark: false,
       i_show: false,
       e_show: false,
-      key_index: '0'
+      key_index: '0',
+      loading: true
     }
   },
   // 监听属性 类似于data概念
@@ -259,9 +262,16 @@ export default {
         ''
       ).then(res => {
         console.log(res.data.object)
-
-        this.tableData = res.data.object.list
-        this.getDataList(res.data.object.total)
+        if (res.status === 200) {
+          this.loading = false
+          this.tableData = res.data.object.list
+          this.getDataList(res.data.object.total)
+        } else {
+          this.$message({
+            message: res.data.msg,
+            type: 'warning'
+          })
+        }
       })
     },
     getType() {
@@ -297,6 +307,7 @@ export default {
       this.total = total
     },
     handleCurrentChange(val) {
+      this.loading = true
       this.currentPage = val
       this.initData()
     },
@@ -305,6 +316,7 @@ export default {
       this.currentPage = 1
     },
     handleClick(tab, event) {
+      this.loading = true
       if (tab.index === '1') {
         this.key_index = '1'
         this.mark = true
@@ -334,7 +346,7 @@ export default {
     },
     makeSure() {
       console.log(this.key_index)
-
+      this.loading = true
       const ids = this.tableDataSelections.join(',')
       let opStatu = ''
       if (this.key_index === '0') {
@@ -361,6 +373,7 @@ export default {
       })
     },
     refusedProduct() {
+      this.loading = true
       const ids = this.tableDataSelections.join(',')
       let opStatu = ''
       if (this.key_index === '0') {

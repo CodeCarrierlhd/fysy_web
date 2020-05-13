@@ -24,8 +24,9 @@
           >
           <el-button
             @click="batchDelete(tableDataSelections)"
-            type="primary"
+            :type="defaultColr"
             v-if="d_show"
+            :disabled="btnStatu"
             ><i class="el-icon-delete"></i>删除</el-button
           >
         </div>
@@ -44,6 +45,7 @@
           background: '#eef1f6'
         }"
         height="600"
+        v-loading="loading"
         border
       >
         <el-table-column
@@ -60,14 +62,7 @@
           width="100"
         >
           <template slot-scope="scope">
-            <el-input
-              v-if="scope.row.account.edit"
-              ref="account"
-              v-model="scope.row.account.value"
-              @blur="scope.row.account.edit = false"
-            >
-            </el-input>
-            <span v-else>{{ scope.row.account.value }}</span>
+            <span>{{ scope.row.account.value }}</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -96,9 +91,9 @@
           align="center"
           width="160"
           :filter-multiple="false"
+          column-key="roleType"
           :filters="roleTypeGroup"
           :filter-method="filterTag"
-          column-key="roleType"
           filter-placement="bottom-end"
         >
           <template slot-scope="scope">
@@ -184,7 +179,7 @@
                 }
               "
             >
-              <el-option :key="''" :label="'全部'" :value="''"> </el-option>
+              <!-- <el-option :key="''" :label="'全部'" :value="''"> </el-option> -->
               <el-option
                 v-for="item in cities"
                 :key="item.code"
@@ -265,7 +260,7 @@
             >
             <el-button
               size="mini"
-              @click="handleDelete(scope.row)"
+              @click="handleDelete(scope.row, scope.$index)"
               v-if="d_show"
               >删除</el-button
             >
@@ -295,6 +290,20 @@
         :delContent="`确定删除账号，数据无法找回！`"
       >
       </del-dialog>
+      <el-dialog
+        title="错误提示"
+        :visible.sync="errorVisible"
+        width="400px"
+        :before-close="handleClose"
+      >
+        <span>{{ infoTitle }}</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="errorVisible = false">取 消</el-button>
+          <el-button type="primary" @click="errorVisible = false"
+            >确 定</el-button
+          >
+        </span>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -341,22 +350,29 @@ export default {
       edit: false,
       tableDataSelections: [],
       changeKey: 0,
-      delArr: ''
+      delArr: '',
+      btnStatu: true,
+      defaultColr: 'info',
+      errorVisible: false,
+      addOne: true,
+      infoTitle: '',
+      loading: true,
+      nowRoleId: 0
     }
   },
   // 监听属性 类似于data概念
   computed: {},
   // 监控data中的数据变化
   watch: {
-    cities(val, oldVal) {
-      this.cityGroup = []
-      for (let index = 0; index < val.length; index++) {
-        this.cityGroup.push({
-          text: val[index].name,
-          value: val[index].name
-        })
-      }
-    }
+    // cities(val, oldVal) {
+    //   this.cityGroup = []
+    //   for (let index = 0; index < val.length; index++) {
+    //     this.cityGroup.push({
+    //       text: val[index].name,
+    //       value: val[index].name
+    //     })
+    //   }
+    // }
   },
   // 方法集合
   methods: {
@@ -364,7 +380,34 @@ export default {
       this.tableData = []
       this.listData(this.currentPage, this.limit, '/user/listData').then(
         res => {
-          this.initData(res)
+          if (res.status === 200) {
+            this.loading = false
+
+            this.tableData = []
+            const vdata = res.data.object.list
+            for (let i = 0; i < vdata.length; i++) {
+              this.tableData.push({
+                username: vdata[i].username,
+                address: vdata[i].address,
+                account: vdata[i].account,
+                roleType: vdata[i].roleType,
+                province: vdata[i].province,
+                city: vdata[i].city,
+                mobile: vdata[i].mobile,
+                contact: vdata[i].contact,
+                id: vdata[i].id,
+                roleId: vdata[i].roleId,
+                isSet: false
+              })
+            }
+            this.formatData()
+            this.getDataList(res.data.object.total)
+          } else {
+            this.$message({
+              message: res.data.msg,
+              type: 'warning'
+            })
+          }
         }
       )
     },
@@ -391,6 +434,13 @@ export default {
     selectionChangeHandle(val) {
       console.log(val)
       this.tableDataSelections = val
+      if (val.length > 0) {
+        this.defaultColr = 'primary'
+        this.btnStatu = false
+      } else {
+        this.defaultColr = 'info'
+        this.btnStatu = true
+      }
     },
     // table column 的方法，改写这个方法
     filterTag(value, row, column) {
@@ -430,10 +480,6 @@ export default {
       this.init(this.options)
     },
     init(options) {
-      console.log(options)
-      console.log(this.tableData)
-      // this.makeData()
-      // const newData = []
       this.valueData(
         this.currentPage,
         this.limit,
@@ -443,20 +489,64 @@ export default {
         this.options.cityTag,
         this.options.typeTag
       ).then(res => {
-        this.initData(res)
+        this.tableData = []
+        const vdata = res.data.object.list
+        for (let i = 0; i < vdata.length; i++) {
+          this.tableData.push({
+            username: vdata[i].username,
+            address: vdata[i].address,
+            account: vdata[i].account,
+            roleType: vdata[i].roleType,
+            province: vdata[i].province,
+            city: vdata[i].city,
+            mobile: vdata[i].mobile,
+            contact: vdata[i].contact,
+            id: vdata[i].id,
+            roleId: vdata[i].roleId,
+            isSet: false
+          })
+        }
+        this.formatData()
+        this.getDataList(res.data.object.total)
       })
     },
     // 单元格双击事件
     celledit(row, column, cell, event) {
-      this.edit = true
+      console.log(row, column)
+
       if (this.e_show) {
         row.isSet = true
+        for (let i = 0; i < this.tableData.length; i++) {
+          if (this.tableData[i].id !== row.id) {
+            for (const key in this.tableData[i]) {
+              // this.tableData[i][key].edit = false
+              if (key !== 'id' && key !== 'isSet' && key !== 'roleId') {
+                this.tableData[i][key].edit = false
+              } else {
+                this.tableData[i].isSet = false
+              }
+            }
+          }
+        }
+        this.provinces = provinceCity.provinces
+
         if (row[column.property].type === 'city') {
           for (let i = 0; i < this.provinces.length; i++) {
             if (this.provinces[i].name === row.province.value) {
               this.cities = this.provinces[i].cities
             }
           }
+        } else if (column.columnKey === 'roleType') {
+          this.getSums('/user/getOne?id=' + row.id).then(res => {
+            this.roleGroups = []
+            for (let i = 0; i < res.data.object.roleList.length; i++) {
+              this.roleGroups.push({
+                label: res.data.object.roleList[i].roleType,
+                value: res.data.object.roleList[i].roleId
+              })
+            }
+            console.log(this.roleGroups)
+          })
         }
         if (row[column.property]) {
           row[column.property].edit = true
@@ -465,18 +555,29 @@ export default {
     },
     changeCell(value, item, index, type) {
       console.log(value, item, index, type)
+
+      for (let i = 0; i < this.provinces.length; i++) {
+        if (value === this.provinces[i].name) {
+          this.tableData[index].city.value = this.provinces[i].cities[0].name
+        }
+      }
+
       if (type === 'province') {
         for (let i = 0; i < this.provinces.length; i++) {
           if (this.provinces[i].name === value) {
             this.cities = this.provinces[i].cities
           }
         }
+      } else if (type === 'roleType') {
+        const roles = this.roleGroups.filter(item => item.label === value)
+        this.nowRoleId = roles[0].value
       }
     },
     getDataList(total) {
       this.total = total
     },
     handleCurrentChange(val) {
+      this.loading = true
       this.currentPage = val
       this.makeData()
       this.init(this.options)
@@ -484,19 +585,43 @@ export default {
 
     // 表格新增行
     addRow() {
-      this.provinces = provinceCity.provinces
-      this.tableData.push({
-        account: { value: '', edit: true },
-        username: { value: '', edit: true },
-        address: { value: '', edit: true },
-        contact: { value: '', edit: true },
-        mobile: { value: '', edit: true },
-        province: { value: '', edit: true },
-        city: { value: '', edit: true },
-        roleType: { value: '', edit: true },
-        id: 0,
-        isSet: true
-      })
+      if (this.addOne) {
+        this.addOne = false
+        this.roleList('', 'role/listData').then(res => {
+          this.roleGroups = []
+          for (let i = 0; i < res.data.object.length; i++) {
+            this.roleGroups.push({
+              label: res.data.object[i].roleType,
+              value: res.data.object[i].roleId
+            })
+          }
+        })
+        this.edit = true
+        this.provinces = provinceCity.provinces
+        const ids = this.tableData[this.tableData.length - 1].id + 1
+        this.tableData.unshift({
+          account: { value: '', edit: true },
+          username: { value: '', edit: true },
+          address: { value: '', edit: true },
+          contact: { value: '', edit: true },
+          mobile: { value: '', edit: true },
+          province: { value: '', edit: true },
+          city: { value: '', edit: true },
+          roleType: { value: '', edit: true },
+          id: ids,
+          isSet: true
+        })
+        for (let i = 1; i < this.tableData.length; i++) {
+          for (const key in this.tableData[i]) {
+            // this.tableData[i][key].edit = false
+            if (key !== 'id' && key !== 'isSet' && key !== 'roleId') {
+              this.tableData[i][key].edit = false
+            } else {
+              this.tableData[i].isSet = false
+            }
+          }
+        }
+      }
     },
     // 删除选中数据（单纯实现前端删除）
     batchDelete(selections) {
@@ -518,9 +643,10 @@ export default {
     },
     // 保存提交
     handleSave(index, row) {
-      const a = {}
       console.log(row)
+      console.log(this.nowRoleId)
 
+      const a = {}
       for (const key in row) {
         if (key !== 'isSet') {
           a[key] = row[key].value
@@ -529,21 +655,39 @@ export default {
       if (row.id !== 0) {
         a.id = row.id
       }
-
       let nowload = ''
-      if (this.edit) {
+      if (!this.edit) {
+        a.roleId = this.nowRoleId
         nowload = 'user/update'
       } else {
         nowload = 'user/insert'
       }
-      console.log(a)
-
-      this.dataChange(a, nowload).then(res => {
-        if (res.data.code === 200) {
-          this.edit = false
+      for (const key in a) {
+        if (key !== 'account') {
+          if (a[key] === '') {
+            this.errorVisible = true
+          }
         }
-      })
-      return (row.isSet = !row.isSet)
+      }
+      if (!this.errorVisible) {
+        console.log(a)
+
+        this.dataChange(a, nowload).then(res => {
+          console.log(res)
+
+          if (res.data.code === 200) {
+            this.edit = false
+            this.makeData()
+            this.addOne = true
+            return (row.isSet = !row.isSet)
+          } else {
+            this.errorVisible = true
+            this.infoTitle = res.data.msg
+          }
+        })
+      } else {
+        this.infoTitle = '所有内容不能为空'
+      }
     },
     changePassword(index, row) {
       this.centerDialogVisible++
@@ -563,30 +707,50 @@ export default {
         '',
         ''
       ).then(res => {
-        this.initData(res)
+        this.tableData = []
+        const vdata = res.data.object.list
+        for (let i = 0; i < vdata.length; i++) {
+          this.tableData.push({
+            username: vdata[i].username,
+            address: vdata[i].address,
+            account: vdata[i].account,
+            roleType: vdata[i].roleType,
+            province: vdata[i].province,
+            city: vdata[i].city,
+            mobile: vdata[i].mobile,
+            contact: vdata[i].contact,
+            id: vdata[i].id,
+            roleId: vdata[i].roleId,
+            isSet: false
+          })
+        }
+        this.formatData()
+        this.getDataList(res.data.object.total)
       })
     },
     clearSearch() {
       this.makeData()
     },
-    handleDelete(row) {
-      console.log(row)
-      this.changeKey++
-      this.delArr = row.id.toString()
-      // this.delItem(row.id, 'user/delete').then(res => {
-      //   if (res.data.code === 200) {
-      //     this.makeData()
-      //   }
-      // })
+    handleDelete(row, index) {
+      if (row.id === this.tableData[this.tableData.length - 1].id + 1) {
+        this.tableData.splice(index, 1)
+      } else {
+        this.changeKey++
+        this.delArr = row.id.toString()
+      }
+      this.addOne = true
+      this.edit = false
     },
     getBeforeData() {
       this.searchData('user/getSearchData').then(res => {
-        this.provinces = res.data.object.provinces
+        // this.provinces = res.data.object.provinces
+        console.log(res)
+
         this.proviceGroup = []
-        for (let index = 0; index < this.provinces.length; index++) {
+        for (let index = 0; index < res.data.object.provinces.length; index++) {
           this.proviceGroup.push({
-            text: this.provinces[index].name,
-            value: this.provinces[index].name
+            text: res.data.object.provinces[index].name,
+            value: res.data.object.provinces[index].name
           })
         }
         const arr = []
@@ -603,7 +767,6 @@ export default {
         }
 
         this.roleTypeGroup = arr
-        this.roleGroups = brr
       })
     },
     initBtn() {
@@ -623,33 +786,12 @@ export default {
         }
       })
     },
-    changeValue(e) {
-      this.$forceUpdate()
-    },
-    initData(res) {
-      this.tableData = []
-      const vdata = res.data.object.list
-      for (let i = 0; i < vdata.length; i++) {
-        this.tableData.push({
-          username: vdata[i].username,
-          address: vdata[i].address,
-          account: vdata[i].account,
-          roleType: vdata[i].roleType,
-          province: vdata[i].province,
-          city: vdata[i].city,
-          mobile: vdata[i].mobile,
-          contact: vdata[i].contact,
-          id: vdata[i].id,
-          roleId: vdata[i].roleId,
-          isSet: false
-        })
-      }
-      this.formatData()
-      this.getDataList(res.data.object.total)
-    },
     onLoadData() {
       this.$refs.filterTable.clearSelection()
       this.makeData()
+    },
+    handleClose(done) {
+      this.errorVisible = false
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）

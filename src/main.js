@@ -29,7 +29,8 @@ import {
   productDone,
   searchAll,
   sendId,
-  sendProducts
+  sendProducts,
+  getSearchData
 } from '@/utils/comon'
 
 import { exportCompanyExcel, downloadFile } from '../src/utils/importCommon'
@@ -62,6 +63,7 @@ Vue.prototype.roleList = roleList
 Vue.prototype.productDone = productDone
 Vue.prototype.searchAll = searchAll
 Vue.prototype.sendId = sendId
+Vue.prototype.getSearchData = getSearchData
 Vue.prototype.sendProducts = sendProducts
 Vue.prototype.exportCompanyExcel = exportCompanyExcel
 Vue.prototype.downloadFile = downloadFile

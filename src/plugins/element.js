@@ -38,7 +38,8 @@ import {
   RadioGroup,
   Radio,
   Carousel,
-  CarouselItem
+  CarouselItem,
+  Loading
 } from 'element-ui'
 
 Vue.use(Button)
@@ -77,6 +78,7 @@ Vue.use(RadioGroup)
 Vue.use(Radio)
 Vue.use(Carousel)
 Vue.use(CarouselItem)
+Vue.use(Loading)
 Vue.prototype.$message = Message
 Vue.prototype.$notify = Notification
 Vue.prototype.$msgbox = MessageBox

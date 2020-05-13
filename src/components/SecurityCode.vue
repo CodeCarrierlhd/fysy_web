@@ -75,6 +75,7 @@
               fontWeight: 800,
               background: '#eef1f6'
             }"
+            v-loading="loading"
             border
             height="280"
             @filter-change="fnFilterChangeInit"
@@ -206,7 +207,8 @@ export default {
       newDialogTableVisible: false,
       sums: 0,
       sumCount: true,
-      exportFileName: ''
+      exportFileName: '',
+      loading: true
     }
   },
   // 监听属性 类似于data概念
@@ -226,15 +228,23 @@ export default {
         this.typeNumber
       ).then(res => {
         console.log(res)
-        for (let i = 0; i < res.data.object.list.length; i++) {
-          this.tableData.push({
-            code: res.data.object.list[i].code,
-            createTime: res.data.object.list[i].createTime,
-            codeType: res.data.object.list[i].codeType,
-            status: res.data.object.list[i].status
+        if (res.status === 200) {
+          this.loading = false
+          for (let i = 0; i < res.data.object.list.length; i++) {
+            this.tableData.push({
+              code: res.data.object.list[i].code,
+              createTime: res.data.object.list[i].createTime,
+              codeType: res.data.object.list[i].codeType,
+              status: res.data.object.list[i].status
+            })
+          }
+          this.getDataList(res.data.object.total)
+        } else {
+          this.$message({
+            message: res.data.msg,
+            type: 'warning'
           })
         }
-        this.getDataList(res.data.object.total)
       })
     },
     initSums() {
@@ -264,20 +274,32 @@ export default {
       })
     },
     handleClick(tab, event) {
+      this.loading = true
       if (tab.index === '1') {
         // 这里需要请求后台接口拿数据
         this.dateName = '最近查询日期'
         this.statusName = '已查询次数'
         this.nowPage = '1'
-        this.codeData(
-          this.currentPage,
-          this.limit,
-          '/serveCode/fwCode/listData',
-          this.search,
-          this.nowPage,
-          this.typeNumber
-        ).then(res => {
-          this.tableData = []
+        this.hasUsedData()
+      } else {
+        this.dateName = '生成日期'
+        this.statusName = '状态'
+        this.nowPage = '0'
+        this.initData()
+      }
+    },
+    hasUsedData() {
+      this.codeData(
+        this.currentPage,
+        this.limit,
+        '/serveCode/fwCode/listData',
+        this.search,
+        this.nowPage,
+        this.typeNumber
+      ).then(res => {
+        this.tableData = []
+        if (res.status === 200) {
+          this.loading = false
           for (let i = 0; i < res.data.object.list.length; i++) {
             this.tableData.push({
               code: res.data.object.list[i].code,
@@ -287,21 +309,21 @@ export default {
             })
           }
           this.getDataList(res.data.object.total)
-        })
-      } else {
-        this.dateName = '生成日期'
-        this.statusName = '状态'
-        this.nowPage = '0'
-        this.initData()
-      }
+        }
+      })
     },
     getDataList(toatl) {
       this.total = toatl
     },
     handleCurrentChange(val) {
+      this.loading = true
       this.currentPage = val
       // this.getDataList();
-      this.initData()
+      if (this.nowPage === '1') {
+        this.hasUsedData()
+      } else {
+        this.initData()
+      }
     },
     handleSizeChange(val) {
       this.limit = val

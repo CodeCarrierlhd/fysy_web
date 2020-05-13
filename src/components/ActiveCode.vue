@@ -78,6 +78,7 @@
             }"
             border
             height="280"
+            v-loading="loading"
           >
             <el-table-column
               label="序号"
@@ -170,7 +171,8 @@ export default {
       a_number: 0,
       radio: 0,
       newDialogTableVisible: false,
-      unused_show: true
+      unused_show: true,
+      loading: true
     }
   },
   // 监听属性 类似于data概念
@@ -190,16 +192,23 @@ export default {
         ''
       ).then(res => {
         console.log(res)
-
-        for (let i = 0; i < res.data.object.list.length; i++) {
-          this.tableData.push({
-            code: res.data.object.list[i].code,
-            createTime: res.data.object.list[i].createTime,
-            status: res.data.object.list[i].status,
-            queryCount: res.data.object.list[i].queryCount
+        if (res.status === 200) {
+          this.loading = false
+          for (let i = 0; i < res.data.object.list.length; i++) {
+            this.tableData.push({
+              code: res.data.object.list[i].code,
+              createTime: res.data.object.list[i].createTime,
+              status: res.data.object.list[i].status,
+              queryCount: res.data.object.list[i].queryCount
+            })
+          }
+          this.getDataList(res.data.object.total)
+        } else {
+          this.$message({
+            message: res.data.msg,
+            type: 'warning'
           })
         }
-        this.getDataList(res.data.object.total)
       })
     },
     initSums() {
@@ -224,6 +233,7 @@ export default {
       })
     },
     handleClick(tab, event) {
+      this.loading = true
       if (tab.index === '1') {
         this.nowPage = '1'
         this.unused_show = false
@@ -237,6 +247,7 @@ export default {
       this.total = total
     },
     handleCurrentChange(val) {
+      this.loading = true
       this.currentPage = val
       this.initData()
     },

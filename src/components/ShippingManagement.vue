@@ -30,25 +30,20 @@
               </div>
               <el-button
                 @click="exportClientInfoExcel()"
-                type="primary"
+                :type="defaultColr"
+                :disabled="btnStatu"
                 size="medium"
                 v-if="e_show"
                 ><i class="el-icon-download"></i>导出</el-button
               >
             </div>
             <div v-if="add_show">
-              <el-button
-                @click="addData"
-                v-if="btnShow"
-                type="primary"
-                v-show="s_show"
-                ><i class="el-icon-plus"></i> 新增</el-button
-              >
-              <div v-else>
-                <el-button @click="delData" type="primary"
-                  ><i class="el-icon-delete"></i>删除</el-button
+              <div></div>
+              <div style="display:flex">
+                <el-button @click="addData" type="primary" v-show="s_show"
+                  ><i class="el-icon-plus"></i> 新增</el-button
                 >
-                <el-button @click="sendPro" type="primary"
+                <el-button @click="sendPro" type="primary" v-if="!btnShow"
                   ><i class="el-icon-thumb"></i>确认发货</el-button
                 >
               </div>
@@ -82,6 +77,7 @@
               background: '#eef1f6'
             }"
             border
+            v-loading="loading"
             height="600"
           >
             <el-table-column
@@ -261,6 +257,7 @@
       <el-table
         ref="getProducts"
         :data="newTableData"
+        v-loading="loading1"
         @filter-change="fnFilterChangeInit1"
         @selection-change="selectionChangeHandle1"
         :row-key="getRowKey"
@@ -517,7 +514,13 @@ export default {
       s_show: false,
       e_show: false,
       key_index: '2',
-      uid: 0
+      defaultColr: 'info',
+      btnStatu: true,
+      uid: 0,
+      loading: true,
+      loading1: true,
+      middleSelection: [],
+      clickSum: 0
     }
   },
   // 监听属性 类似于data概念
@@ -535,20 +538,29 @@ export default {
         '&materialId=',
         '',
         '&selectedOpIds=',
-        '',
+        this.middleSelection.join(','),
         '&uid=',
         '',
         '&value=',
         this.search1
       ).then(res => {
+        console.log(res)
+
         this.newTableData = []
-        this.newTableData = res.data.object.list
-        this.getDataList1(res.data.object.total)
+        if (res.status === 200) {
+          this.loading1 = false
+          this.newTableData = res.data.object.list
+          this.$refs.getProducts.clearSelection()
+          this.getDataList1(res.data.object.total)
+        } else {
+          this.$message({
+            message: res.data.msg,
+            type: 'warning'
+          })
+        }
       })
     },
     selectionChangeHandle(selection) {
-      console.log(selection)
-
       this.tableDataSelections = []
       // this.btnShow = false
       for (let i = 0; i < selection.length; i++) {
@@ -556,14 +568,15 @@ export default {
       }
       if (selection.length > 0) {
         this.btnShow = false
+        this.btnStatu = false
+        this.defaultColr = 'primary'
       } else {
         this.btnShow = true
+        this.btnStatu = false
+        this.defaultColr = 'info'
       }
-      console.log(this.tableDataSelections)
     },
     selectionChangeHandle1(selection) {
-      console.log(selection)
-
       this.tableDataSelections1 = []
       for (let i = 0; i < selection.length; i++) {
         this.tableDataSelections1.push(selection[i].opId)
@@ -581,37 +594,65 @@ export default {
     },
     handleCurrentChange(val) {
       this.currentPage = val
+      this.loading = true
       this.search = ''
       if (this.key_index === '3') {
         this.changeTab('0', '')
       } else if (this.key_index === '4') {
         this.changeTab('3', this.uid)
+      } else {
+        this.searchAll(
+          this.currentPage,
+          this.limit,
+          '/inventory/listData',
+          '&materialId=',
+          '',
+          '&selectedOpIds=',
+          this.middleSelection.join(','),
+          '&uid=',
+          '',
+          '&value=',
+          '',
+          '&pageType=',
+          '2'
+        ).then(res => {
+          this.loading = false
+          this.tableData = res.data.object.list
+          this.getDataList(res.data.object.total)
+        })
       }
     },
     handleCurrentChange1(val) {
       this.currentPage1 = val
+      this.loading1 = true
       this.initData1()
     },
     handleClick(tab, event) {
+      this.loading = true
+      this.middleSelection = []
+      this.search = ''
+      this.btnStatu = true
+      this.defaultColr = 'info'
       if (tab.index === '2') {
-        this.key_index = '4'
+        this.key_index = '3'
         this.$nextTick(() => {
-          this.changeTab('3', this.uid)
+          this.changeTab(this.key_index, this.uid)
           this.show_role = true
           this.add_show = false
           this.a_statu = true
           this.wait_pro = false
         })
       } else if (tab.index === '1') {
-        this.key_index = '3'
+        this.key_index = '0'
         this.$nextTick(() => {
-          this.changeTab('0', '')
+          this.changeTab(this.key_index, '')
           this.show_role = false
           this.add_show = false
           this.a_statu = false
           this.wait_pro = true
         })
       } else {
+        this.loading = false
         this.key_index = '2'
         this.tableData = []
         this.getDataList(0)
@@ -651,6 +692,7 @@ export default {
       return row.opId
     },
     changRole(val) {
+      this.loading = true
       this.uid = val
       this.changeTab('3', this.uid)
     },
@@ -660,51 +702,58 @@ export default {
       this.initData1()
       this.dialogVisibleClassify = true
     },
-    n_addPro() {
-      console.log('重新发货')
-    },
-    delData() {
-      console.log('删除', this.tableDataSelections)
-      for (let i = 0; i < this.tableData.length; i++) {
-        for (let j = 0; j < this.tableDataSelections.length; j++) {
-          if (this.tableDataSelections[j] === this.tableData[i].opId) {
-            this.tableData.splice(i, 1)
-          }
-        }
-      }
-      this.$refs.sendProFilterTable[0].clearSelection()
-    },
     chosePro() {
       this.dialogVisibleClassify = false
-      const ids = this.tableDataSelections1.join(',')
+      this.search = ''
+      // const ids = this.tableDataSelections1.join(',')
+      for (let index = 0; index < this.tableDataSelections1.length; index++) {
+        this.middleSelection.push(this.tableDataSelections1[index])
+      }
       this.searchAll(
         this.currentPage,
         this.limit,
-        '/inventory/listByOpIdArray',
-        '&opIds=',
-        ids,
+        '/inventory/listData',
+        '&materialId=',
         '',
+        '&selectedOpIds=',
+        this.middleSelection.join(','),
+        '&uid=',
         '',
-        '',
-        '',
-        '',
-        ''
+        '&value=',
+        this.search,
+        '&pageType=',
+        '2'
       ).then(res => {
-        console.log(res)
-        for (let i = 0; i < res.data.object.length; i++) {
-          this.tableData.push(res.data.object[i])
-        }
-        this.getDataList(this.tableData.length)
+        this.tableData = res.data.object.list
+        this.$nextTick(() => {
+          for (let i = 0; i < this.tableData.length; i++) {
+            this.$refs.sendProFilterTable[0].toggleRowSelection(
+              this.tableData[i],
+              true
+            )
+          }
+        })
+        this.getDataList(res.data.object.total)
         this.$refs.getProducts.clearSelection()
       })
     },
     sendPro() {
+      this.clickSum = 0
       this.newDialogTableVisible = true
       const ids = this.tableDataSelections.join(',')
-      console.log(this.tableDataSelections)
+      // console.log(this.middleSelection, this.tableDataSelections)
+
+      // for (let i = 0; i < this.middleSelection.length; i++) {
+      //   for (let j = 0; j < this.tableDataSelections.length; j++) {
+      //     if (this.middleSelection[i] === this.tableDataSelections[j]) {
+      //       this.middleSelection.splice(i, 1)
+      //     }
+      //   }
+      // }
       this.sendProducts(ids, '', '', '', '/deliver/generateOrderInfo').then(
         res => {
           console.log(res.data.object)
+          this.reciveGroup = []
           for (let i = 0; i < res.data.object.receiverList.length; i++) {
             this.reciveGroup.push({
               value: res.data.object.receiverList[i].id,
@@ -719,6 +768,7 @@ export default {
 
           this.sender = res.data.object.sender
           this.order = res.data.object.order
+          this.gridData = []
           for (let j = 0; j < res.data.object.goodsList.list.length; j++) {
             this.gridData.push({
               smaterialType: res.data.object.goodsList.list[j].materialType,
@@ -737,40 +787,37 @@ export default {
         }
       }
     },
-    refreshData() {
-      console.log('刷新')
-    },
     quitSend() {
       this.newDialogTableVisible = false
       console.log('退出')
     },
     sendProduct() {
       this.newDialogTableVisible = false
+      this.loading = true
       const ids = this.tableDataSelections.join(',')
-      this.sendProducts(
-        ids,
-        this.order.orderNo,
-        this.order.orderTime.replace(/-/g, '/'),
-        this.reciver.id,
-        '/deliver/sureSend'
-      ).then(res => {
-        if (res.data.code === 200) {
-          for (let i = 0; i < this.tableData.length; i++) {
-            for (let j = 0; j < this.tableDataSelections.length; j++) {
-              if (this.tableDataSelections[j] === this.tableData[i].opId) {
-                this.tableData.splice(i, 1)
-              }
-            }
+      if (this.clickSum === 0) {
+        this.sendProducts(
+          ids,
+          this.order.orderNo,
+          this.order.orderTime.replace(/-/g, '/'),
+          this.reciver.id,
+          '/deliver/sureSend'
+        ).then(res => {
+          if (res.data.code === 200) {
+            // this.initData()
+            this.clickSum++
+            this.tableData = []
+            this.loading = false
+            this.$refs.sendProFilterTable[0].clearSelection()
+            this.$notify({
+              title: '发货状态',
+              message: '产品发货成功',
+              position: 'top-right',
+              duration: 2000
+            })
           }
-          this.$refs.sendProFilterTable[0].clearSelection()
-          this.$notify({
-            title: '发货状态',
-            message: '产品发货成功',
-            position: 'top-right',
-            duration: 2000
-          })
-        }
-      })
+        })
+      }
     },
     initBtn() {
       const btnArr = JSON.parse(this.$route.query.btnRight)
@@ -785,8 +832,8 @@ export default {
       })
     },
     searchEnterFun() {
-      console.log(this.key_index)
-      console.log(this.uid)
+      console.log(this.middleSelection)
+
       let a = 0
       if (this.key_index === '3') {
         a = 0
@@ -825,7 +872,7 @@ export default {
           this.getDataList(res.data.object.total)
         })
       } else {
-        const ids = this.tableDataSelections.join(',')
+        a = 2
         this.searchAll(
           this.currentPage,
           this.limit,
@@ -833,7 +880,7 @@ export default {
           '&materialId=',
           '',
           '&selectedOpIds=',
-          ids,
+          this.middleSelection.join(','),
           '&uid=',
           '',
           '&value=',
@@ -841,11 +888,24 @@ export default {
           '&pageType=',
           a
         ).then(res => {
+          console.log(a)
+          this.loading = false
           this.tableData = res.data.object.list
           this.getDataList(res.data.object.total)
         })
       }
+      //   this.getSearchData(
+      //     '/inventory/listByOpIdArray',
+      //     this.middleSelection,
+      //     this.search,
+      //     a
+      //   ).then(res => {
+      //     console.log(res)
 
+      //     // this.tableData = res.data.object.list
+      //     // this.getDataList(res.data.object.total)
+      //   })
+      // }
       // this.changeTab(a, '')
     },
     searchEnterFun1() {
@@ -856,7 +916,7 @@ export default {
         '&materialId=',
         '',
         '&selectedOpIds=',
-        '',
+        this.middleSelection.join(','),
         '&uid=',
         this.uid,
         '&value=',
@@ -880,7 +940,6 @@ export default {
       })
     },
     changeTab(statu, uid) {
-      console.log(statu)
       this.search = ''
       this.tableData = []
       this.searchAll(
@@ -896,9 +955,21 @@ export default {
         '&value=',
         this.search
       ).then(res => {
-        console.log(res)
-        this.tableData = res.data.object.list
-        this.getDataList(res.data.object.total)
+        if (res.status === 200) {
+          this.loading = false
+          this.tableData = res.data.object.list
+          if (statu === '0') {
+            this.$refs.sendProFilterTable[1].clearSelection()
+          } else if (statu === '3') {
+            this.$refs.sendProFilterTable[2].clearSelection()
+          }
+          this.getDataList(res.data.object.total)
+        } else {
+          this.$message({
+            message: res.data.msg,
+            type: 'warning'
+          })
+        }
       })
     },
     getUid() {
@@ -914,6 +985,7 @@ export default {
       })
     },
     restart(row) {
+      this.loading = true
       this.dataChange({ opId: row.opId }, '/deliver/reSend').then(res => {
         if (res.data.code === 200) {
           this.changeTab('0', '')
@@ -943,6 +1015,7 @@ export default {
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created() {
+    this.loading = false
     this.initBtn()
     this.getType()
     this.getUid()

@@ -1,19 +1,8 @@
-// var proEnv = require('./config/prod.env') // 生产环境
-// var devEnv = require('./config/dev.env') // 本地环境
-// const env = process.env.NODE_ENV
+// const path = require('path');
 
-// let target = ''
-// // 默认是本地环境
-// if (env === 'production') {
-//   // 生产环境
-//   target = proEnv.VUE_APP_URP
-// } else {
-//   // 本地环境
-//   target = devEnv.VUE_APP_URP
-// }
-// // 生成代理配置对象
-console.log(process.env.NODE_ENV)
-console.log(process.env.VUE_APP_BASEURL)
+// const webpack = require('webpack')
+// const CompressionWebpackPlugin = require('compression-webpack-plugin')
+// const productionGzipExtensions = ['js', 'css']
 
 // console.log(target)
 
@@ -39,3 +28,26 @@ module.exports = {
     before: app => {}
   }
 }
+//  configureWebpack:{
+//     resolve:{
+//       alias:{
+//         '@':path.resolve(__dirname, './src'),
+//         '@i':path.resolve(__dirname, './src/assets'),
+//       }
+//     },
+//     plugins: [
+//       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+
+//       // 下面是下载的插件的配置
+//       new CompressionWebpackPlugin({
+//         algorithm: 'gzip',
+//         test: new RegExp('\\.(' + productionGzipExtensions.join('|') + ')$'),
+//         threshold: 10240,
+//         minRatio: 0.8
+//       }),
+//       new webpack.optimize.LimitChunkCountPlugin({
+//         maxChunks: 5,
+//         minChunkSize: 100
+//       })
+//     ]
+//   }

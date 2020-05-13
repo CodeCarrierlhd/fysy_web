@@ -30,25 +30,20 @@
               </div>
               <el-button
                 @click="exportClientInfoExcel()"
-                type="primary"
+                :type="defaultColr"
+                :disabled="btnStatu"
                 size="medium"
                 v-if="e_show"
                 ><i class="el-icon-download"></i>导出</el-button
               >
             </div>
             <div v-if="add_show">
-              <el-button
-                @click="addData"
-                v-if="btnShow"
-                type="primary"
-                v-show="s_show"
-                ><i class="el-icon-plus"></i> 新增</el-button
-              >
-              <div v-else>
-                <el-button @click="delData" type="primary"
-                  ><i class="el-icon-delete"></i>删除</el-button
+              <div style="display:flex">
+                <el-button @click="addData" type="primary" v-show="s_show"
+                  ><i class="el-icon-plus"></i> 新增</el-button
                 >
-                <el-button @click="sendPro" type="primary"
+
+                <el-button @click="sendPro" type="primary" v-if="!btnShow"
                   ><i class="el-icon-thumb"></i>确认退货</el-button
                 >
               </div>
@@ -71,9 +66,7 @@
           </div>
           <el-table
             ref="sendProFilterTable"
-            :data="
-              tableData.slice((currentPage - 1) * limit, currentPage * limit)
-            "
+            :data="tableData"
             @selection-change="selectionChangeHandle"
             @filter-change="fnFilterChangeInit"
             :row-key="getRowKey"
@@ -84,6 +77,7 @@
               background: '#eef1f6'
             }"
             height="600"
+            v-loading="loading"
             border
           >
             <el-table-column
@@ -191,19 +185,6 @@
               width="150"
             >
             </el-table-column>
-            <!-- <el-table-column
-              v-if="wait_pro"
-              prop="productStatus"
-              label="状态"
-              align="center"
-              width="150"
-              :filter-multiple="false"
-              :filters="p_statuGroup"
-              :filter-method="filterTag"
-              column-key="productStatus"
-              key="p_statu"
-              filter-placement="bottom-end"
-            ></el-table-column> -->
             <el-table-column
               v-if="wait_pro"
               prop="productStatus"
@@ -280,6 +261,7 @@
         @selection-change="selectionChangeHandle1"
         :row-key="getRowKey"
         height="600"
+        v-loading="loading1"
         style="margin:10px 0;width:100%"
       >
         <el-table-column
@@ -502,7 +484,7 @@ export default {
       search1: '',
       tabNames: [
         { label: '退货', name: 'one' },
-        { label: '待收货', name: 'two' },
+        { label: '待退货', name: 'two' },
         { label: '已完成', name: 'third' }
       ],
       roleGroups: [],
@@ -533,7 +515,13 @@ export default {
       loseReason: '',
       key_index: '2',
       uid: 0,
-      returnReasonType: 0
+      defaultColr: 'info',
+      btnStatu: true,
+      returnReasonType: 0,
+      loading: true,
+      loading1: true,
+      middleSelection: [],
+      clickSum: 0
     }
   },
   // 监听属性 类似于data概念
@@ -544,7 +532,6 @@ export default {
   methods: {
     initData() {},
     initData1() {
-      this.tableData = []
       this.searchAll(
         this.currentPage1,
         this.limit1,
@@ -552,17 +539,24 @@ export default {
         '&materialId=',
         '',
         '&selectedOpIds=',
-        '',
+        this.middleSelection.join(','),
         '&uid',
         '',
         '&value=',
-        this.search
+        this.search1
       ).then(res => {
         this.newTableData = []
-        this.newTableData = res.data.object.list
-        console.log(res.data.object.total)
-
-        this.getDataList1(res.data.object.total)
+        if (res.status === 200) {
+          this.loading1 = false
+          this.newTableData = res.data.object.list
+          this.$refs.getProducts.clearSelection()
+          this.getDataList1(res.data.object.total)
+        } else {
+          this.$message({
+            message: res.data.msg,
+            type: 'warning'
+          })
+        }
       })
     },
     selectionChangeHandle(selection) {
@@ -575,8 +569,12 @@ export default {
       }
       if (selection.length > 0) {
         this.btnShow = false
+        this.defaultColr = 'primary'
+        this.btnStatu = false
       } else {
         this.btnShow = true
+        this.defaultColr = 'info'
+        this.btnStatu = true
       }
       console.log(this.tableDataSelections)
     },
@@ -599,15 +597,43 @@ export default {
       this.total1 = total
     },
     handleCurrentChange(val) {
+      this.loading = true
       this.currentPage = val
+      if (this.key_index === '2') {
+        this.searchAll(
+          this.currentPage,
+          this.limit,
+          '/inventory/listData',
+          '&materialId=',
+          '',
+          '&selectedOpIds=',
+          this.middleSelection.join(','),
+          '&uid=',
+          '',
+          '&value=',
+          this.search,
+          '&pageType=',
+          '2'
+        ).then(res => {
+          this.loading = false
+          this.tableData = res.data.object.list
+          this.getDataList(res.data.object.total)
+        })
+      } else {
+        this.changeTab(this.key_index, this.uid)
+      }
     },
     handleCurrentChange1(val) {
+      this.loading1 = true
       this.currentPage1 = val
-      console.log(this.currentPage1)
       this.initData1()
     },
     handleClick(tab, event) {
+      this.middleSelection = []
       this.search = ''
+      this.loading = true
+      this.btnStatu = true
+      this.defaultColr = 'info'
       if (tab.index === '2') {
         this.key_index = '4'
         this.$nextTick(() => {
@@ -627,6 +653,7 @@ export default {
           this.wait_pro = true
         })
       } else {
+        this.loading = false
         this.key_index = '2'
         this.tableData = []
         this.getDataList(0)
@@ -664,8 +691,8 @@ export default {
       return row.opId
     },
     changRole(val) {
+      this.loading = true
       this.changeTab('3', val)
-      console.log('角色改变', val)
     },
     addData() {
       this.newTableData = []
@@ -686,29 +713,39 @@ export default {
     },
     chosePro() {
       this.dialogVisibleClassify = false
-      const ids = this.tableDataSelections1.join(',')
+      for (let index = 0; index < this.tableDataSelections1.length; index++) {
+        this.middleSelection.push(this.tableDataSelections1[index])
+      }
       this.searchAll(
         this.currentPage,
         this.limit,
-        '/inventory/listByOpIdArray',
-        '&opIds=',
-        ids,
+        '/inventory/listData',
+        '&materialId=',
         '',
+        '&selectedOpIds=',
+        this.middleSelection.join(','),
+        '&uid=',
         '',
-        '',
-        '',
-        '',
-        ''
+        '&value=',
+        this.search,
+        '&pageType=',
+        '2'
       ).then(res => {
-        console.log(res)
-        for (let i = 0; i < res.data.object.length; i++) {
-          this.tableData.push(res.data.object[i])
-        }
-        this.getDataList(this.tableData.length)
+        this.tableData = res.data.object.list
+        this.$nextTick(() => {
+          for (let i = 0; i < this.tableData.length; i++) {
+            this.$refs.sendProFilterTable[0].toggleRowSelection(
+              this.tableData[i],
+              true
+            )
+          }
+        })
+        this.getDataList(res.data.object.total)
         this.$refs.getProducts.clearSelection()
       })
     },
     sendPro() {
+      this.clickSum = 0
       this.newDialogTableVisible = true
       const ids = this.tableDataSelections.join(',')
       console.log(this.tableDataSelections)
@@ -758,9 +795,6 @@ export default {
         }
       }
     },
-    refreshData() {
-      console.log('刷新')
-    },
     quitSend() {
       this.newDialogTableVisible = false
       this.$refs.sendProFilterTable[0].clearSelection()
@@ -773,37 +807,31 @@ export default {
     sendProduct() {
       this.newDialogTableVisible = false
       const ids = this.tableDataSelections.join(',')
-      this.dataChange(
-        {
-          opIds: ids,
-          orderNo: this.order.orderNo,
-          orderTime: this.order.orderTime.replace(/-/g, '/'),
-          receiver: this.reciver.id,
-          returnReason: this.loseReason,
-          returnReasonType: this.returnReasonType
-        },
-        '/return/sureReturn'
-      ).then(res => {
-        console.log(res)
-
-        if (res.data.code === 200) {
-          for (let i = 0; i < this.tableData.length; i++) {
-            for (let j = 0; j < this.tableDataSelections.length; j++) {
-              if (this.tableDataSelections[j] === this.tableData[i].opId) {
-                this.tableData.splice(i, 1)
-              }
-            }
+      if (this.clickSum === 0) {
+        this.dataChange(
+          {
+            opIds: ids,
+            orderNo: this.order.orderNo,
+            orderTime: this.order.orderTime.replace(/-/g, '/'),
+            receiver: this.reciver.id,
+            returnReason: this.loseReason,
+            returnReasonType: this.returnReasonType
+          },
+          '/return/sureReturn'
+        ).then(res => {
+          if (res.data.code === 200) {
+            this.clickSum++
+            this.tableData = []
             this.$refs.sendProFilterTable[0].clearSelection()
+            this.$notify({
+              title: '退货状态',
+              message: '产品退货成功',
+              position: 'top-right',
+              duration: 2000
+            })
           }
-          this.$refs.sendProFilterTable[0].clearSelection()
-          this.$notify({
-            title: '退货状态',
-            message: '产品退货成功',
-            position: 'top-right',
-            duration: 2000
-          })
-        }
-      })
+        })
+      }
     },
     initBtn() {
       const btnArr = JSON.parse(this.$route.query.btnRight)
@@ -820,7 +848,7 @@ export default {
     searchEnterFun() {
       console.log(this.key_index)
       console.log(this.uid)
-
+      this.loading = true
       let a = 0
       if (this.key_index === '4') {
         a = 4
@@ -838,7 +866,7 @@ export default {
           a
         ).then(res => {
           console.log(res)
-
+          this.loading = false
           this.tableData = res.data.object.list
           this.getDataList(res.data.object.total)
         })
@@ -857,11 +885,12 @@ export default {
           '&status=',
           a
         ).then(res => {
+          this.loading = false
           this.tableData = res.data.object.list
           this.getDataList(res.data.object.total)
         })
       } else {
-        const ids = this.tableDataSelections.join(',')
+        a = 2
         this.searchAll(
           this.currentPage,
           this.limit,
@@ -869,7 +898,7 @@ export default {
           '&materialId=',
           '',
           '&selectedOpIds=',
-          ids,
+          this.middleSelection.join(','),
           '&uid=',
           '',
           '&value=',
@@ -877,6 +906,7 @@ export default {
           '&pageType=',
           a
         ).then(res => {
+          this.loading = false
           this.tableData = res.data.object.list
           this.getDataList(res.data.object.total)
         })
@@ -890,7 +920,7 @@ export default {
         '&materialId=',
         '',
         '&selectedOpIds=',
-        '',
+        this.middleSelection.join(','),
         '&uid=',
         this.uid,
         '&value=',
@@ -916,7 +946,7 @@ export default {
     changeTab(statu, uid) {
       this.searchAll(
         this.currentPage,
-        8,
+        this.limit,
         '/return/listData',
         '&materialId=',
         '',
@@ -927,9 +957,21 @@ export default {
         '&value=',
         this.search
       ).then(res => {
-        console.log(res)
-        this.tableData = res.data.object.list
-        this.getDataList(res.data.object.total)
+        if (res.status === 200) {
+          this.loading = false
+          this.tableData = res.data.object.list
+          if (statu === '1') {
+            this.$refs.sendProFilterTable[1].clearSelection()
+          } else if (statu === '4') {
+            this.$refs.sendProFilterTable[2].clearSelection()
+          }
+          this.getDataList(res.data.object.total)
+        } else {
+          this.$message({
+            message: res.data.msg,
+            type: 'warning'
+          })
+        }
       })
     },
     getUid() {
@@ -946,9 +988,10 @@ export default {
       })
     },
     restart(row) {
-      this.dataChange({ opId: row.opId }, '/deliver/reSend').then(res => {
+      this.loading = true
+      this.dataChange({ opId: row.opId }, '/return/reSend').then(res => {
         if (res.data.code === 200) {
-          this.changeTab('0', '')
+          this.changeTab('1', '')
         }
       })
     },
@@ -975,6 +1018,7 @@ export default {
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created() {
+    this.loading = false
     this.initBtn()
     this.getType()
     this.getUid()

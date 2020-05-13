@@ -23,8 +23,9 @@
           >
           <el-button
             @click="batchDelete(tableDataSelections)"
-            type="primary"
+            :type="defaultColr"
             v-if="d_show"
+            :disabled="btnStatu"
             ><i class="el-icon-delete"></i>删除</el-button
           >
         </div>
@@ -43,6 +44,7 @@
           fontWeight: 800,
           background: '#eef1f6'
         }"
+        v-loading="loading"
         border
       >
         <el-table-column
@@ -148,7 +150,7 @@
                 }
               "
             >
-              <el-option :key="''" :label="'全部'" :value="''"> </el-option>
+              <!-- <el-option :key="''" :label="'全部'" :value="''"> </el-option> -->
               <el-option
                 v-for="item in cities"
                 :key="item.code"
@@ -224,7 +226,7 @@
             >
             <el-button
               size="mini"
-              @click="handleDelete(scope.row)"
+              @click="handleDelete(scope.row, scope.$index)"
               v-if="d_show"
               >删除</el-button
             >
@@ -248,6 +250,20 @@
         :delContent="`确定删除生产商，数据无法找回！`"
       >
       </del-dialog>
+      <el-dialog
+        title="错误提示"
+        :visible.sync="errorVisible"
+        width="400px"
+        :before-close="handleClose"
+      >
+        <span>所有内容不能为空</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="errorVisible = false">取 消</el-button>
+          <el-button type="primary" @click="errorVisible = false"
+            >确 定</el-button
+          >
+        </span>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -286,7 +302,12 @@ export default {
       tableDataSelections: [],
       edit: false,
       changeKey: 0,
-      delArr: ''
+      delArr: '',
+      btnStatu: true,
+      defaultColr: 'info',
+      errorVisible: false,
+      addOne: true,
+      loading: true
     }
   },
   // 监听属性 类似于data概念
@@ -309,22 +330,30 @@ export default {
       this.tableData = []
       this.listData(this.currentPage, this.limit, '/producer/listData').then(
         res => {
-          const vdata = res.data.object.list
-          for (let i = 0; i < vdata.length; i++) {
-            this.tableData.push({
-              producerName: vdata[i].producerName,
-              address: vdata[i].address,
-              producerCode: vdata[i].producerCode,
-              province: vdata[i].province,
-              city: vdata[i].city,
-              mobile: vdata[i].mobile,
-              contact: vdata[i].contact,
-              isSet: false,
-              id: vdata[i].id
+          if (res.status === 200) {
+            this.loading = false
+            const vdata = res.data.object.list
+            for (let i = 0; i < vdata.length; i++) {
+              this.tableData.push({
+                producerName: vdata[i].producerName,
+                address: vdata[i].address,
+                producerCode: vdata[i].producerCode,
+                province: vdata[i].province,
+                city: vdata[i].city,
+                mobile: vdata[i].mobile,
+                contact: vdata[i].contact,
+                isSet: false,
+                id: vdata[i].id
+              })
+            }
+            this.formatData()
+            this.getDataList(res.data.object.total)
+          } else {
+            this.$message({
+              message: res.data.msg,
+              type: 'warning'
             })
           }
-          this.formatData()
-          this.getDataList(res.data.object.total)
         }
       )
     },
@@ -355,6 +384,13 @@ export default {
       // this.btnShow = false
       for (let i = 0; i < selection.length; i++) {
         this.tableDataSelections.push(selection[i].id)
+      }
+      if (selection.length > 0) {
+        this.defaultColr = 'primary'
+        this.btnStatu = false
+      } else {
+        this.defaultColr = 'info'
+        this.btnStatu = true
       }
     },
     // table column 的方法，改写这个方法
@@ -425,9 +461,22 @@ export default {
     },
     // 单元格双击事件
     celledit(row, column, cell, event) {
-      this.edit = true
       if (this.e_show) {
         row.isSet = true
+        for (let i = 0; i < this.tableData.length; i++) {
+          if (this.tableData[i].id !== row.id) {
+            for (const key in this.tableData[i]) {
+              // this.tableData[i][key].edit = false
+              if (key !== 'id' && key !== 'isSet') {
+                // console.log(this.tableData[i][key].edit)
+                this.tableData[i][key].edit = false
+              } else {
+                this.tableData[i].isSet = false
+              }
+            }
+          }
+        }
+        this.provinces = provinceCity.provinces
         if (row[column.property].type === 'city') {
           for (let i = 0; i < this.provinces.length; i++) {
             if (this.provinces[i].name === row.province.value) {
@@ -441,7 +490,11 @@ export default {
       }
     },
     changeCell(value, item, index, type) {
-      console.log(value, item, index, type)
+      for (let i = 0; i < this.provinces.length; i++) {
+        if (value === this.provinces[i].name) {
+          this.tableData[index].city.value = this.provinces[i].cities[0].name
+        }
+      }
       if (type === 'province') {
         for (let i = 0; i < this.provinces.length; i++) {
           if (this.provinces[i].name === value) {
@@ -465,34 +518,41 @@ export default {
     },
     // 表格新增行
     addRow() {
-      this.provinces = provinceCity.provinces
-      const id = this.tableData[this.tableData.length - 1].id + 1
-      this.tableData.push({
-        producerCode: { value: '', edit: true },
-        producerName: { value: '', edit: true },
-        address: { value: '', edit: true },
-        contact: { value: '', edit: true },
-        mobile: { value: '', edit: true },
-        province: { value: '', edit: true },
-        city: { value: '', edit: true },
-        id: id,
-        isSet: true
-      })
+      if (this.addOne) {
+        console.log(this.tableData)
+
+        this.addOne = false
+        this.provinces = provinceCity.provinces
+        const id = this.tableData[this.tableData.length - 1].id + 1
+        this.edit = true
+        this.tableData.unshift({
+          producerCode: { value: '', edit: true },
+          producerName: { value: '', edit: true },
+          address: { value: '', edit: true },
+          contact: { value: '', edit: true },
+          mobile: { value: '', edit: true },
+          province: { value: '', edit: true },
+          city: { value: '', edit: true },
+          id: id,
+          isSet: true
+        })
+        for (let i = 1; i < this.tableData.length; i++) {
+          for (const key in this.tableData[i]) {
+            // this.tableData[i][key].edit = false
+            if (key !== 'id' && key !== 'isSet') {
+              // console.log(this.tableData[i][key].edit)
+              this.tableData[i][key].edit = false
+            } else {
+              this.tableData[i].isSet = false
+            }
+          }
+        }
+      }
     },
     // 删除选中数据（单纯实现前端删除）
     batchDelete(selections) {
-      // const ids = []
-      // for (let i = 0; i < this.tableDataSelections.length; i++) {
-      //   ids.push(this.tableDataSelections[i].id)
-      // }
-      // const idArr = ids.join(',')
       this.changeKey++
       this.delArr = this.tableDataSelections.join(',')
-      // this.delItem(idArr, 'producer/delete').then(res => {
-      //   if (res.data.code === 200) {
-      //     this.makeData()
-      //   }
-      // })
     },
     pwdChange(row, index) {
       console.log(row, index)
@@ -509,19 +569,31 @@ export default {
         a.id = row.id
       }
       let nowload = ''
-      if (this.edit) {
+      if (!this.edit) {
         nowload = 'producer/update'
       } else {
         nowload = 'producer/insert'
       }
-      console.log(nowload)
-
-      this.dataChange(a, nowload).then(res => {
-        if (res.data.code === 200) {
-          this.edit = false
+      for (const key in a) {
+        if (a[key] === '') {
+          this.errorVisible = true
         }
-      })
-      return (row.isSet = !row.isSet)
+      }
+      if (!this.errorVisible) {
+        this.dataChange(a, nowload).then(res => {
+          if (res.data.code === 200) {
+            this.edit = false
+            this.addOne = true
+            this.makeData()
+          } else {
+            this.$message({
+              message: res.data.msg,
+              type: 'warning'
+            })
+          }
+        })
+        return (row.isSet = !row.isSet)
+      }
     },
     getRowKey(row) {
       return row.id
@@ -545,25 +617,26 @@ export default {
     },
     getBeforeData() {
       this.searchData('producer/getSearchData').then(res => {
-        this.provinces = res.data.object.provinces
-        console.log(this.provinces)
+        // this.provinces = res.data.object.provinces
+        // console.log(this.provinces)
         this.proviceGroup = []
-        for (let index = 0; index < this.provinces.length; index++) {
+        for (let index = 0; index < res.data.object.provinces.length; index++) {
           this.proviceGroup.push({
-            text: this.provinces[index].name,
-            value: this.provinces[index].name
+            text: res.data.object.provinces[index].name,
+            value: res.data.object.provinces[index].name
           })
         }
       })
     },
-    handleDelete(row) {
-      this.changeKey++
-      this.delArr = row.id.toString()
-      // this.delItem(row.id, 'producer/delete').then(res => {
-      //   if (res.data.code === 200) {
-      //     this.makeData()
-      //   }
-      // })
+    handleDelete(row, index) {
+      if (row.id === this.tableData[this.tableData.length - 1].id + 1) {
+        this.tableData.splice(index, 1)
+      } else {
+        this.changeKey++
+        this.delArr = row.id.toString()
+      }
+      this.addOne = true
+      this.edit = false
     },
     searchEnterFun() {
       this.valueData(
@@ -601,6 +674,9 @@ export default {
     onLoadData() {
       this.$refs.filterTable.clearSelection()
       this.makeData()
+    },
+    handleClose(done) {
+      this.errorVisible = false
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）

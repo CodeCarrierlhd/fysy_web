@@ -26,6 +26,7 @@
         :data="tableData"
         @cell-click="hideInfo"
         style="width: 100%;"
+        v-loading="loading"
         border
       >
         <el-table-column type="index" width="100" align="center" label="序号">
@@ -60,7 +61,7 @@
         :title="showTitle"
         class="filterClassfiy"
         width="730px"
-        :close-on-click-modal="false"
+        @close="quit"
         :visible.sync="dialogVisibleClassify"
         center
       >
@@ -104,40 +105,42 @@
                 </div>
                 <div v-show="first.childShow" class="checkboxGroups">
                   <template v-for="(second, secIndex) in first.child">
-                    <el-checkbox
-                      v-model="second.mychecked"
-                      @change="
-                        secondChanged(firIndex, secIndex, second.id, first.id)
-                      "
-                      :key="second.id"
-                      :title="second.rightName"
-                      :label="second.id"
-                      >{{ second.rightName }}</el-checkbox
-                    >
-                    <div
-                      class="thirdContent"
-                      v-for="(third, index) in second.child"
-                      :key="third.id"
-                    >
-                      <template>
-                        <el-checkbox
-                          v-model="third.onechecked"
-                          @change="
-                            thirdChanged(
-                              firIndex,
-                              secIndex,
-                              index,
-                              third.id,
-                              second.id,
-                              first.id
-                            )
-                          "
-                          :key="third.id"
-                          :title="third.rightName"
-                          :label="third.id"
-                          >{{ third.rightName }}</el-checkbox
-                        >
-                      </template>
+                    <div :key="secIndex">
+                      <el-checkbox
+                        v-model="second.mychecked"
+                        @change="
+                          secondChanged(firIndex, secIndex, second.id, first.id)
+                        "
+                        :key="second.id"
+                        :title="second.rightName"
+                        :label="second.id"
+                        >{{ second.rightName }}</el-checkbox
+                      >
+                      <div
+                        class="thirdContent"
+                        v-for="(third, index) in second.child"
+                        :key="third.id"
+                      >
+                        <template>
+                          <el-checkbox
+                            v-model="third.onechecked"
+                            @change="
+                              thirdChanged(
+                                firIndex,
+                                secIndex,
+                                index,
+                                third.id,
+                                second.id,
+                                first.id
+                              )
+                            "
+                            :key="third.id"
+                            :title="third.rightName"
+                            :label="third.id"
+                            >{{ third.rightName }}</el-checkbox
+                          >
+                        </template>
+                      </div>
                     </div>
                   </template>
                 </div>
@@ -147,7 +150,7 @@
         </div>
 
         <span slot="footer" class="dialog-footer">
-          <el-button @click="dialogVisibleClassify = false">取 消</el-button>
+          <el-button @click="quit">取 消</el-button>
           <el-button
             type="primary"
             @click="funrightName ? initTableData() : editData()"
@@ -195,6 +198,20 @@
       :delContent="`确定删除账号，数据无法找回！`"
     >
     </del-dialog>
+    <el-dialog
+      title="错误提示"
+      :visible.sync="errorVisible"
+      width="400px"
+      :before-close="handleClose"
+    >
+      <span>{{ infoTitle }}</span>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="errorVisible = false">取 消</el-button>
+        <el-button type="primary" @click="errorVisible = false"
+          >确 定</el-button
+        >
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -235,7 +252,10 @@ export default {
       e_show: false,
       edit: false,
       changeKey: 0,
-      delArr: ''
+      delArr: '',
+      errorVisible: false,
+      infoTitle: '',
+      loading: true
     }
   },
   // 监听属性 类似于data概念
@@ -249,13 +269,38 @@ export default {
   // 方法集合
   methods: {
     initTableData() {
-      this.dialogVisibleClassify = false
-      this.getIds(this.menuList)
-      this.rightInsert(this.options, this.roleValue, '/roleRight/insert').then(
-        res => {
+      this.getIds()
+      console.log(this.options === '' && this.roleValue === '')
+
+      if (this.options === '' || this.roleValue === '') {
+        this.errorVisible = true
+        this.infoTitle = '用户角色，权限不能为空'
+      } else {
+        this.dialogVisibleClassify = false
+        this.rightInsert(
+          this.options,
+          this.roleValue,
+          '/roleRight/insert'
+        ).then(res => {
           if (res.status === 200) {
             this.initData()
+          } else {
+            this.errorVisible = true
+            this.infoTitle = res.data.msg
           }
+        })
+      }
+    },
+    editData() {
+      this.getIds()
+      this.dialogVisibleClassify = false
+      this.rightChange(this.options, this.keyId, '/roleRight/update').then(
+        res => {
+          if (res.data.code !== 200) {
+            this.errorVisible = true
+            this.infoTitle = res.data.msg
+          }
+          this.funrightName = true
         }
       )
     },
@@ -295,7 +340,6 @@ export default {
     },
     handleFilterClassify() {
       this.options = []
-      // this.funrightName = false
       this.dialogVisibleClassify = true
       this.edit = false
       this.initStatu()
@@ -361,19 +405,7 @@ export default {
         }
       })
     },
-    editData() {
-      // for (let i = 0; i < middleArr.length; i++) {
-      //   this.ids += middleArr[i] + ','
-      // }
-      this.getIds()
-      this.rightChange(this.options, this.keyId, '/roleRight/update').then(
-        res => {
-          console.log(res)
-        }
-      )
-      this.funrightName = true
-      this.dialogVisibleClassify = false
-    },
+
     getDataList() {
       this.total = this.tableData.length
     },
@@ -514,10 +546,18 @@ export default {
     initData() {
       this.roleList('', 'role/listData').then(res => {
         this.tableData = []
-        for (let i = 0; i < res.data.object.length; i++) {
-          this.tableData.push({
-            roleId: res.data.object[i].roleId,
-            roleType: res.data.object[i].roleType
+        if (res.status === 200) {
+          this.loading = false
+          for (let i = 0; i < res.data.object.length; i++) {
+            this.tableData.push({
+              roleId: res.data.object[i].roleId,
+              roleType: res.data.object[i].roleType
+            })
+          }
+        } else {
+          this.$message({
+            message: res.data.msg,
+            type: 'warning'
           })
         }
       })
@@ -525,11 +565,6 @@ export default {
     deltRole(row, index) {
       this.changeKey++
       this.delArr = row.roleId.toString()
-      // this.delItem(row.roleId, '/role/delete').then(res => {
-      //   if (res.status === 200) {
-      //     this.initData()
-      //   }
-      // })
     },
     getIds() {
       const middleArr = []
@@ -607,7 +642,14 @@ export default {
       })
     },
     onLoadData() {
-      this.initTableData()
+      this.initData()
+    },
+    handleClose(done) {
+      this.errorVisible = false
+    },
+    quit() {
+      this.funrightName = true
+      this.dialogVisibleClassify = false
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）

@@ -18,6 +18,12 @@ const getSums = listName => {
   return axios.get(listName)
 }
 
+const getSearchData = (listName, ids, search, pageType) => {
+  return axios.get(
+    listName + '?opIds=' + ids + '&value=' + search + '&pageType=' + pageType
+  )
+}
+
 // 条件查询
 const valueData = (
   currentPage,
@@ -204,5 +210,6 @@ export {
   productDone,
   searchAll,
   sendId,
-  sendProducts
+  sendProducts,
+  getSearchData
 }

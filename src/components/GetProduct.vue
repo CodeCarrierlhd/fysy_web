@@ -30,7 +30,8 @@
             <div>
               <el-button
                 @click="exportClientInfoExcel()"
-                type="primary"
+                :type="defaultColr"
+                :disabled="btnStatu"
                 size="medium"
                 v-if="i_show"
                 ><i class="el-icon-download"></i>导出</el-button
@@ -51,6 +52,7 @@
             }"
             border
             height="600"
+            v-loading="loading"
           >
             <el-table-column
               type="selection"
@@ -298,7 +300,10 @@ export default {
       r_show: false,
       key_index: '0',
       unsed: false,
-      materialId: ''
+      materialId: '',
+      loading: true,
+      defaultColr: 'info',
+      btnStatu: true
     }
   },
   // 监听属性 类似于data概念
@@ -322,9 +327,16 @@ export default {
         '',
         ''
       ).then(res => {
-        console.log(res)
-        this.tableData = res.data.object.list
-        this.getDataList(res.data.object.total)
+        if (res.status === 200) {
+          this.loading = false
+          this.tableData = res.data.object.list
+          this.getDataList(res.data.object.total)
+        } else {
+          this.$message({
+            message: res.data.msg,
+            type: 'warning'
+          })
+        }
       })
     },
 
@@ -338,17 +350,25 @@ export default {
       for (let i = 0; i < selection.length; i++) {
         this.tableDataSelections.push(selection[i].productId)
       }
-      console.log(this.tableDataSelections)
+      if (selection.length > 0) {
+        this.defaultColr = 'primary'
+        this.btnStatu = false
+      } else {
+        this.defaultColr = 'info'
+        this.btnStatu = true
+      }
     },
     getDataList(total) {
       this.total = total
     },
     handleCurrentChange(val) {
+      this.loading = true
       this.currentPage = val
       this.initData()
     },
 
     handleClick(tab, event) {
+      this.loading = true
       if (tab.index === '1') {
         this.key_index = '1'
         this.unsed = true
@@ -370,6 +390,8 @@ export default {
       this.dialogVisible = true
       this.stepGroups = []
       this.sendId(row.productId, '/productTrace/generateReport').then(res => {
+        console.log(res)
+
         for (let i = 0; i < res.data.object.length; i++) {
           if (res.data.object[i].productStatus === '已发出') {
             this.stepGroups.push({
@@ -403,9 +425,8 @@ export default {
               stepName: res.data.object[i].productStatus,
               iconType: 'el-icon-user',
               stepContent: res.data.object[i].opUser,
-              stepTime:
-                '使用时间：' +
-                this.translateTime(res.data.object[i].createTime.time)
+              stepTime: '使用时间：' + res.data.object[i].createTime
+              // this.translateTime(res.data.object[i].createTime.time)
             })
           }
         }
@@ -516,6 +537,7 @@ export default {
       })
     },
     searchEnterFun() {
+      this.loading = true
       this.initData()
     },
     exportClientInfoExcel() {
