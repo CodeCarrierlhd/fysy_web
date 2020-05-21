@@ -405,7 +405,6 @@ export default {
         }
       })
     },
-
     getDataList() {
       this.total = this.tableData.length
     },

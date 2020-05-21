@@ -66,6 +66,7 @@
           </div>
           <el-table
             ref="sendProFilterTable"
+            v-loading="loading"
             :data="tableData"
             @selection-change="selectionChangeHandle"
             @filter-change="fnFilterChangeInit"
@@ -77,7 +78,6 @@
               background: '#eef1f6'
             }"
             border
-            v-loading="loading"
             height="600"
           >
             <el-table-column
@@ -580,6 +580,13 @@ export default {
       this.tableDataSelections1 = []
       for (let i = 0; i < selection.length; i++) {
         this.tableDataSelections1.push(selection[i].opId)
+      }
+      if (selection.length > 0) {
+        this.defaultColr = 'primary'
+        this.btnStatu = false
+      } else {
+        this.defaultColr = 'info'
+        this.btnStatu = true
       }
     },
     // table column 的方法，改写这个方法

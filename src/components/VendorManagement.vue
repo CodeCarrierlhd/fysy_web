@@ -559,6 +559,8 @@ export default {
     },
     // 保存提交
     handleSave(index, row) {
+      console.log(this.edit)
+
       const a = {}
       for (const key in row) {
         if (key !== 'isSet') {
