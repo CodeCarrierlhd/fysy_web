@@ -315,10 +315,16 @@ export default {
           console.log(res)
           this.materialLists = res.data.object.scale.materialList
           this.totalSales = res.data.object.scale.totalSales
-          if (res.data.object.scale.materialList.length === 1) {
+          if (
+            res.data.object.scale.materialList &&
+            res.data.object.scale.materialList.length === 1
+          ) {
             this.choseMaterial = res.data.object.scale.materialList[0]
             this.choseTotal = res.data.object.scale.totalSales
-            if (res.data.object.scale.materialList[0].imageUrls.length > 0) {
+            if (
+              res.data.object.scale.materialList[0].imageUrls &&
+              res.data.object.scale.materialList[0].imageUrls.length > 0
+            ) {
               this.imgExit = true
               this.imgList = []
               this.imgList = JSON.parse(

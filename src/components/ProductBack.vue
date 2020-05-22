@@ -394,7 +394,11 @@
         </li>
         <li>
           <span>收货单位：</span>
-          <el-select v-model="recived" placeholder="请选择">
+          <el-select
+            v-model="recived"
+            placeholder="请选择"
+            @change="recivedChange"
+          >
             <el-option
               v-for="item in reciveGroup"
               :key="item.value"
@@ -599,6 +603,8 @@ export default {
     handleCurrentChange(val) {
       this.loading = true
       this.currentPage = val
+      console.log(this.key_index, this.uid)
+
       if (this.key_index === '2') {
         this.searchAll(
           this.currentPage,
@@ -692,7 +698,8 @@ export default {
     },
     changRole(val) {
       this.loading = true
-      this.changeTab('3', val)
+      this.uid = val
+      this.changeTab('4', val)
     },
     addData() {
       this.newTableData = []
@@ -769,10 +776,11 @@ export default {
           this.receiverList = res.data.object.receiverList
           this.reasonList = res.data.object.returnReasonList
           this.reason = res.data.object.returnReasonList[0].desc
-          this.reciver = res.data.object.receiverList[0]
-          if (res.data.object.receiverList.length > 0) {
-            this.recived = res.data.object.receiverList[0].username
-          }
+          this.recived = res.data.object.receiverList[0].id
+          // this.reciver = res.data.object.receiverList[0]
+          // if (res.data.object.receiverList.length > 0) {
+          //   this.recived = res.data.object.receiverList[0].username
+          // }
 
           this.sender = res.data.object.sender
           this.order = res.data.object.order
@@ -788,13 +796,13 @@ export default {
         }
       )
     },
-    reciverChange(val) {
-      for (let index = 0; index < this.receiverList.length; index++) {
-        if (val === this.receiverList[index].id) {
-          this.reciver = this.receiverList[index]
-        }
-      }
-    },
+    // reciverChange(val) {
+    //   for (let index = 0; index < this.receiverList.length; index++) {
+    //     if (val === this.receiverList[index].id) {
+    //       this.reciver = this.receiverList[index]
+    //     }
+    //   }
+    // },
     quitSend() {
       this.newDialogTableVisible = false
       this.$refs.sendProFilterTable[0].clearSelection()
@@ -804,16 +812,22 @@ export default {
       console.log(val)
       this.returnReasonType = val
     },
+    recivedChange(val) {
+      this.recived = val
+      console.log(this.recived)
+    },
     sendProduct() {
       this.newDialogTableVisible = false
       const ids = this.tableDataSelections.join(',')
+      console.log(this.recived)
+
       if (this.clickSum === 0) {
         this.dataChange(
           {
             opIds: ids,
             orderNo: this.order.orderNo,
             orderTime: this.order.orderTime.replace(/-/g, '/'),
-            receiver: this.reciver.id,
+            receiver: this.recived,
             returnReason: this.loseReason,
             returnReasonType: this.returnReasonType
           },

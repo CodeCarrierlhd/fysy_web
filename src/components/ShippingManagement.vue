@@ -604,9 +604,12 @@ export default {
       this.loading = true
       this.search = ''
       if (this.key_index === '3') {
-        this.changeTab('0', '')
-      } else if (this.key_index === '4') {
+        console.log(this.uid)
         this.changeTab('3', this.uid)
+      } else if (this.key_index === '4') {
+        console.log(this.uid)
+
+        this.changeTab('0', '')
       } else {
         this.searchAll(
           this.currentPage,
@@ -643,6 +646,8 @@ export default {
       if (tab.index === '2') {
         this.key_index = '3'
         this.$nextTick(() => {
+          console.log(this.key_index, this.uid)
+
           this.changeTab(this.key_index, this.uid)
           this.show_role = true
           this.add_show = false
@@ -652,6 +657,8 @@ export default {
       } else if (tab.index === '1') {
         this.key_index = '0'
         this.$nextTick(() => {
+          console.log(this.key_index, this.uid)
+
           this.changeTab(this.key_index, '')
           this.show_role = false
           this.add_show = false
@@ -840,27 +847,8 @@ export default {
     },
     searchEnterFun() {
       console.log(this.middleSelection)
-
       let a = 0
       if (this.key_index === '3') {
-        a = 0
-        this.searchAll(
-          this.currentPage,
-          this.limit,
-          '/deliver/listData',
-          '&materialId=',
-          '',
-          '&uid=',
-          '',
-          '&value=',
-          this.search,
-          '&status=',
-          a
-        ).then(res => {
-          this.tableData = res.data.object.list
-          this.getDataList(res.data.object.total)
-        })
-      } else if (this.key_index === '4') {
         a = 3
         this.searchAll(
           this.currentPage,
@@ -870,6 +858,24 @@ export default {
           '',
           '&uid=',
           this.uid,
+          '&value=',
+          this.search,
+          '&status=',
+          a
+        ).then(res => {
+          this.tableData = res.data.object.list
+          this.getDataList(res.data.object.total)
+        })
+      } else if (this.key_index === '4') {
+        a = 0
+        this.searchAll(
+          this.currentPage,
+          this.limit,
+          '/deliver/listData',
+          '&materialId=',
+          '',
+          '&uid=',
+          '',
           '&value=',
           this.search,
           '&status=',

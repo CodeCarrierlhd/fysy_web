@@ -5,6 +5,7 @@
 // const productionGzipExtensions = ['js', 'css']
 
 // console.log(target)
+// const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 module.exports = {
   publicPath: './',
@@ -15,6 +16,17 @@ module.exports = {
     port: 3001,
     hotOnly: false,
     disableHostCheck: true,
+    // configureWebpack: {
+    //   plugins: [
+    //     new UglifyJsPlugin({
+    //       uglifyOptions: {
+    //         compress: {
+    //           drop_console: true
+    //         }
+    //       }
+    //     })
+    //   ]
+    // },
     proxy: {
       '/api': {
         target: process.env.VUE_APP_BASEURL, // 对应自己的接口

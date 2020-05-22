@@ -54,7 +54,7 @@
               <span class="title">当前库存概况</span>
               <span class="title">单位：个</span>
             </div>
-            <div id="pieChart"></div>
+            <div id="pieChart" style="width:100%;height:260px"></div>
           </div>
           <div style="width:530px;background-color: #fff;">
             <div
@@ -104,6 +104,7 @@
 // 例如：import 《组件名称》 from '《组件路径》';
 import { Chart } from '@antv/g2'
 import axios from 'axios'
+import echarts from 'echarts'
 export default {
   // import引入的组件需要注入到对象中才能使用
   components: {},
@@ -169,7 +170,7 @@ export default {
             lineData.push({
               timer: graphx[i],
               title: '进货',
-              datas: inventory[i]
+              datas: instock[i]
             })
             lineData.push({
               timer: graphx[i],
@@ -179,7 +180,7 @@ export default {
             lineData.push({
               timer: graphx[i],
               title: '库存',
-              datas: instock[i]
+              datas: inventory[i]
             })
             lineData.push({
               timer: graphx[i],
@@ -189,8 +190,8 @@ export default {
           }
           for (let m = 0; m < res.data.object.invrntoryList.length; m++) {
             pieData.push({
-              item: res.data.object.invrntoryList[m].materialModel,
-              count: res.data.object.invrntoryList[m].amount
+              value: res.data.object.invrntoryList[m].amount,
+              name: res.data.object.invrntoryList[m].materialModel
             })
           }
           for (
@@ -206,7 +207,13 @@ export default {
           // { year: '1951 年', sales: 38 },
           // if(lineD)
           this.initLine(lineData)
-          this.initPie(pieData, res.data.object.totalInventory)
+          this.initPie(
+            pieData,
+            res.data.object.totalInventory.amount,
+            this.pieChar,
+            'pieChart'
+          )
+          // this.initPie(pieData, res.data.object.totalInventory)
           this.initBar(barData)
           this.tableData = res.data.object.modelDataList
         })
@@ -325,79 +332,133 @@ export default {
 
       this.barChar.render()
     },
-    initPie(data, conunts) {
-      console.log(conunts)
-
-      this.pieChar.clear()
-      this.pieChar.changeData(data)
-
-      // this.pieChar.scale('count', {
-      //   formatter: val => {
-      //     val = val * 100 + '%'
-      //     return val
-      //   }
+    initPie(pdata, conunts, chart, chartId) {
+      chart = echarts.init(document.getElementById(chartId))
+      const option = {
+        title: {
+          text: conunts,
+          subtext: '总库存量/个',
+          left: '50%',
+          top: '41%',
+          padding: 5,
+          textAlign: 'center'
+        },
+        tooltip: {
+          // 提示框，可以在全局也可以在
+          trigger: 'item', // 提示框的样式
+          formatter: '{b} <br/> 数量：{c} <br/> 占比：{d}%',
+          color: '#FFF', // 提示框的背景色
+          textStyle: {
+            // 提示的字体样式
+            fontSize: '14px',
+            fontWeight: 400,
+            color: '#fff',
+            padding: 15
+          }
+        },
+        series: [
+          {
+            type: 'pie', // 环形图的type和饼图相同
+            radius: ['50%', '70%'], // 饼图的半径，第一个为内半径，第二个为外半径
+            avoidLabelOverlap: false,
+            color: [
+              '#2A426E',
+              '#435E93',
+              '#0289D4',
+              '#59C4EB',
+              '#FF7B71',
+              '#FA99A8',
+              '#FFCC00',
+              '#FFDB4C',
+              '#AAAAAA',
+              '#BBBBBB',
+              '#DDDDDD',
+              '#F8F8F8'
+            ],
+            label: {
+              normal: {
+                // 正常的样式
+                show: true,
+                position: 'left',
+                color: '#777777'
+              }
+            }, // 提示文字
+            labelLine: {
+              normal: {
+                show: true
+              }
+            },
+            data: pdata
+          }
+        ]
+      }
+      chart.setOption(option)
+      // console.log(conunts)
+      // this.pieChar.clear()
+      // this.pieChar.changeData(data)
+      // // this.pieChar.scale('count', {
+      // //   formatter: val => {
+      // //     val = val * 100 + '%'
+      // //     return val
+      // //   }
+      // // })
+      // this.pieChar.legend({
+      //   visible: false
       // })
-      this.pieChar.legend({
-        visible: false
-      })
-      this.pieChar.coordinate('theta', {
-        radius: 0.75,
-        innerRadius: 0.6
-      })
-      this.pieChar.tooltip({
-        showTitle: false,
-        showMarkers: false,
-        itemTpl:
-          '<li class="g2-tooltip-list-item"><span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}: {value}</li>'
-      })
-      // 辅助文本
-      //  { item: '事例五', count: 9, percent: 0.09 },
-      this.pieChar
-        .annotation()
-        .text({
-          position: ['50%', '50%'],
-          content: '总库存量/个',
-          style: {
-            fontSize: 12,
-            fill: '#8c8c8c',
-            textAlign: 'center'
-          },
-          offsetY: -20
-        })
-        .text({
-          position: ['50%', '50%'],
-          content: conunts.amount,
-          style: {
-            fontSize: 24,
-            fill: '#8c8c8c',
-            textAlign: 'center'
-          },
-          offsetX: -5,
-          offsetY: 10
-        })
-
-      this.pieChar
-        .interval()
-        .adjust('stack')
-        .position('count')
-        .color('item')
-        .label('count', count => {
-          return {
-            content: data => {
-              return `${data.item}: ${count}`
-            }
-          }
-        })
-        .tooltip('item*count', (item, count) => {
-          return {
-            name: item,
-            value: count
-          }
-        })
-
-      // this.pieChar.interaction('element-active')
-
-      this.pieChar.render()
+      // this.pieChar.coordinate('theta', {
+      //   radius: 0.75,
+      //   innerRadius: 0.6
+      // })
+      // this.pieChar.tooltip({
+      //   showTitle: false,
+      //   showMarkers: false,
+      //   itemTpl:
+      //     '<li class="g2-tooltip-list-item"><span style="background-color:{color};" class="g2-tooltip-marker"></span>{name}: {value}</li>'
+      // })
+      // // 辅助文本
+      // //  { item: '事例五', count: 9, percent: 0.09 },
+      // this.pieChar.annotation()
+      // // .text({
+      // //   position: ['50%', '50%'],
+      // //   content: '总库存量/个',
+      // //   style: {
+      // //     fontSize: 12,
+      // //     fill: '#8c8c8c',
+      // //     textAlign: 'center'
+      // //   },
+      // //   offsetY: -20
+      // // })
+      // // .text({
+      // //   position: ['50%', '50%'],
+      // //   content: conunts.amount,
+      // //   style: {
+      // //     fontSize: 24,
+      // //     fill: '#8c8c8c',
+      // //     textAlign: 'center'
+      // //   },
+      // //   offsetX: -5,
+      // //   offsetY: 10
+      // // })
+      // this.pieChar
+      //   .interval()
+      //   .adjust('stack')
+      //   .position('count')
+      //   .color('item')
+      //   .label('count', count => {
+      //     return {
+      //       content: data => {
+      //         return `${data.item}: ${count}`
+      //       }
+      //     }
+      //   })
+      //   .tooltip('item*count', (item, count) => {
+      //     return {
+      //       name: item,
+      //       value: count
+      //     }
+      //   })
+      // // this.pieChar.interaction('element-active')
+      // this.pieChar.render()
     },
     initData(uid) {
       axios
@@ -423,11 +484,11 @@ export default {
             height: 260,
             padding: [40, 60]
           })
-          this.pieChar = new Chart({
-            container: 'pieChart',
-            autoFit: true,
-            height: 260
-          })
+          // this.pieChar = new Chart({
+          //   container: 'pieChart',
+          //   autoFit: true,
+          //   height: 260
+          // })
           const lineData = []
           const pieData = []
           const barData = []
@@ -460,8 +521,8 @@ export default {
           }
           for (let m = 0; m < res.data.object.invrntoryList.length; m++) {
             pieData.push({
-              item: res.data.object.invrntoryList[m].materialModel,
-              count: res.data.object.invrntoryList[m].amount
+              value: res.data.object.invrntoryList[m].amount,
+              name: res.data.object.invrntoryList[m].materialModel
             })
           }
           for (
@@ -475,8 +536,15 @@ export default {
             })
           }
           this.initLine(lineData)
+          console.log(pieData, res.data.object.totalInventory)
 
-          this.initPie(pieData, res.data.object.totalInventory)
+          // this.initPie(pieData, res.data.object.totalInventory)
+          this.initPie(
+            pieData,
+            res.data.object.totalInventory.amount,
+            this.pieChar,
+            'pieChart'
+          )
           this.initBar(barData)
           this.tableData = res.data.object.modelDataList
         })
