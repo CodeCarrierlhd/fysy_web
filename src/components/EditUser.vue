@@ -8,6 +8,7 @@
       ref="loginForm"
       :model="loginForm"
       label-width="0"
+      @submit.native.prevent
     >
       <img :src="logoImg" style="width:360px" />
       <p>修改密码</p>
@@ -79,15 +80,12 @@
         </div>
       </el-form-item>
       <el-form-item>
-        <el-button
-          size="midle"
-          @click.native.prevent="editUserInfo"
-          class="edit-submit"
+        <el-button @click.native.prevent="editUserInfo" class="edit-submit"
           >确认修改</el-button
         >
       </el-form-item>
       <el-form-item>
-        <el-button size="midle" @click="cancleEdit" class="edit-cancle"
+        <el-button @click.native.prevent="cancleEdit" class="edit-cancle"
           >取消并返回</el-button
         >
       </el-form-item>
@@ -181,7 +179,22 @@ export default {
       this.dataChange(this.loginForm, '/user/updatePwd').then(res => {
         if (res.data.code === 200) {
           this.$refs.loginForm.resetFields()
+          this.$notify({
+            title: '成功',
+            message: '密码重置成功',
+            position: 'top-right',
+            duration: 5000,
+            type: 'success'
+          })
           this.$emit('childFn', '')
+        } else {
+          this.getIdentifyCode()
+          this.$notify({
+            title: '错误',
+            message: res.data.msg + '请重新输入',
+            position: 'top-right',
+            duration: 5000
+          })
         }
       })
     },
@@ -195,7 +208,6 @@ export default {
       this.identifyCode = us.identifyCode() + '?' + timestamp
     },
     cancleEdit() {
-      console.log(1)
       this.$emit('childFn', '')
       this.$refs.loginForm.resetFields()
     }

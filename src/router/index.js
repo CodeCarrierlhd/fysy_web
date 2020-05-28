@@ -1,22 +1,22 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
-import Login from '../views/Login.vue'
-import MainContent from '../components/MainContent'
-import AcMa from '../components/AccountManagement.vue'
-import AuMa from '../components/AuthorityManagement.vue'
-import MaMa from '../components/MaterialManagement.vue'
-import VeMa from '../components/VendorManagement.vue'
-import ActiveCode from '../components/ActiveCode.vue'
-import SecurityCode from '../components/SecurityCode.vue'
-import ShMa from '../components/ShippingManagement.vue'
-import ProductStorage from '../components/ProductStorage.vue'
-import ProductBack from '../components/ProductBack.vue'
-import InMa from '../components/InventoryManagement.vue'
-import GetProduct from '../components/GetProduct.vue'
-import AcSt from '../components/ActiveStatistics.vue'
-import FlSt from '../components/FlowStatistics.vue'
-import SaSt from '../components/SalesStatistics.vue'
+// import Home from '../views/Home.vue'
+// import Login from '../views/Login.vue'
+// import MainContent from '../components/MainContent'
+// import AcMa from '../components/AccountManagement.vue'
+// import AuMa from '../components/AuthorityManagement.vue'
+// import MaMa from '../components/MaterialManagement.vue'
+// import VeMa from '../components/VendorManagement.vue'
+// import ActiveCode from '../components/ActiveCode.vue'
+// import SecurityCode from '../components/SecurityCode.vue'
+// import ShMa from '../components/ShippingManagement.vue'
+// import ProductStorage from '../components/ProductStorage.vue'
+// import ProductBack from '../components/ProductBack.vue'
+// import InMa from '../components/InventoryManagement.vue'
+// import GetProduct from '../components/GetProduct.vue'
+// import AcSt from '../components/ActiveStatistics.vue'
+// import FlSt from '../components/FlowStatistics.vue'
+// import SaSt from '../components/SalesStatistics.vue'
 
 import us from '../services/users'
 
@@ -31,13 +31,13 @@ const routes = [
       keepAlive: false
     },
     redirect: '/wellcome',
-    component: Home,
+    component: resolve => require(['../views/Home.vue'], resolve),
 
     children: [
       {
         path: '/wellcome',
         name: 'MainContent',
-        component: MainContent,
+        component: resolve => require(['../components/MainContent'], resolve),
         meta: {
           auth: true
         }
@@ -45,7 +45,8 @@ const routes = [
       {
         path: '/AcMa',
         name: 'AccountManagement',
-        component: AcMa,
+        component: resolve =>
+          require(['../components/AccountManagement.vue'], resolve),
         meta: {
           auth: true
         }
@@ -53,7 +54,8 @@ const routes = [
       {
         path: '/AuMa',
         name: 'AuthorityManagement',
-        component: AuMa,
+        component: resolve =>
+          require(['../components/AuthorityManagement.vue'], resolve),
         meta: {
           auth: true
         }
@@ -61,7 +63,8 @@ const routes = [
       {
         path: '/MaMa',
         name: 'MaterialManagement',
-        component: MaMa,
+        component: resolve =>
+          require(['../components/MaterialManagement.vue'], resolve),
         meta: {
           auth: true
         }
@@ -69,7 +72,8 @@ const routes = [
       {
         path: '/VeMa',
         name: 'VendorManagement',
-        component: VeMa,
+        component: resolve =>
+          require(['../components/VendorManagement.vue'], resolve),
         meta: {
           auth: true
         }
@@ -77,7 +81,8 @@ const routes = [
       {
         path: '/ActiveCode',
         name: 'ActiveCode',
-        component: ActiveCode,
+        component: resolve =>
+          require(['../components/ActiveCode.vue'], resolve),
         meta: {
           auth: true
         }
@@ -85,7 +90,8 @@ const routes = [
       {
         path: '/SecurityCode',
         name: 'SecurityCode',
-        component: SecurityCode,
+        component: resolve =>
+          require(['../components/SecurityCode.vue'], resolve),
         meta: {
           auth: true
         }
@@ -93,7 +99,8 @@ const routes = [
       {
         path: '/ShMa',
         name: 'ShippingManagement',
-        component: ShMa,
+        component: resolve =>
+          require(['../components/ShippingManagement.vue'], resolve),
         meta: {
           auth: true
         }
@@ -101,7 +108,9 @@ const routes = [
       {
         path: '/ProductStorage',
         name: 'ProductStorage',
-        component: ProductStorage,
+        component: resolve =>
+          require(['../components/ProductStorage.vue'], resolve),
+
         meta: {
           auth: true
         }
@@ -109,7 +118,8 @@ const routes = [
       {
         path: '/ProductBack',
         name: 'ProductBack',
-        component: ProductBack,
+        component: resolve =>
+          require(['../components/ProductBack.vue'], resolve),
         meta: {
           auth: true
         }
@@ -117,7 +127,8 @@ const routes = [
       {
         path: '/InMa',
         name: 'InventoryManagement',
-        component: InMa,
+        component: resolve =>
+          require(['../components/InventoryManagement.vue'], resolve),
         meta: {
           auth: true
         }
@@ -125,7 +136,8 @@ const routes = [
       {
         path: '/GetProduct',
         name: 'GetProduct',
-        component: GetProduct,
+        component: resolve =>
+          require(['../components/GetProduct.vue'], resolve),
         meta: {
           auth: true
         }
@@ -133,7 +145,8 @@ const routes = [
       {
         path: '/AcSt',
         name: 'ActiveStatistics',
-        component: AcSt,
+        component: resolve =>
+          require(['../components/ActiveStatistics.vue'], resolve),
         meta: {
           auth: true
         }
@@ -141,7 +154,8 @@ const routes = [
       {
         path: '/FlSt',
         name: 'FlowStatistics',
-        component: FlSt,
+        component: resolve =>
+          require(['../components/FlowStatistics.vue'], resolve),
         meta: {
           auth: true
         }
@@ -149,7 +163,9 @@ const routes = [
       {
         path: '/SaSt',
         name: 'SalesStatistics',
-        component: SaSt,
+        component: resolve =>
+          require(['../components/SalesStatistics.vue'], resolve),
+
         meta: {
           auth: true
         }
@@ -162,7 +178,7 @@ const routes = [
     meta: {
       keepAlive: false
     },
-    component: Login
+    component: resolve => require(['../views/Login.vue'], resolve)
   }
 ]
 

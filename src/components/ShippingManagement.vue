@@ -84,7 +84,7 @@
               type="selection"
               width="100"
               align="center"
-              :reserve-selection="true"
+              :reserve-selection="selectStatu"
             ></el-table-column>
             <el-table-column
               prop="materialType"
@@ -226,7 +226,6 @@
             :limit="limit"
             :small="true"
             @handleCurrentChange="handleCurrentChange"
-            style="margin:15px 50px;"
           />
         </div>
       </el-tab-pane>
@@ -260,7 +259,7 @@
         v-loading="loading1"
         @filter-change="fnFilterChangeInit1"
         @selection-change="selectionChangeHandle1"
-        :row-key="getRowKey"
+        :row-key="getRowKey1"
         height="600"
         style="width: 100%;margin:10px 20px;"
         border
@@ -269,7 +268,7 @@
           type="selection"
           width="100"
           align="center"
-          :reserve-selection="true"
+          :reserve-selection="selectStatu"
         ></el-table-column>
         <el-table-column
           prop="materialType"
@@ -353,7 +352,6 @@
         :limit="limit1"
         :small="true"
         @handleCurrentChange="handleCurrentChange1"
-        style="margin:15px 50px;"
       />
     </el-dialog>
 
@@ -520,7 +518,8 @@ export default {
       loading: true,
       loading1: true,
       middleSelection: [],
-      clickSum: 0
+      clickSum: 0,
+      selectStatu: true
     }
   },
   // 监听属性 类似于data概念
@@ -545,12 +544,10 @@ export default {
         this.search1
       ).then(res => {
         console.log(res)
-
-        this.newTableData = []
         if (res.status === 200) {
           this.loading1 = false
           this.newTableData = res.data.object.list
-          this.$refs.getProducts.clearSelection()
+          // this.$refs.getProducts.clearSelection()
           this.getDataList1(res.data.object.total)
         } else {
           this.$message({
@@ -581,6 +578,8 @@ export default {
       for (let i = 0; i < selection.length; i++) {
         this.tableDataSelections1.push(selection[i].opId)
       }
+      console.log(this.tableDataSelections1)
+
       if (selection.length > 0) {
         this.defaultColr = 'primary'
         this.btnStatu = false
@@ -697,12 +696,14 @@ export default {
         ''
       ).then(res => {
         console.log(res)
-
         this.newTableData = res.data.object.list
         this.getDataList1(res.data.object.total)
       })
     },
     getRowKey(row) {
+      return row.opId
+    },
+    getRowKey1(row) {
       return row.opId
     },
     changRole(val) {
@@ -723,6 +724,7 @@ export default {
       for (let index = 0; index < this.tableDataSelections1.length; index++) {
         this.middleSelection.push(this.tableDataSelections1[index])
       }
+      this.limit = this.middleSelection.length
       this.searchAll(
         this.currentPage,
         this.limit,
@@ -755,15 +757,6 @@ export default {
       this.clickSum = 0
       this.newDialogTableVisible = true
       const ids = this.tableDataSelections.join(',')
-      // console.log(this.middleSelection, this.tableDataSelections)
-
-      // for (let i = 0; i < this.middleSelection.length; i++) {
-      //   for (let j = 0; j < this.tableDataSelections.length; j++) {
-      //     if (this.middleSelection[i] === this.tableDataSelections[j]) {
-      //       this.middleSelection.splice(i, 1)
-      //     }
-      //   }
-      // }
       this.sendProducts(ids, '', '', '', '/deliver/generateOrderInfo').then(
         res => {
           console.log(res.data.object)

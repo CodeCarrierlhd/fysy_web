@@ -253,6 +253,11 @@
           >
             <template slot="description">
               <div>
+                <div v-if="item.stepName === '已使用'">
+                  <p>{{ item.user }}</p>
+                  <p>{{ item.address }}</p>
+                </div>
+
                 <p>{{ item.stepContent }}</p>
                 <p>{{ item.stepTime }}</p>
               </div>
@@ -425,7 +430,9 @@ export default {
               stepName: res.data.object[i].productStatus,
               iconType: 'el-icon-user',
               stepContent: res.data.object[i].opUser,
-              stepTime: '使用时间：' + res.data.object[i].createTime
+              stepTime: '使用时间：' + res.data.object[i].createTime,
+              user: res.data.object[i].user,
+              address: res.data.object[i].address
               // this.translateTime(res.data.object[i].createTime.time)
             })
           }

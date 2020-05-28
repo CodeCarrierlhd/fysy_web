@@ -226,7 +226,6 @@
             :limit="limit"
             :small="true"
             @handleCurrentChange="handleCurrentChange"
-            style="margin:15px 50px;"
           />
         </div>
       </el-tab-pane>
@@ -259,7 +258,7 @@
         :data="newTableData"
         @filter-change="fnFilterChangeInit1"
         @selection-change="selectionChangeHandle1"
-        :row-key="getRowKey"
+        :row-key="getRowKey1"
         height="600"
         v-loading="loading1"
         style="margin:10px 0;width:100%"
@@ -268,7 +267,7 @@
           type="selection"
           width="100"
           align="center"
-          :reserve-selection="true"
+          :reserve-selection="selectStatu"
         ></el-table-column>
         <el-table-column
           prop="materialType"
@@ -352,7 +351,6 @@
         :limit="limit1"
         :small="true"
         @handleCurrentChange="handleCurrentChange1"
-        style="margin:15px 50px;"
       />
     </el-dialog>
 
@@ -525,7 +523,8 @@ export default {
       loading: true,
       loading1: true,
       middleSelection: [],
-      clickSum: 0
+      clickSum: 0,
+      selectStatu: true
     }
   },
   // 监听属性 类似于data概念
@@ -549,11 +548,10 @@ export default {
         '&value=',
         this.search1
       ).then(res => {
-        this.newTableData = []
         if (res.status === 200) {
           this.loading1 = false
           this.newTableData = res.data.object.list
-          this.$refs.getProducts.clearSelection()
+          // this.$refs.getProducts.clearSelection()
           this.getDataList1(res.data.object.total)
         } else {
           this.$message({
@@ -696,6 +694,9 @@ export default {
     getRowKey(row) {
       return row.opId
     },
+    getRowKey1(row) {
+      return row.opId
+    },
     changRole(val) {
       this.loading = true
       this.uid = val
@@ -723,6 +724,7 @@ export default {
       for (let index = 0; index < this.tableDataSelections1.length; index++) {
         this.middleSelection.push(this.tableDataSelections1[index])
       }
+      this.limit = this.middleSelection.length
       this.searchAll(
         this.currentPage,
         this.limit,

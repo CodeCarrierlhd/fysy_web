@@ -330,20 +330,6 @@ export default {
   activated() {} // 如果页面有keep-alive缓存功能，这个函数会触发
 }
 </script>
-<style>
-.el-tabs__item {
-  width: 200px !important;
-  text-align: center;
-  border-bottom: 0;
-  font-size: 18px;
-  font-weight: 500;
-  color: rgba(51, 51, 51, 1);
-  line-height: 36px;
-}
-.el-tabs--card > .el-tabs__header .el-tabs__item.is-active {
-  border-top: 3px solid #2a426e;
-}
-</style>
 
 <style scoped>
 .container {

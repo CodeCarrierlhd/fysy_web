@@ -16,17 +16,6 @@ module.exports = {
     port: 3001,
     hotOnly: false,
     disableHostCheck: true,
-    // configureWebpack: {
-    //   plugins: [
-    //     new UglifyJsPlugin({
-    //       uglifyOptions: {
-    //         compress: {
-    //           drop_console: true
-    //         }
-    //       }
-    //     })
-    //   ]
-    // },
     proxy: {
       '/api': {
         target: process.env.VUE_APP_BASEURL, // 对应自己的接口
@@ -40,26 +29,3 @@ module.exports = {
     before: app => {}
   }
 }
-//  configureWebpack:{
-//     resolve:{
-//       alias:{
-//         '@':path.resolve(__dirname, './src'),
-//         '@i':path.resolve(__dirname, './src/assets'),
-//       }
-//     },
-//     plugins: [
-//       new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-
-//       // 下面是下载的插件的配置
-//       new CompressionWebpackPlugin({
-//         algorithm: 'gzip',
-//         test: new RegExp('\\.(' + productionGzipExtensions.join('|') + ')$'),
-//         threshold: 10240,
-//         minRatio: 0.8
-//       }),
-//       new webpack.optimize.LimitChunkCountPlugin({
-//         maxChunks: 5,
-//         minChunkSize: 100
-//       })
-//     ]
-//   }

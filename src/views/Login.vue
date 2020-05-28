@@ -1,6 +1,6 @@
 <template>
-  <div style="display:flex;height:100%">
-    <img :src="r_img" style="width:66.7%;height:100%" />
+  <div class="loginContent" :style="backgroundDiv">
+    <!-- <img :src="r_img" style="width:66.7%;height:100%" /> -->
     <el-form
       class="login-form"
       status-icon
@@ -96,7 +96,13 @@ export default {
     }
 
     return {
-      r_img: require('@/assets/logo/bg1.png'),
+      // r_img: require('@/assets/logo/bg1.png'),
+      backgroundDiv: {
+        backgroundImage: 'url(' + require('@/assets/logo/bg1.png') + ')',
+        backgroundSize: '100% 100%',
+        backgroundRepeat: 'no-repeat'
+      },
+
       logoImg: require('@/assets/logo/log_b.png'),
       identifyCode: '',
       fontstyle: {},
@@ -231,10 +237,11 @@ export default {
   color: #409eff;
 }
 .login-form {
-  margin: auto;
   text-align: center;
-  /* margin-top: 20.1%; */
-  width: 300px;
+  padding: 210px 140px 0 140px;
+  width: 360px;
+  height: 100%;
+  background-color: #ffffff;
 }
 .login-form p {
   font-size: 24px;
@@ -266,5 +273,14 @@ input[type='password']:focus {
 }
 .identifyinput >>> .el-input__inner {
   width: 210px;
+}
+.loginContent {
+  height: 100%;
+  width: 100%;
+  /* background: no-repeat center top;
+  background-size: contain; */
+  display: flex;
+  justify-content: flex-end;
+  overflow: hidden;
 }
 </style>

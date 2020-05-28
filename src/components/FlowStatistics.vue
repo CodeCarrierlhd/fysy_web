@@ -156,8 +156,6 @@ export default {
             this.uid
         )
         .then(res => {
-          console.log(res)
-
           const lineData = []
           const pieData = []
           const barData = []

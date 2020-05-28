@@ -570,6 +570,8 @@ export default {
         }
       } else if (type === 'roleType') {
         const roles = this.roleGroups.filter(item => item.label === value)
+        console.log(roles)
+
         this.nowRoleId = roles[0].value
       }
     },
@@ -655,9 +657,14 @@ export default {
       if (row.id !== 0) {
         a.id = row.id
       }
+      if (row.roleId !== 0) {
+        a.roleId = row.roleId
+      }
       let nowload = ''
       if (!this.edit) {
-        a.roleId = this.nowRoleId
+        if (this.nowRoleId !== 0) {
+          a.roleId = this.nowRoleId
+        }
         nowload = 'user/update'
       } else {
         nowload = 'user/insert'

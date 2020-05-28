@@ -95,7 +95,7 @@
           edit="false"
         >
         </el-table-column>
-
+        <!--
         <el-table-column
           prop="producerName"
           label="生产商"
@@ -107,9 +107,16 @@
           column-key="producerName"
           filter-placement="bottom-end"
         >
+        </el-table-column> -->
+        <el-table-column
+          prop="producerName"
+          label="生产商"
+          edit="false"
+          align="center"
+        >
         </el-table-column>
 
-        <el-table-column
+        <!-- <el-table-column
           prop="status"
           align="center"
           label="状态"
@@ -119,6 +126,11 @@
           :filters="status"
           :filter-method="filterTag"
         >
+          <template slot-scope="scope">
+            <el-checkbox v-model="scope.row.isCheck" disabled></el-checkbox>
+          </template>
+        </el-table-column> -->
+        <el-table-column prop="status" align="center" label="状态" width="85">
           <template slot-scope="scope">
             <el-checkbox v-model="scope.row.isCheck" disabled></el-checkbox>
           </template>

@@ -99,12 +99,6 @@ export default {
       this.dataChange({ id: this.keyId }, '/user/resetPwd').then(res => {
         if (res.data.code === 200) {
           this.show = false
-          this.$notify({
-            title: '成功',
-            message: '密码重置成功',
-            position: 'top-right',
-            duration: 2000
-          })
         }
       })
     }

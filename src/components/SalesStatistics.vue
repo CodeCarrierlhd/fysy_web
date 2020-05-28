@@ -115,7 +115,7 @@
             <div>
               <p class="p_groups">
                 <span class="p_title">{{ item.materialModel }}</span>
-                <span class="p_title">{{ item.amount }}</span>
+                <span class="p_title">{{ item.amount }}个</span>
               </p>
               <div style="background:rgba(255,255,255,1);padding:25px 21px">
                 <el-progress
@@ -217,7 +217,7 @@ export default {
       materialList: [],
       dateValue: 0,
       province: '',
-      material: '',
+      material: '0',
       chartData: [],
       percen: 0,
       materialLists: [],
@@ -336,15 +336,40 @@ export default {
             }
           }
           const lineData = res.data.object.graph
-          const barData = res.data.object.histogram
-          // const barData = res.data.object.histogram
-          this.initLineChart(
-            lineData.x,
-            lineData.y,
-            this.lineChart,
-            'lineChart'
-          )
-          this.initBarChart(barData.histogram_x, barData.histogram_y)
+
+          if (res.data.object.map) {
+            this.initProvice(res.data.object.map.province)
+            this.initLineChart(
+              lineData.x,
+              lineData.y,
+              this.cityLineChart,
+              'cityLineChart'
+            )
+            this.provienceDesc = res.data.object.map.content
+            const pieData = [
+              {
+                value: res.data.object.map.provinceSales,
+                name: this.province
+              },
+              {
+                value:
+                  res.data.object.map.totalSales -
+                  res.data.object.map.provinceSales,
+                name: '其他'
+              }
+            ]
+
+            this.initPie(pieData)
+          } else {
+            const barData = res.data.object.histogram
+            this.initBarChart(barData.histogram_x, barData.histogram_y)
+            this.initLineChart(
+              lineData.x,
+              lineData.y,
+              this.lineChart,
+              'lineChart'
+            )
+          }
         })
     },
 
@@ -573,74 +598,29 @@ export default {
     uidChange(val) {
       this.uid = val
       this.dateValue = 0
-      this.material = ''
+      this.material = '0'
+      this.p_info = true
       this.province = ''
-      // this.pieChart.dispose()
-      // this.myChart.dispose()
       this.provienceChange = true
       this.initData(val)
       this.getType(val)
     },
-    getCityData() {
-      axios
-        .get(
-          '/statistics/sales?materialId=' +
-            this.material +
-            '&province=' +
-            this.province +
-            '&timeValue=' +
-            this.dateValue +
-            '&uid=' +
-            this.uid
-        )
-        .then(res => {
-          console.log(res)
-          this.materialLists = res.data.object.scale.materialList
-          this.totalSales = res.data.object.scale.totalSales
-
-          this.initProvice(res.data.object.map.province)
-          const lineData = res.data.object.graph
-          this.initLineChart(
-            lineData.x,
-            lineData.y,
-            this.cityLineChart,
-            'cityLineChart'
-          )
-          this.provienceDesc = res.data.object.map.content
-          // { value: 335, name: '直接访问' }
-          const pieData = [
-            {
-              value: res.data.object.map.provinceSales,
-              name: this.province
-            },
-            {
-              value:
-                res.data.object.map.totalSales -
-                res.data.object.map.provinceSales,
-              name: '其他'
-            }
-          ]
-          this.initPie(pieData)
-        })
-    },
     provienceChangeFun(val) {
       this.province = val
-      if (val === '全国') {
-        if (!this.provienceChange) {
-          this.provienceChange = true
-          // this.pieChart.dispose()
-          // this.myChart.dispose()
-        }
-        this.initData(this.uid)
-      } else {
-        if (this.provienceChange) {
-          this.provienceChange = false
-          const oldLine = echarts.init(document.getElementById('lineChart'))
-          oldLine.dispose()
-        }
-
-        this.getCityData()
+      if (this.provienceChange) {
+        const oldLine = echarts.init(document.getElementById('lineChart'))
+        oldLine.dispose()
+        const barChar = echarts.init(document.getElementById('barChart'))
+        barChar.dispose()
       }
+      if (val === '全国') {
+        this.provienceChange = true
+      } else {
+        this.provienceChange = false
+        console.log(this.barChart)
+        console.log(this.myChart)
+      }
+      this.initData(this.uid)
     },
     typeChange(val) {
       if (val === '0') {

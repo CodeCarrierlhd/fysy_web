@@ -203,8 +203,6 @@
             :limit="limit"
             :small="true"
             @handleCurrentChange="handleCurrentChange"
-            @handleSizeChange="handleSizeChange"
-            style="margin:15px 50px;"
           />
         </div>
       </el-tab-pane>
@@ -310,10 +308,6 @@ export default {
       this.loading = true
       this.currentPage = val
       this.initData()
-    },
-    handleSizeChange(val) {
-      this.limit = val
-      this.currentPage = 1
     },
     handleClick(tab, event) {
       this.loading = true

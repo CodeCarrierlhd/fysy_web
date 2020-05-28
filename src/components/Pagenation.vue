@@ -4,7 +4,7 @@
     <el-pagination
       background
       @current-change="handleCurrentChange"
-      layout="prev, pager, next, jumper"
+      layout="total,prev, pager, next, jumper"
       :current-page.sync="currentPage"
       :page-size="limit"
       :total="total"
@@ -25,7 +25,7 @@ export default {
     // 这里存放数据
     return {
       currentPage: 1
-    };
+    }
   },
   props: {
     // 避免直接改变prop属性
@@ -53,9 +53,9 @@ export default {
   watch: {
     currentPage(val) {
       // 改变这个值并不会触发 handleCurrentChange
-      if (typeof val === "number") {
-        console.log("prop currentPage!!!");
-        this.currentPage = val;
+      if (typeof val === 'number') {
+        console.log('prop currentPage!!!')
+        this.currentPage = val
       }
     }
   },
@@ -63,7 +63,7 @@ export default {
   methods: {
     // 当前页变化
     handleCurrentChange(val) {
-      this.$emit("handleCurrentChange", val);
+      this.$emit('handleCurrentChange', val)
     }
     // size变化
     // handleSizeChange(val) {
@@ -82,7 +82,7 @@ export default {
   beforeDestroy() {}, // 生命周期 - 销毁之前
   destroyed() {}, // 生命周期 - 销毁完成
   activated() {} // 如果页面有keep-alive缓存功能，这个函数会触发
-};
+}
 </script>
 <style scope>
 .pagination {

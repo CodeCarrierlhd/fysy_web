@@ -17,7 +17,7 @@
             ><i class="el-icon-search"></i>搜索</el-button
           >
         </div>
-        <el-button type="primary" @click="handleFilterClassify" v-if="a_show"
+        <el-button type="primary" @click="initStatu" v-if="a_show"
           ><i class="el-icon-plus"></i>新增</el-button
         >
       </div>
@@ -204,7 +204,7 @@
       width="400px"
       :before-close="handleClose"
     >
-      <span>{{ infoTitle }}</span>
+      <p>{{ infoTitle }}</p>
       <span slot="footer" class="dialog-footer">
         <el-button @click="errorVisible = false">取 消</el-button>
         <el-button type="primary" @click="errorVisible = false"
@@ -305,28 +305,36 @@ export default {
       )
     },
     initStatu() {
-      this.roleValue = ''
-      this.roleOptions = []
       this.rightList('0', '/right/listData').then(res => {
         console.log(res)
-        for (let j = 0; j < res.data.object.roleList.length; j++) {
-          this.roleOptions.push({
-            value: res.data.object.roleList[j],
-            label: res.data.object.roleList[j]
-          })
-        }
-        const result = res.data.object.rightList
-        for (let i = 0; i < result.length; i++) {
-          result[i].allChecked = false
-          result[i].childShow = false
-          for (let j = 0; j < result[i].child.length; j++) {
-            result[i].child[j].mychecked = false
-            for (let m = 0; m < result[i].child[j].child.length; m++) {
-              result[i].child[j].child[m].onechecked = false
+        if (res.data.object.roleList.length > 0) {
+          this.options = []
+          this.dialogVisibleClassify = true
+          this.edit = false
+          this.roleValue = ''
+          this.roleOptions = []
+          for (let j = 0; j < res.data.object.roleList.length; j++) {
+            this.roleOptions.push({
+              value: res.data.object.roleList[j],
+              label: res.data.object.roleList[j]
+            })
+          }
+          const result = res.data.object.rightList
+          for (let i = 0; i < result.length; i++) {
+            result[i].allChecked = false
+            result[i].childShow = false
+            for (let j = 0; j < result[i].child.length; j++) {
+              result[i].child[j].mychecked = false
+              for (let m = 0; m < result[i].child[j].child.length; m++) {
+                result[i].child[j].child[m].onechecked = false
+              }
             }
           }
+          this.menuList = result
+        } else {
+          this.errorVisible = true
+          this.infoTitle = '所有角色已经添加完成'
         }
-        this.menuList = result
       })
     },
     showBlock(index) {
@@ -338,12 +346,7 @@ export default {
         // this.menuList[index].childShow = true;
       }
     },
-    handleFilterClassify() {
-      this.options = []
-      this.dialogVisibleClassify = true
-      this.edit = false
-      this.initStatu()
-    },
+
     unique(arr) {
       return Array.from(new Set(arr))
     },
@@ -405,17 +408,15 @@ export default {
         }
       })
     },
-    getDataList() {
-      this.total = this.tableData.length
+    getDataList(total) {
+      this.total = total
     },
     handleCurrentChange(val) {
       this.currentPage = val
-      // this.getDataList();
     },
     handleSizeChange(val) {
       this.limit = val
       this.currentPage = 1
-      // this.getDataList();
     },
     firstChanged(index, id) {
       const arr = this.menuList[index].child
@@ -544,6 +545,8 @@ export default {
 
     initData() {
       this.roleList('', 'role/listData').then(res => {
+        console.log(res)
+
         this.tableData = []
         if (res.status === 200) {
           this.loading = false
@@ -553,6 +556,7 @@ export default {
               roleType: res.data.object[i].roleType
             })
           }
+          this.getDataList(this.tableData.length)
         } else {
           this.$message({
             message: res.data.msg,
