@@ -37,20 +37,17 @@
         ></el-input>
       </el-form-item>
       <el-form-item prop="verifyCode">
-        <!-- 注意：prop与input绑定的值一定要一致，否则验证规则中的value会报undefined，因为value即为绑定的input输入值 -->
-        <!-- <el-input
-          v-model="loginForm.verifyCode"
-          placeholder="请输入验证码"
-          class="identifyinput"
-        ></el-input>-->
         <div style="display:flex;justify-content: space-between;">
-          <el-input
-            type="text"
-            v-model="loginForm.verifyCode"
-            placeholder="请输入验证码"
-            class="identifyinput"
-            @keyup.enter.native="keyEnter"
-          ></el-input>
+          <div>
+            <el-input
+              type="text"
+              v-model="loginForm.verifyCode"
+              placeholder="请输入验证码"
+              class="identifyinput"
+              @keyup.enter.native="keyEnter"
+            ></el-input>
+          </div>
+
           <div>
             <div @click="refreshCode">
               <!-- <s-identify :identifyCode="identifyCode"></s-identify> -->
@@ -264,6 +261,9 @@ input[type='password']:focus {
 .el-button {
   width: 100%;
 }
+.identifyinput {
+  height: 100%;
+}
 .n_input >>> .el-input__inner,
 .identifyinput >>> .el-input__inner {
   border-top: 0 !important;
@@ -273,6 +273,7 @@ input[type='password']:focus {
 }
 .identifyinput >>> .el-input__inner {
   width: 210px;
+  height: 100%;
 }
 .loginContent {
   height: 100%;

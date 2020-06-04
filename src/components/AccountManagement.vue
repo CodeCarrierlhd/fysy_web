@@ -255,6 +255,7 @@
             >
             <el-button
               size="mini"
+              v-if="scope.row.resBtn"
               @click="changePassword(scope.$index, scope.row)"
               >密码重置</el-button
             >
@@ -363,17 +364,7 @@ export default {
   // 监听属性 类似于data概念
   computed: {},
   // 监控data中的数据变化
-  watch: {
-    // cities(val, oldVal) {
-    //   this.cityGroup = []
-    //   for (let index = 0; index < val.length; index++) {
-    //     this.cityGroup.push({
-    //       text: val[index].name,
-    //       value: val[index].name
-    //     })
-    //   }
-    // }
-  },
+  watch: {},
   // 方法集合
   methods: {
     makeData() {
@@ -397,7 +388,8 @@ export default {
                 contact: vdata[i].contact,
                 id: vdata[i].id,
                 roleId: vdata[i].roleId,
-                isSet: false
+                isSet: false,
+                resBtn: true
               })
             }
             this.formatData()
@@ -611,7 +603,8 @@ export default {
           city: { value: '', edit: true },
           roleType: { value: '', edit: true },
           id: ids,
-          isSet: true
+          isSet: true,
+          resBtn: false
         })
         for (let i = 1; i < this.tableData.length; i++) {
           for (const key in this.tableData[i]) {
