@@ -149,12 +149,13 @@ const dataChange = (arr, loadName) => {
   return axios.post(loadName, params)
 }
 
-const sendProducts = (ids, orderNo, orderTime, receiver, loadName) => {
+const sendProducts = (ids, orderNo, orderTime, receiver, price, loadName) => {
   var params = qs.stringify({
     opIds: ids,
     orderNo: orderNo,
     orderTime: orderTime,
-    receiver: receiver
+    receiver: receiver,
+    price: price
   })
 
   return axios.post(loadName, params)

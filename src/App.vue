@@ -35,20 +35,19 @@ body,
 .el-tabs--card > .el-tabs__header .el-tabs__item.is-active {
   border-top: 3px solid #2a426e;
 }
-/* .el-tabs__item {
-  width: 200px !important;
-  text-align: center;
-
-  font-size: 18px;
-  font-weight: 500;
-  color: rgba(51, 51, 51, 1);
-  line-height: 36px;
+.el-tabs--card > .el-tabs__header {
+  margin: 0;
 }
-.el-tabs--card > .el-tabs__header .el-tabs__item.is-active {
-  border-top: 3px solid #2a426e;
-} */
 ::-webkit-scrollbar {
   width: 10px !important;
   height: 10px !important;
+}
+.container {
+  margin: 25px 20px;
+  width: 100%;
+  background-color: #fff;
+}
+.el-dialog__header {
+  padding-bottom: 10px;
 }
 </style>

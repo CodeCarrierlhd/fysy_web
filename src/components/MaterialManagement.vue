@@ -46,10 +46,12 @@
           fontSize: '15px',
           color: '#000',
           fontWeight: 800,
-          background: '#eef1f6'
+          background: '#eef1f6',
+          padding: '4px'
         }"
         border
-        height="600"
+        height="680"
+        :cell-style="{ padding: '2px' }"
       >
         <el-table-column
           type="selection"
@@ -165,7 +167,7 @@
         :limit="limit"
         :small="true"
         @handleCurrentChange="handleCurrentChange"
-        style="margin:15px 50px;"
+        style="padding:10px 0"
       />
 
       <el-dialog
@@ -568,48 +570,50 @@ export default {
     },
     submitForm(form) {
       console.log(this.form)
-      if (this.imageUrls.length === 4) {
-        for (const key in this.form) {
-          if (key !== 'imageUrls') {
-            if (this.form[key] === '') {
-              this.errorVisible = true
-              this.infoTitle = '所有内容不能为空'
-            }
+
+      for (const key in this.form) {
+        if (
+          key !== 'imageUrls' &&
+          key !== 'description' &&
+          key !== 'marketDate'
+        ) {
+          if (this.form[key] === '') {
+            this.errorVisible = true
+            this.infoTitle = '所有内容不能为空'
           }
+        }
+      }
+      console.log(this.form)
+
+      if (!this.errorVisible) {
+        this.newDialogTableVisible = false
+        let url = ''
+        if (this.editPro) {
+          url = '/material/update'
+        } else {
+          url = '/material/insert'
+        }
+        if (this.imageUrls.length > 0) {
+          this.form.imageUrls = JSON.stringify(this.imageUrls)
         }
         console.log(this.form)
 
-        if (!this.errorVisible) {
-          this.newDialogTableVisible = false
-          let url = ''
-          if (this.editPro) {
-            url = '/material/update'
+        this.dataChange(this.form, url).then(res => {
+          console.log(res)
+          if (res.data.code === 200) {
+            this.imageUrl = ''
+            this.imageUrl1 = ''
+            this.imageUrl2 = ''
+            this.imageUrl3 = ''
+            this.imageUrls = []
+            this.$refs[form].resetFields()
+            this.makeData()
+            this.editPro = false
           } else {
-            url = '/material/insert'
+            this.errorVisible = true
+            this.infoTitle = res.data.msg
           }
-          this.form.imageUrls = JSON.stringify(this.imageUrls)
-          console.log(this.form)
-
-          this.dataChange(this.form, url).then(res => {
-            console.log(res)
-            if (res.data.code === 200) {
-              this.imageUrl = ''
-              this.imageUrl1 = ''
-              this.imageUrl2 = ''
-              this.imageUrl3 = ''
-              this.imageUrls = []
-              this.$refs[form].resetFields()
-              this.makeData()
-              this.editPro = false
-            } else {
-              this.errorVisible = true
-              this.infoTitle = res.data.msg
-            }
-          })
-        }
-      } else {
-        this.errorVisible = true
-        this.infoTitle = '所有内容不能为空'
+        })
       }
     },
     handleChange(param) {
@@ -777,7 +781,6 @@ export default {
   line-height: 110px;
   text-align: center;
   position: relative;
-  top: 36px;
 }
 .avatar {
   width: 110px;
@@ -794,7 +797,8 @@ export default {
   text-align: center;
 }
 .container {
-  margin: 40px 60px;
+  margin: 25px 20px;
   width: 100%;
+  background-color: #fff;
 }
 </style>

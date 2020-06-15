@@ -13,7 +13,7 @@
         :key="index"
         :label="item.label"
       >
-        <div style="margin:10px 20px">
+        <div style="margin:10px 25px">
           <div class="btn_header">
             <div style="display:flex;">
               <div style="display:flex;margin-right:10px">
@@ -29,12 +29,19 @@
                 >
               </div>
               <el-button
-                @click="exportClientInfoExcel()"
+                @click="exportClientInfoExcel"
                 :type="defaultColr"
                 :disabled="btnStatu"
                 size="medium"
                 v-if="e_show"
                 ><i class="el-icon-download"></i>导出</el-button
+              >
+              <el-button
+                @click="exportAllExcel"
+                type="primary"
+                size="medium"
+                v-if="e_show"
+                >一键导出</el-button
               >
             </div>
             <div v-if="i_show">
@@ -63,10 +70,12 @@
               fontSize: '15px',
               color: '#000',
               fontWeight: 800,
-              background: '#eef1f6'
+              background: '#eef1f6',
+              padding: '4px'
             }"
             border
-            height="600"
+            height="660"
+            :cell-style="{ padding: '2px' }"
           >
             <el-table-column
               type="selection"
@@ -203,6 +212,7 @@
             :limit="limit"
             :small="true"
             @handleCurrentChange="handleCurrentChange"
+            style="padding:10px 0"
           />
         </div>
       </el-tab-pane>
@@ -418,11 +428,43 @@ export default {
         names = '退货数据导出'
       }
       const that = this
+      const loading = that.$loading({
+        lock: true,
+        text: '正在导出,请稍后',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
       this.exportCompanyExcel(
-        { opIds: ids, status: this.key_index },
+        { opIds: ids, pageType: this.key_index },
         '/stock/export'
       ).then(response => {
         if (response.status === 200) {
+          loading.close()
+          that.$refs.filterTable[Number(that.key_index)].clearSelection()
+          that.downloadFile(response.data, names)
+        }
+      })
+    },
+    exportAllExcel() {
+      let names = ''
+      if (this.key_index === '0') {
+        names = '待入仓数据导出'
+      } else {
+        names = '退货数据导出'
+      }
+      const that = this
+      const loading = that.$loading({
+        lock: true,
+        text: '正在导出,请稍后',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+      this.exportCompanyExcel(
+        { value: this.search, pageType: this.key_index },
+        '/stock/exportInAll'
+      ).then(response => {
+        if (response.status === 200) {
+          loading.close()
           that.downloadFile(response.data, names)
         }
       })
@@ -447,8 +489,8 @@ export default {
 </script>
 <style scoped>
 .container {
-  margin: 40px 60px;
-  width: 93%;
+  margin: 25px 30px;
+  width: 97%;
 }
 .find {
   width: 100%;
@@ -457,7 +499,7 @@ export default {
 .btn_header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 25px;
+  margin-bottom: 10px;
 }
 .btngroups {
   text-align: center;

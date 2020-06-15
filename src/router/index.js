@@ -179,6 +179,11 @@ const routes = [
       keepAlive: false
     },
     component: resolve => require(['../views/Login.vue'], resolve)
+  },
+  {
+    path: '/down/:packType',
+    name: 'Down',
+    component: resolve => require(['../views/DownFile.vue'], resolve)
   }
 ]
 
@@ -204,6 +209,10 @@ router.beforeEach((to, from, next) => {
     next()
   }
 })
+
+// router.afterEach((to, from) => {
+//   console.log(to, from)
+// })
 
 // 此VueRouter是自己自定义引入暴露出来的，即是自定义的，以下的VueRouter同样是这样
 // 解决两次访问相同路由地址报错

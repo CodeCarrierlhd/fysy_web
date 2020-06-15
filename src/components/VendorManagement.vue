@@ -42,10 +42,13 @@
           fontSize: '15px',
           color: '#000',
           fontWeight: 800,
-          background: '#eef1f6'
+          background: '#eef1f6',
+          padding: '4px'
         }"
-        v-loading="loading"
         border
+        height="680"
+        :cell-style="{ padding: '2px' }"
+        v-loading="loading"
       >
         <el-table-column
           type="selection"
@@ -57,7 +60,7 @@
           prop="producerCode"
           label="生产商编号"
           edit="false"
-          width="100"
+          width="120"
           align="center"
         >
           <template slot-scope="scope">
@@ -240,6 +243,7 @@
         :small="true"
         @handleCurrentChange="handleCurrentChange"
         @handleSizeChange="handleSizeChange"
+        style="padding:10px 0"
       />
       <del-dialog
         :keyNumber="changeKey"
@@ -700,16 +704,11 @@ export default {
 }
 </script>
 <style scope>
-.container {
-  margin: 40px 60px;
-  width: 93%;
-  background-color: #fff;
-}
 .cell {
   /* display: flex !important;
   justify-content: space-between; */
   /* padding: 25px 20px; */
-  max-height: 110px !important;
+  max-height: 46px !important;
 }
 .el-table-filter {
   max-height: 400px;

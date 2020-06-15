@@ -36,6 +36,13 @@
                 v-if="e_show"
                 ><i class="el-icon-download"></i>导出</el-button
               >
+              <el-button
+                @click="exportAllExcel"
+                type="primary"
+                size="medium"
+                v-if="exportAll && e_show"
+                >一键导出</el-button
+              >
             </div>
             <div v-if="add_show">
               <div style="display:flex">
@@ -74,11 +81,13 @@
               fontSize: '15px',
               color: '#000',
               fontWeight: 800,
-              background: '#eef1f6'
+              background: '#eef1f6',
+              padding: '4px'
             }"
-            height="600"
-            v-loading="loading"
             border
+            height="660"
+            :cell-style="{ padding: '2px' }"
+            v-loading="loading"
           >
             <el-table-column
               type="selection"
@@ -132,7 +141,7 @@
               prop="produceDate"
               label="生产日期 "
               align="center"
-              width="100"
+              width="140"
             >
             </el-table-column>
 
@@ -140,7 +149,7 @@
               prop="expiryDate"
               label="失效日期"
               align="center"
-              width="100"
+              width="140"
             >
             </el-table-column>
             <el-table-column
@@ -160,7 +169,7 @@
               prop="producer"
               label="生产厂家"
               align="center"
-              width="150"
+              width="350"
             >
             </el-table-column>
             <el-table-column
@@ -199,12 +208,14 @@
               v-if="wait_pro"
             >
               <template slot-scope="scope">
-                <span
-                  @click="restart(scope.row)"
-                  v-if="scope.row.productStatus === '已拒绝'"
-                  class="loseContro"
-                  >重新发货</span
-                >
+                <p v-if="scope.row.productStatus === '已拒绝'">
+                  <el-button @click="restart(scope.row)" size="mini"
+                    >重新发货</el-button
+                  >
+                  <el-button @click="interStorage(scope.row)" size="mini"
+                    >收入库存</el-button
+                  >
+                </p>
                 <span v-else>------</span>
               </template>
             </el-table-column>
@@ -259,9 +270,17 @@
         @filter-change="fnFilterChangeInit1"
         @selection-change="selectionChangeHandle1"
         :row-key="getRowKey1"
-        height="600"
+        :header-cell-style="{
+          fontSize: '15px',
+          color: '#000',
+          fontWeight: 800,
+          background: '#eef1f6',
+          padding: '4px'
+        }"
+        border
+        height="660"
+        :cell-style="{ padding: '2px' }"
         v-loading="loading1"
-        style="margin:10px 0;width:100%"
       >
         <el-table-column
           type="selection"
@@ -288,6 +307,7 @@
           label="产品型号"
           align="center"
           width="150"
+          column-key="materialModel"
           :filter-multiple="false"
           :filters="materialModelGroup"
           :filter-method="filterTag"
@@ -313,7 +333,7 @@
           prop="produceDate"
           label="生产日期 "
           align="center"
-          width="160"
+          width="140"
         >
         </el-table-column>
 
@@ -321,7 +341,7 @@
           prop="expiryDate"
           label="失效日期"
           align="center"
-          width="100"
+          width="140"
         >
         </el-table-column>
         <el-table-column
@@ -341,7 +361,7 @@
           prop="producer"
           label="生产厂家"
           align="center"
-          width="150"
+          width="350"
         >
         </el-table-column>
       </el-table>
@@ -394,6 +414,7 @@
           <span>收货单位：</span>
           <el-select
             v-model="recived"
+            filterable
             placeholder="请选择"
             @change="recivedChange"
           >
@@ -524,7 +545,10 @@ export default {
       loading1: true,
       middleSelection: [],
       clickSum: 0,
-      selectStatu: true
+      selectStatu: true,
+      exportAll: false,
+      exportKey: '2',
+      page_key: 0
     }
   },
   // 监听属性 类似于data概念
@@ -638,7 +662,10 @@ export default {
       this.loading = true
       this.btnStatu = true
       this.defaultColr = 'info'
+      this.page_key = tab.index
       if (tab.index === '2') {
+        this.exportAll = true
+        this.exportKey = '6'
         this.key_index = '4'
         this.$nextTick(() => {
           this.changeTab('4', this.uid)
@@ -648,6 +675,8 @@ export default {
           this.wait_pro = false
         })
       } else if (tab.index === '1') {
+        this.exportAll = true
+        this.exportKey = '5'
         this.key_index = '1'
         this.$nextTick(() => {
           this.changeTab('1', '')
@@ -657,6 +686,7 @@ export default {
           this.wait_pro = true
         })
       } else {
+        this.exportKey = '2'
         this.loading = false
         this.key_index = '2'
         this.tableData = []
@@ -672,6 +702,7 @@ export default {
     },
     fnFilterChangeInit1(filter) {
       console.log(filter)
+      this.loading1 = true
       this.searchAll(
         this.currentPage1,
         this.limit1,
@@ -686,7 +717,7 @@ export default {
         this.search
       ).then(res => {
         console.log(res)
-
+        this.loading1 = false
         this.newTableData = res.data.object.list
         this.getDataList1(res.data.object.total)
       })
@@ -778,8 +809,8 @@ export default {
           this.receiverList = res.data.object.receiverList
           this.reasonList = res.data.object.returnReasonList
           this.reason = res.data.object.returnReasonList[0].desc
-          this.recived = res.data.object.receiverList[0].id
-          // this.reciver = res.data.object.receiverList[0]
+          // this.recived = res.data.object.receiverList[0].id
+          this.reciver = res.data.object.receiverList[0]
           // if (res.data.object.receiverList.length > 0) {
           //   this.recived = res.data.object.receiverList[0].username
           // }
@@ -798,13 +829,6 @@ export default {
         }
       )
     },
-    // reciverChange(val) {
-    //   for (let index = 0; index < this.receiverList.length; index++) {
-    //     if (val === this.receiverList[index].id) {
-    //       this.reciver = this.receiverList[index]
-    //     }
-    //   }
-    // },
     quitSend() {
       this.newDialogTableVisible = false
       this.$refs.sendProFilterTable[0].clearSelection()
@@ -1011,6 +1035,14 @@ export default {
         }
       })
     },
+    interStorage(row) {
+      this.loading = true
+      this.dataChange({ opId: row.opId }, '/return/instock').then(res => {
+        if (res.data.code === 200) {
+          this.changeTab('1', '')
+        }
+      })
+    },
     exportClientInfoExcel() {
       const ids = this.tableDataSelections.join(',')
       let names = ''
@@ -1022,11 +1054,45 @@ export default {
         names = '发货完成数据导出'
       }
       const that = this
+      const loading = that.$loading({
+        lock: true,
+        text: '正在导出,请稍后',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
       this.exportCompanyExcel(
-        { opIds: ids, status: this.key_index },
+        { opIds: ids, pageType: this.exportKey },
         '/deliver/export'
       ).then(response => {
         if (response.status === 200) {
+          loading.close()
+          this.$refs.sendProFilterTable[this.page_key].clearSelection()
+          that.downloadFile(response.data, names)
+        }
+      })
+    },
+    exportAllExcel() {
+      let names = ''
+      if (this.key_index === '2') {
+        names = '发货数据导出'
+      } else if (this.key_index === '3') {
+        names = '待收货数据导出'
+      } else {
+        names = '发货完成数据导出'
+      }
+      const that = this
+      const loading = that.$loading({
+        lock: true,
+        text: '正在导出,请稍后',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+      this.exportCompanyExcel(
+        { uid: this.uid, pageType: this.exportKey, value: this.search },
+        '/return/exportInAll'
+      ).then(response => {
+        if (response.status === 200) {
+          loading.close()
           that.downloadFile(response.data, names)
         }
       })
@@ -1054,14 +1120,9 @@ export default {
 .el-dialog {
   margin-top: 0 !important;
 }
-/*
-.el-tabs >>> .el-tabs__content {
-  width: 96% !important;
-} */
-
 .container {
-  margin: 40px 60px;
-  width: 93%;
+  margin: 25px 30px;
+  width: 97%;
 }
 .find {
   width: 100%;
@@ -1070,7 +1131,7 @@ export default {
 .btn_header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 25px;
+  margin-bottom: 10px;
 }
 .new_header {
   display: flex;

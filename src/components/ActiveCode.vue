@@ -1,6 +1,6 @@
 <!-- 激活码管理 -->
 <template>
-  <div style="margin:40px 60px;width:93%">
+  <div style="margin:20px 25px;width:98%">
     <div
       style="display:flex;justify-content: space-between;margin-bottom:45px"
       v-if="s_show"
@@ -27,7 +27,7 @@
           </p>
         </div>
         <p class="sumFont">
-          <span>激活码库存量</span><span>{{ a_number }}%</span>
+          <span>溯源码库存量</span><span>{{ a_number }}%</span>
         </p>
         <el-progress :percentage="a_number" :show-text="false"></el-progress>
       </el-card>
@@ -46,7 +46,7 @@
           :label="item.label"
         >
           <div
-            style="display: flex;width: 96%;justify-content: space-around;margin:20px 25px;"
+            style="display: flex;width: 96%;justify-content: space-around;margin:10px 25px;"
           >
             <div style="display:flex;width:100%;">
               <el-input
@@ -61,9 +61,15 @@
               >
             </div>
             <div v-if="unused_show">
-              <el-button @click="importData()" type="primary" v-if="i_show"
-                ><i class="el-icon-upload2"></i> 导入</el-button
+              <el-upload
+                :multiple="false"
+                :show-file-list="false"
+                :http-request="handleChange"
+                accept=".xls,.xlsx"
+                action="string"
               >
+                <el-button size="medium" type="primary">上传文件</el-button>
+              </el-upload>
             </div>
           </div>
 
@@ -77,7 +83,7 @@
               background: '#eef1f6'
             }"
             border
-            height="280"
+            height="400"
             v-loading="loading"
           >
             <el-table-column
@@ -87,7 +93,7 @@
               width="150"
             >
             </el-table-column>
-            <el-table-column prop="code" label="激活码" align="center">
+            <el-table-column prop="code" label="溯源码" align="center">
             </el-table-column>
             <el-table-column prop="createTime" label="生成日期" align="center">
             </el-table-column>
@@ -101,13 +107,14 @@
             :small="true"
             @handleCurrentChange="handleCurrentChange"
             @handleSizeChange="handleSizeChange"
+            style="padding:10px 0"
           />
         </el-tab-pane>
         <!-- <el-tab-pane label="库存" name="havenProduct">配置管理</el-tab-pane>
         <el-tab-pane label="已使用" name="hasUsed">角色管理</el-tab-pane> -->
       </el-tabs>
     </div>
-    <el-dialog
+    <!-- <el-dialog
       title="导入数据"
       :visible.sync="newDialogTableVisible"
       custom-class="sendPro"
@@ -118,7 +125,7 @@
         <div style="line-height: 36px;">
           <span>选择导入类型：</span>
           <el-radio-group v-model="radio">
-            <el-radio :label="0">激活码</el-radio>
+            <el-radio :label="0">溯源码</el-radio>
             <el-radio :label="1">箱码</el-radio>
           </el-radio-group>
         </div>
@@ -132,7 +139,7 @@
           <el-button size="medium" type="primary">上传文件</el-button>
         </el-upload>
       </div>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 

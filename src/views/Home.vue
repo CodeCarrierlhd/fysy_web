@@ -8,7 +8,7 @@
         ></Menu>
       </el-aside>
       <el-container>
-        <el-header height="80px">
+        <el-header height="60px">
           <Header
             :userInfo="userInfo"
             @showBlock="showBlock"
@@ -79,7 +79,6 @@ export default {
       }
     },
     handleRouterChange(sonmenu) {
-      console.log(sonmenu)
       this.$router.push({
         path: '/' + sonmenu.uri,
         // name: sonmenu.uri,
@@ -89,6 +88,7 @@ export default {
         }
       })
     },
+
     getInfo() {
       us.getUserInfo().then(res => {
         this.$nextTick(() => {
@@ -124,6 +124,7 @@ export default {
 .el-aside {
   background-color: #435e93;
   text-align: center;
+  overflow-y: hidden;
 }
 
 .el-main {
@@ -134,6 +135,7 @@ export default {
   padding: 0;
   height: 100%;
   background-color: #eeeeee;
+  overflow-x: hidden;
 }
 body > .el-container {
   margin-bottom: 40px;

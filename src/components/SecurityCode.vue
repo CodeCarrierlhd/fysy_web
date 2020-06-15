@@ -1,6 +1,6 @@
 <!-- 激活码管理 -->
 <template>
-  <div style="margin:40px 60px;width:93%">
+  <div style="margin:20px 25px;width:98%">
     <div
       style="display:flex;justify-content: space-between;margin-bottom:45px;"
       v-if="s_show"
@@ -46,7 +46,7 @@
           :label="item.label"
         >
           <div
-            style="display: flex;width: 96%;justify-content: space-around;margin:25px 20px;"
+            style="display: flex;width: 96%;justify-content: space-around;margin:10px 25px;"
           >
             <div style="display:flex;width:100%;">
               <el-input
@@ -61,7 +61,7 @@
               >
             </div>
             <div>
-              <el-button @click="importData()" type="primary" v-if="i_show"
+              <el-button @click="importData" type="primary" v-if="i_show"
                 ><i class="el-icon-download"></i>生成并导出</el-button
               >
             </div>
@@ -77,7 +77,7 @@
             }"
             v-loading="loading"
             border
-            height="280"
+            height="400"
             @filter-change="fnFilterChangeInit"
           >
             <el-table-column
@@ -126,6 +126,7 @@
             :small="true"
             @handleCurrentChange="handleCurrentChange"
             @handleSizeChange="handleSizeChange"
+            style="padding:10px 0"
           />
         </el-tab-pane>
         <!-- <el-tab-pane label="库存" name="havenProduct">配置管理</el-tab-pane>
@@ -385,11 +386,18 @@ export default {
     },
     exportClientInfoExcel() {
       const that = this
+      const loading = that.$loading({
+        lock: true,
+        text: '正在导出,请稍后',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
       this.exportCompanyExcel(
         { number: that.sums },
         '/serveCode/fwCode/createAndExport'
       ).then(response => {
         if (response.status === 200) {
+          loading.close()
           that.downloadFile(response.data, this.exportFileName)
           this.newDialogTableVisible = false
           this.sums = 0

@@ -1,7 +1,7 @@
 <!-- 库存管理 -->
 <template>
   <div class="container">
-    <div style="padding:20px 25px">
+    <div style="padding:10px 20px">
       <div class="t_header">
         <div style="display:flex">
           <div style="display:flex;margin-right:10px" v-if="s_show">
@@ -17,12 +17,19 @@
             >
           </div>
           <el-button
-            @click="exportClientInfoExcel()"
+            @click="exportClientInfoExcel"
             :type="defaultColr"
             :disabled="btnStatu"
             size="medium"
             v-if="e_show"
             ><i class="el-icon-download"></i>导出</el-button
+          >
+          <el-button
+            @click="exportAllExcel"
+            type="primary"
+            size="medium"
+            v-if="e_show"
+            >一键导出</el-button
           >
           <el-button
             @click="loseData"
@@ -61,10 +68,12 @@
           fontSize: '15px',
           color: '#000',
           fontWeight: 800,
-          background: '#eef1f6'
+          background: '#eef1f6',
+          padding: '4px'
         }"
         border
-        height="600"
+        height="700"
+        :cell-style="{ padding: '2px' }"
         v-loading="loading"
       >
         <el-table-column
@@ -147,7 +156,7 @@
           prop="producer"
           label="生产厂家"
           align="center"
-          width="150"
+          width="350"
         >
         </el-table-column>
         <el-table-column label="操作" align="center" v-if="b_show">
@@ -374,13 +383,39 @@ export default {
     exportClientInfoExcel() {
       const ids = this.tableDataSelections.join(',')
       const that = this
+      const loading = that.$loading({
+        lock: true,
+        text: '正在导出,请稍后',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
       this.exportCompanyExcel({ opIds: ids }, '/inventory/export').then(
         response => {
           if (response.status === 200) {
+            loading.close()
+            this.$refs.filterTable.clearSelection()
             that.downloadFile(response.data, '库存数据导出')
           }
         }
       )
+    },
+    exportAllExcel() {
+      const that = this
+      const loading = that.$loading({
+        lock: true,
+        text: '正在导出,请稍后',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+      this.exportCompanyExcel(
+        { uid: that.a_acount, value: that.search },
+        '/inventory/exportInAll'
+      ).then(response => {
+        if (response.status === 200) {
+          loading.close()
+          that.downloadFile(response.data, '库存数据导出')
+        }
+      })
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
@@ -403,8 +438,8 @@ export default {
 
 <style scoped>
 .container {
-  margin: 40px 60px;
-  width: 93%;
+  margin: 25px 30px;
+  width: 97%;
   background-color: #fff;
 }
 
@@ -418,5 +453,6 @@ export default {
   display: flex;
   justify-content: space-between;
   background-color: #fff;
+  margin-bottom: 10px;
 }
 </style>

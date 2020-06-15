@@ -2,8 +2,8 @@
 <template>
   <div class="header">
     <p class="arrow">
-      <img :src="left_arrow" alt @click="$router.go(-1)" />
-      <img :src="right_arrow" alt @click="$router.go(1)" />
+      <!-- <img :src="left_arrow" alt @click="directionChange(1)" />
+      <img :src="right_arrow" alt @click="directionChange(2)" /> -->
     </p>
     <p>
       <img :src="user_img" alt />
@@ -50,6 +50,115 @@ export default {
       if (this.userInfo.length < 0) {
         console.log('2222')
       }
+    },
+    directionChange(num) {
+      if (num === 1) {
+        this.$router.beforeResolve((to, from, next) => {
+          next()
+          let keyIndex = '0'
+          switch (from.name) {
+            case 'AccountManagement':
+              keyIndex = '13'
+              break
+            case 'AuthorityManagement':
+              keyIndex = '14'
+              break
+            case 'MaterialManagement':
+              keyIndex = '12'
+              break
+            case 'VendorManagement':
+              keyIndex = '11'
+              break
+            case 'ActiveCode':
+              keyIndex = '21'
+              break
+            case 'SecurityCode':
+              keyIndex = '22'
+              break
+            case 'ShippingManagement':
+              keyIndex = '32'
+              break
+            case 'ProductStorage':
+              keyIndex = '31'
+              break
+            case 'ProductBack':
+              keyIndex = '33'
+              break
+            case 'InventoryManagement':
+              keyIndex = '34'
+              break
+            case 'GetProduct':
+              keyIndex = '41'
+              break
+            case 'ActiveStatistics':
+              keyIndex = '53'
+              break
+            case 'FlowStatistics':
+              keyIndex = '52'
+              break
+            case 'SalesStatistics':
+              keyIndex = '51'
+              break
+          }
+          console.log(keyIndex)
+
+          this.$store.commit('changeMenuIndex', keyIndex)
+        })
+        this.$router.go(-1)
+      } else {
+        this.$router.beforeResolve((to, from, next) => {
+          next()
+          let keyIndex = '0'
+          switch (to.name) {
+            case 'AccountManagement':
+              keyIndex = '13'
+              break
+            case 'AuthorityManagement':
+              keyIndex = '14'
+              break
+            case 'MaterialManagement':
+              keyIndex = '12'
+              break
+            case 'VendorManagement':
+              keyIndex = '11'
+              break
+            case 'ActiveCode':
+              keyIndex = '21'
+              break
+            case 'SecurityCode':
+              keyIndex = '22'
+              break
+            case 'ShippingManagement':
+              keyIndex = '32'
+              break
+            case 'ProductStorage':
+              keyIndex = '31'
+              break
+            case 'ProductBack':
+              keyIndex = '33'
+              break
+            case 'InventoryManagement':
+              keyIndex = '34'
+              break
+            case 'GetProduct':
+              keyIndex = '41'
+              break
+            case 'ActiveStatistics':
+              keyIndex = '53'
+              break
+            case 'FlowStatistics':
+              keyIndex = '52'
+              break
+            case 'SalesStatistics':
+              keyIndex = '51'
+              break
+          }
+          console.log(keyIndex)
+
+          this.$store.commit('changeMenuIndex', keyIndex)
+        })
+        this.$router.go(1)
+      }
     }
   }
 }
@@ -65,6 +174,13 @@ export default {
       display: inline-block;
       vertical-align: middle;
     }
+    img:not(:first-child):hover {
+      cursor: pointer;
+    }
+  }
+  .arrow > img:hover {
+    cursor: pointer;
+    transform: scale(1.4);
   }
   .arrow > img:first-child {
     margin: 0 40px 0 60px;

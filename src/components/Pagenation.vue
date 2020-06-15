@@ -86,7 +86,7 @@ export default {
 </script>
 <style scope>
 .pagination {
-  margin: 40px 60px;
   text-align: right;
+  padding: 10px 0;
 }
 </style>

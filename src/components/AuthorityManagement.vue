@@ -77,15 +77,6 @@
             </el-option>
           </el-select>
         </div>
-        <!-- <div style="margin-bottom:35px" v-else>
-          <span>输入角色类型名称：</span>
-
-          <el-input
-            v-model="roleValue"
-            placeholder="请输入角色类型名称"
-            style="border-radius:4px;width:30%;height: 90%;"
-          />
-        </div> -->
         <div style="display:flex">
           <p>角色权限选择：</p>
           <div class="checkboxGroup">
@@ -94,7 +85,6 @@
                 class="item"
                 v-for="(first, firIndex) in menuList"
                 :key="first.id"
-                @click="showBlock(firIndex)"
               >
                 <div class="itemHeader">
                   <el-checkbox
@@ -102,44 +92,56 @@
                     @change="firstChanged(firIndex, first.id)"
                     >{{ first.rightName }}</el-checkbox
                   >
+                  <div style="padding-left:150px" @click="showBlock(firIndex)">
+                    <img :src="first.childShow ? upImg : downImg" />
+                  </div>
                 </div>
                 <div v-show="first.childShow" class="checkboxGroups">
                   <template v-for="(second, secIndex) in first.child">
-                    <div :key="secIndex">
-                      <el-checkbox
-                        v-model="second.mychecked"
-                        @change="
-                          secondChanged(firIndex, secIndex, second.id, first.id)
-                        "
-                        :key="second.id"
-                        :title="second.rightName"
-                        :label="second.id"
-                        >{{ second.rightName }}</el-checkbox
-                      >
-                      <div
-                        class="thirdContent"
-                        v-for="(third, index) in second.child"
-                        :key="third.id"
-                      >
-                        <template>
-                          <el-checkbox
-                            v-model="third.onechecked"
-                            @change="
-                              thirdChanged(
-                                firIndex,
-                                secIndex,
-                                index,
-                                third.id,
-                                second.id,
-                                first.id
-                              )
-                            "
-                            :key="third.id"
-                            :title="third.rightName"
-                            :label="third.id"
-                            >{{ third.rightName }}</el-checkbox
-                          >
-                        </template>
+                    <div :key="secIndex" class="secondContent">
+                      <div style="padding:5px 0;width:25%">
+                        <el-checkbox
+                          v-model="second.mychecked"
+                          @change="
+                            secondChanged(
+                              firIndex,
+                              secIndex,
+                              second.id,
+                              first.id
+                            )
+                          "
+                          :key="second.id"
+                          :title="second.rightName"
+                          :label="second.id"
+                          >{{ second.rightName }}</el-checkbox
+                        >
+                      </div>
+                      <div style="display: flex;flex-wrap: wrap;">
+                        <div
+                          class="thirdContent"
+                          v-for="(third, index) in second.child"
+                          :key="third.id"
+                        >
+                          <template>
+                            <el-checkbox
+                              v-model="third.onechecked"
+                              @change="
+                                thirdChanged(
+                                  firIndex,
+                                  secIndex,
+                                  index,
+                                  third.id,
+                                  second.id,
+                                  first.id
+                                )
+                              "
+                              :key="third.id"
+                              :title="third.rightName"
+                              :label="third.id"
+                              >{{ third.rightName }}</el-checkbox
+                            >
+                          </template>
+                        </div>
                       </div>
                     </div>
                   </template>
@@ -227,6 +229,8 @@ export default {
   data() {
     // 这里存放数据
     return {
+      downImg: require('../assets/imgs/down.png'),
+      upImg: require('../assets/imgs/up.png'),
       tableData: [],
       roleOptions: [],
       roleValue: '',
@@ -363,6 +367,8 @@ export default {
         let arr = []
         for (let i = 0; i < res.data.object.rightList.length; i++) {
           arr = res.data.object.rightList[i]
+          console.log(arr)
+
           if (arr.status === 2) {
             this.$set(arr, 'allChecked', true)
             // arr.allChecked = true;
@@ -377,6 +383,7 @@ export default {
             this.$set(arr, 'allChecked', false)
             for (let j = 0; j < arr.child.length; j++) {
               if (arr.child[j].status === 2) {
+                this.$set(arr.child[j], 'mychecked', true)
                 for (let m = 0; m < arr.child[j].child.length; m++) {
                   this.$set(arr.child[j].child[m], 'onechecked', true)
                 }
@@ -678,7 +685,11 @@ export default {
 
 .container {
   display: flex;
-  width: 95%;
+  width: 98%;
+}
+::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
 }
 .powerContain {
   width: 50%;
@@ -724,12 +735,13 @@ export default {
   border: 1px solid rgba(238, 238, 238, 1);
   display: flex;
   justify-content: left;
-  padding-left: 16px;
+  padding: 0 16px;
   align-items: center;
+  justify-content: space-between;
 }
 .checkboxGroups {
   display: block;
-  padding: 10px 16px;
+  padding: 0 16px;
 }
 .circle {
   width: 14px;
@@ -790,19 +802,21 @@ export default {
   opacity: 0;
 }
 .thirdContent {
-  width: 16%;
   display: inline-block;
-  margin: 5px 0;
+  margin: 5px 20px 0 0;
 }
-.checkboxGroups .el-checkbox {
-  margin: 0;
-  width: 35%;
+.secondContent {
+  /* width: 25%; */
+  display: flex;
 }
 /**这里的样式单独为最下面两行 进行调整 */
-.checkboxGroup > .item:nth-child(5) > .checkboxGroups > .thirdContent {
+/* .checkboxGroup > .item:nth-child(5) > .checkboxGroups > .thirdContent {
   width: 60%;
 }
-.checkboxGroup > .item:nth-child(6) > .checkboxGroups > .thirdContent {
+.checkboxGroup .item:nth-child(6) .checkboxGroups .el-checkbox {
+  margin: 5px 0 !important;
+} */
+/* .checkboxGroup > .item:nth-child(6) > .checkboxGroups > .thirdContent {
   width: 21%;
 }
 .checkboxGroup
@@ -810,5 +824,5 @@ export default {
   > .checkboxGroups
   > .thirdContent:nth-child(5) {
   margin-left: 35%;
-}
+} */
 </style>

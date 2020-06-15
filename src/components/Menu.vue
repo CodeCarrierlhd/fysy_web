@@ -9,8 +9,6 @@
         <el-menu
           v-if="rightLists.length > 0"
           class="el-menu-vertical-demo"
-          @open="handleOpen"
-          @close="handleClose"
           background-color="#435E93"
           text-color="#fff"
           active-text-color="#00f"
@@ -61,7 +59,8 @@ export default {
         'el-icon-house',
         'el-icon-coin',
         'el-icon-s-data'
-      ]
+      ],
+      menuIndex: ''
     }
   },
   watch: {
@@ -71,13 +70,10 @@ export default {
     }
   },
   methods: {
-    handleOpen(key, keyPath) {
-      console.log('open', key, keyPath)
-    },
-    handleClose(key, keyPath) {
-      console.log('close', key, keyPath)
-    },
     menuChange(sonmenu) {
+      console.log(this.$store.state.menuIndex)
+
+      // this.menuIndex = this.$store.state.menuIndex
       this.$emit('handleRouterChange', sonmenu)
     },
     initData(dataArr) {
@@ -126,13 +122,11 @@ export default {
 <style lang="less">
 .logoImg {
   width: 240px;
-  height: 80px;
+  height: 60px;
   border-bottom: 1px solid rgba(42, 66, 110, 1);
   margin: 0;
   position: relative;
   img {
-    width: 166px;
-    height: 29px;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -149,17 +143,20 @@ export default {
 
 .m_title {
   margin-right: 59px;
-  font-size: 20px;
+  font-size: 16px;
   font-family: SourceHanSansSC-Regular, SourceHanSansSC;
   font-weight: 400;
   color: rgba(255, 255, 255, 1);
   line-height: 30px;
 }
+.el-menu-item-group__title {
+  padding: 0;
+}
 .el-submenu__title i {
   color: #fff !important;
 }
 .el-submenu__title i:first-child {
-  font-size: 30px !important;
+  font-size: 20px !important;
   margin-right: 15px !important;
 }
 .el-submenu__title .el-submenu__icon-arrow {

@@ -13,7 +13,7 @@
         :key="index"
         :label="item.label"
       >
-        <div style="margin:10px 20px">
+        <div style="margin:10px 25px">
           <div class="btn_header">
             <div style="display:flex">
               <div style="display:flex;margin-right:10px">
@@ -24,17 +24,24 @@
                   style="border-radius:4px;width:400px;margin-right:10px"
                   placeholder="输入关键字搜索"
                 />
-                <el-button @click="searchEnterFun()" type="primary"
+                <el-button @click="searchEnterFun" type="primary"
                   ><i class="el-icon-search"></i>搜索</el-button
                 >
               </div>
               <el-button
-                @click="exportClientInfoExcel()"
+                @click="exportClientInfoExcel"
                 :type="defaultColr"
                 :disabled="btnStatu"
                 size="medium"
                 v-if="e_show"
                 ><i class="el-icon-download"></i>导出</el-button
+              >
+              <el-button
+                @click="exportAllExcel"
+                type="primary"
+                size="medium"
+                v-if="exportAll && e_show"
+                >一键导出</el-button
               >
             </div>
             <div v-if="add_show">
@@ -69,16 +76,17 @@
             v-loading="loading"
             :data="tableData"
             @selection-change="selectionChangeHandle"
-            @filter-change="fnFilterChangeInit"
             :row-key="getRowKey"
             :header-cell-style="{
               fontSize: '15px',
               color: '#000',
               fontWeight: 800,
-              background: '#eef1f6'
+              background: '#eef1f6',
+              padding: '4px'
             }"
             border
-            height="600"
+            height="660"
+            :cell-style="{ padding: '2px' }"
           >
             <el-table-column
               type="selection"
@@ -132,7 +140,7 @@
               prop="produceDate"
               label="生产日期 "
               align="center"
-              width="100"
+              width="140"
             >
             </el-table-column>
 
@@ -140,7 +148,7 @@
               prop="expiryDate"
               label="失效日期"
               align="center"
-              width="100"
+              width="140"
             >
             </el-table-column>
             <el-table-column
@@ -160,7 +168,7 @@
               prop="producer"
               label="生产厂家"
               align="center"
-              width="150"
+              width="350"
             >
             </el-table-column>
             <el-table-column
@@ -195,16 +203,19 @@
             <el-table-column
               label="操作"
               align="center"
-              width="150"
+              width="250"
               v-if="wait_pro"
             >
               <template slot-scope="scope">
-                <span
-                  @click="restart(scope.row)"
-                  v-if="scope.row.productStatus === '已拒绝'"
-                  class="loseContro"
-                  >重新发货</span
-                >
+                <p v-if="scope.row.productStatus === '已拒绝'">
+                  <el-button @click="restart(scope.row)" size="mini"
+                    >重新发货</el-button
+                  >
+                  <el-button @click="interStorage(scope.row)" size="mini"
+                    >收入库存</el-button
+                  >
+                </p>
+
                 <span v-else>------</span>
               </template>
             </el-table-column>
@@ -257,12 +268,19 @@
         ref="getProducts"
         :data="newTableData"
         v-loading="loading1"
-        @filter-change="fnFilterChangeInit1"
+        @filter-change="fnFilterChangeInit"
         @selection-change="selectionChangeHandle1"
         :row-key="getRowKey1"
-        height="600"
-        style="width: 100%;margin:10px 20px;"
+        :header-cell-style="{
+          fontSize: '15px',
+          color: '#000',
+          fontWeight: 800,
+          background: '#eef1f6',
+          padding: '4px'
+        }"
         border
+        height="660"
+        :cell-style="{ padding: '2px' }"
       >
         <el-table-column
           type="selection"
@@ -290,6 +308,7 @@
           align="center"
           width="150"
           :filter-multiple="false"
+          column-key="materialModel"
           :filters="materialModelGroup"
           :filter-method="filterTag"
         >
@@ -342,7 +361,7 @@
           prop="producer"
           label="生产厂家"
           align="center"
-          width="150"
+          width="350"
         >
         </el-table-column>
       </el-table>
@@ -367,6 +386,7 @@
           <span>收货单位：</span>
           <el-select
             v-model="recived"
+            filterable
             placeholder="请选择"
             @change="reciverChange"
           >
@@ -424,6 +444,16 @@
             <el-table-column prop="sp_sum" label="数量/个" align="center">
             </el-table-column>
           </el-table>
+        </li>
+        <li>
+          <span>单价：</span>
+          <!-- <input type="number" name="reciver.price" v-model="reciver.price" /> -->
+          <el-input
+            v-model="reciver.price"
+            clearable
+            placeholder="输入单价"
+            style="border-radius:4px;width:200px;margin-left:5px"
+          />
         </li>
         <li>
           <span>订单编号：</span>
@@ -519,7 +549,10 @@ export default {
       loading1: true,
       middleSelection: [],
       clickSum: 0,
-      selectStatu: true
+      selectStatu: true,
+      exportKey: '2',
+      exportAll: false,
+      page_key: 0
     }
   },
   // 监听属性 类似于data概念
@@ -642,7 +675,10 @@ export default {
       this.search = ''
       this.btnStatu = true
       this.defaultColr = 'info'
+      this.page_key = tab.index
       if (tab.index === '2') {
+        this.exportAll = true
+        this.exportKey = '4'
         this.key_index = '3'
         this.$nextTick(() => {
           console.log(this.key_index, this.uid)
@@ -654,7 +690,9 @@ export default {
           this.wait_pro = false
         })
       } else if (tab.index === '1') {
+        this.exportAll = true
         this.key_index = '0'
+        this.exportKey = '3'
         this.$nextTick(() => {
           console.log(this.key_index, this.uid)
 
@@ -666,7 +704,9 @@ export default {
         })
       } else {
         this.loading = false
+        this.exportAll = false
         this.key_index = '2'
+        this.exportKey = '2'
         this.tableData = []
         this.getDataList(0)
         this.show_role = false
@@ -677,9 +717,7 @@ export default {
     },
     fnFilterChangeInit(filter) {
       console.log(filter)
-    },
-    fnFilterChangeInit1(filter) {
-      console.log(filter)
+      this.loading1 = true
       this.searchAll(
         this.currentPage1,
         this.limit1,
@@ -696,6 +734,7 @@ export default {
         ''
       ).then(res => {
         console.log(res)
+        this.loading1 = false
         this.newTableData = res.data.object.list
         this.getDataList1(res.data.object.total)
       })
@@ -740,7 +779,11 @@ export default {
         '&pageType=',
         '2'
       ).then(res => {
-        this.tableData = res.data.object.list
+        const arr = []
+        for (let index = 0; index < res.data.object.list.length; index++) {
+          arr.push(res.data.object.list[index])
+        }
+        this.tableData = arr
         this.$nextTick(() => {
           for (let i = 0; i < this.tableData.length; i++) {
             this.$refs.sendProFilterTable[0].toggleRowSelection(
@@ -757,7 +800,7 @@ export default {
       this.clickSum = 0
       this.newDialogTableVisible = true
       const ids = this.tableDataSelections.join(',')
-      this.sendProducts(ids, '', '', '', '/deliver/generateOrderInfo').then(
+      this.sendProducts(ids, '', '', '', '', '/deliver/generateOrderInfo').then(
         res => {
           console.log(res.data.object)
           this.reciveGroup = []
@@ -769,9 +812,9 @@ export default {
           }
           this.receiverList = res.data.object.receiverList
           this.reciver = res.data.object.receiverList[0]
-          if (res.data.object.receiverList.length > 0) {
-            this.recived = res.data.object.receiverList[0].username
-          }
+          // if (res.data.object.receiverList.length > 0) {
+          //   this.recived = res.data.object.receiverList[0].username
+          // }
 
           this.sender = res.data.object.sender
           this.order = res.data.object.order
@@ -803,11 +846,14 @@ export default {
       this.loading = true
       const ids = this.tableDataSelections.join(',')
       if (this.clickSum === 0) {
+        console.log(this.reciver)
+
         this.sendProducts(
           ids,
           this.order.orderNo,
           this.order.orderTime.replace(/-/g, '/'),
           this.reciver.id,
+          this.reciver.price,
           '/deliver/sureSend'
         ).then(res => {
           if (res.data.code === 200) {
@@ -1001,20 +1047,62 @@ export default {
     exportClientInfoExcel() {
       const ids = this.tableDataSelections.join(',')
       let names = ''
-      if (this.key_index === '2') {
+      if (this.exportKey === '2') {
         names = '发货数据导出'
-      } else if (this.key_index === '3') {
+      } else if (this.exportKey === '3') {
         names = '待收货数据导出'
-      } else {
+      } else if (this.exportKey === '4') {
         names = '发货完成数据导出'
       }
       const that = this
+      const loading = that.$loading({
+        lock: true,
+        text: '正在导出,请稍后',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
       this.exportCompanyExcel(
-        { opIds: ids, status: this.key_index },
+        { opIds: ids, pageType: this.exportKey },
         '/deliver/export'
       ).then(response => {
         if (response.status === 200) {
+          loading.close()
+          this.$refs.sendProFilterTable[this.page_key].clearSelection()
           that.downloadFile(response.data, names)
+        }
+      })
+    },
+    exportAllExcel() {
+      let names = ''
+      if (this.exportKey === '2') {
+        names = '发货数据导出'
+      } else if (this.exportKey === '3') {
+        names = '待收货数据导出'
+      } else if (this.exportKey === '4') {
+        names = '发货完成数据导出'
+      }
+      const that = this
+      const loading = that.$loading({
+        lock: true,
+        text: '正在导出,请稍后',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+      this.exportCompanyExcel(
+        { pageType: this.exportKey, value: this.search, uid: this.uid },
+        '/deliver/exportInAll'
+      ).then(response => {
+        if (response.status === 200) {
+          loading.close()
+          that.downloadFile(response.data, names)
+        }
+      })
+    },
+    interStorage(row) {
+      this.loading = true
+      this.dataChange({ opId: row.opId }, '/deliver/instock').then(res => {
+        if (res.data.code === 200) {
+          this.changeTab('0', '')
         }
       })
     }
@@ -1038,12 +1126,12 @@ export default {
 }
 </script>
 <style scoped>
+.container {
+  margin: 25px 30px;
+  width: 97%;
+}
 .el-dialog {
   margin-top: 0 !important;
-}
-.container {
-  margin: 40px 60px;
-  width: 93%;
 }
 .find {
   width: 100%;
@@ -1052,7 +1140,7 @@ export default {
 .btn_header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 25px;
+  margin-bottom: 10px;
 }
 .new_header {
   display: flex;
@@ -1077,7 +1165,4 @@ export default {
 .sendContainer li {
   margin-bottom: 24px;
 }
-/* .el-tabs >>> .el-tabs__content {
-  width: 96% !important;
-} */
 </style>

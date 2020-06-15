@@ -36,6 +36,13 @@
                 v-if="i_show"
                 ><i class="el-icon-download"></i>导出</el-button
               >
+              <el-button
+                @click="exportAllExcel"
+                type="primary"
+                size="medium"
+                v-if="i_show"
+                >一键导出</el-button
+              >
             </div>
           </div>
           <el-table
@@ -48,10 +55,12 @@
               fontSize: '15px',
               color: '#000',
               fontWeight: 800,
-              background: '#eef1f6'
+              background: '#eef1f6',
+              padding: '4px'
             }"
             border
-            height="600"
+            height="660"
+            :cell-style="{ padding: '2px' }"
             v-loading="loading"
           >
             <el-table-column
@@ -104,7 +113,7 @@
               prop="produceDate"
               label="生产日期 "
               align="center"
-              width="100"
+              width="140"
             >
             </el-table-column>
 
@@ -112,7 +121,7 @@
               prop="expiryDate"
               label="失效日期"
               align="center"
-              width="100"
+              width="140"
             >
             </el-table-column>
             <el-table-column
@@ -144,7 +153,7 @@
               prop="hospitalName"
               label="手术机构 "
               align="center"
-              width="80"
+              width="220"
             >
             </el-table-column>
             <el-table-column
@@ -152,7 +161,7 @@
               prop="hospitalAddress"
               label="机构地址 "
               align="center"
-              width="80"
+              width="300"
             >
             </el-table-column>
             <el-table-column
@@ -160,7 +169,7 @@
               prop="appointmentDate"
               label="预约日期 "
               align="center"
-              width="80"
+              width="200"
             >
             </el-table-column>
             <el-table-column
@@ -191,15 +200,28 @@
               prop="signTime"
               label="签收日期"
               align="center"
+              width="200"
+            >
+            </el-table-column>
+            <el-table-column
+              v-if="!unsed"
+              prop="price"
+              label="单价"
+              align="center"
               width="100"
             >
+              <template slot-scope="scope">
+                <span>{{
+                  scope.row.price === '' ? '---' : scope.row.price
+                }}</span>
+              </template>
             </el-table-column>
             <el-table-column
               v-if="!unsed"
               prop="activateStatus"
               label="激活状态"
               align="center"
-              width="100"
+              width="300"
             >
             </el-table-column>
             <el-table-column
@@ -207,7 +229,7 @@
               prop="activateTime"
               label="激活日期"
               align="center"
-              width="100"
+              width="200"
             >
             </el-table-column>
             <el-table-column
@@ -279,6 +301,7 @@
 // 例如：import 《组件名称》 from '《组件路径》';
 import pagination from '../components/Pagenation'
 import html2Canvas from 'html2canvas'
+import '../assets/icon/iconfont.css'
 
 export default {
   // import引入的组件需要注入到对象中才能使用
@@ -332,6 +355,8 @@ export default {
         '',
         ''
       ).then(res => {
+        console.log(res)
+
         if (res.status === 200) {
           this.loading = false
           this.tableData = res.data.object.list
@@ -398,19 +423,28 @@ export default {
         console.log(res)
 
         for (let i = 0; i < res.data.object.length; i++) {
-          if (res.data.object[i].productStatus === '已发出') {
+          if (res.data.object[i].productStatus === '已发货') {
             this.stepGroups.push({
               stepName: res.data.object[i].productStatus,
-              iconType: 'el-icon-truck',
+              iconType: 'iconfont icon-report_yfc',
               stepContent: res.data.object[i].opUser,
               stepTime:
                 '发货时间：' +
                 this.translateTime(res.data.object[i].createTime.time)
             })
+          } else if (res.data.object[i].productStatus === '已退货') {
+            this.stepGroups.push({
+              stepName: res.data.object[i].productStatus,
+              iconType: 'iconfont icon-report_yth',
+              stepContent: res.data.object[i].opUser,
+              stepTime:
+                '退货时间：' +
+                this.translateTime(res.data.object[i].createTime.time)
+            })
           } else if (res.data.object[i].productStatus === '已签收') {
             this.stepGroups.push({
               stepName: res.data.object[i].productStatus,
-              iconType: 'el-icon-circle-check',
+              iconType: 'iconfont icon-report_yqs',
               stepContent: res.data.object[i].opUser,
               stepTime:
                 '签收时间：' +
@@ -419,7 +453,7 @@ export default {
           } else if (res.data.object[i].productStatus === '已激活') {
             this.stepGroups.push({
               stepName: res.data.object[i].productStatus,
-              iconType: 'el-icon-unlock',
+              iconType: 'iconfont icon-report_yjh',
               stepContent: res.data.object[i].opUser,
               stepTime:
                 '激活时间：' +
@@ -428,7 +462,7 @@ export default {
           } else if (res.data.object[i].productStatus === '已使用') {
             this.stepGroups.push({
               stepName: res.data.object[i].productStatus,
-              iconType: 'el-icon-user',
+              iconType: 'iconfont icon-repoort_used',
               stepContent: res.data.object[i].opUser,
               stepTime: '使用时间：' + res.data.object[i].createTime,
               user: res.data.object[i].user,
@@ -556,11 +590,45 @@ export default {
         names = '产品已激活数据导出'
       }
       const that = this
+      const loading = that.$loading({
+        lock: true,
+        text: '正在导出,请稍后',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
       this.exportCompanyExcel(
         { productIds: ids, type: this.key_index },
         '/productTrace/export'
       ).then(response => {
         if (response.status === 200) {
+          console.log(response.data)
+          loading.close()
+          this.$refs.filterTable[Number(this.key_index)].clearSelection()
+          that.downloadFile(response.data, names)
+        }
+      })
+    },
+    exportAllExcel() {
+      let names = ''
+      if (this.key_index === '0') {
+        names = '产品全部数据导出'
+      } else {
+        names = '产品已激活数据导出'
+      }
+      const that = this
+      const loading = that.$loading({
+        lock: true,
+        text: '正在导出,请稍后',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+      this.exportCompanyExcel(
+        { value: this.search, type: this.key_index },
+        '/productTrace/exportInAll'
+      ).then(response => {
+        if (response.status === 200) {
+          console.log(response.data)
+          loading.close()
           that.downloadFile(response.data, names)
         }
       })
@@ -585,11 +653,11 @@ export default {
 </script>
 <style scoped>
 .el-step {
-  padding: 8px 100px;
+  padding: 5px 100px;
 }
 .container {
-  margin: 40px 60px;
-  width: 93%;
+  margin: 25px 30px;
+  width: 97%;
 }
 .find {
   width: 100%;
@@ -598,7 +666,7 @@ export default {
 .btn_header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 25px;
+  margin-bottom: 10px;
 }
 .btngroups {
   text-align: center;

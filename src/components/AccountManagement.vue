@@ -16,6 +16,21 @@
           <el-button @click="searchEnterFun()" type="primary"
             ><i class="el-icon-search"></i>搜索</el-button
           >
+          <el-button
+            @click="exportClientInfoExcel"
+            :type="defaultColr"
+            :disabled="btnStatu"
+            size="medium"
+            v-if="e_show"
+            ><i class="el-icon-download"></i>导出</el-button
+          >
+          <el-button
+            @click="exportAllExcel"
+            type="primary"
+            size="medium"
+            v-if="e_show"
+            >一键导出</el-button
+          >
         </div>
 
         <div>
@@ -42,11 +57,13 @@
           fontSize: '15px',
           color: '#000',
           fontWeight: 800,
-          background: '#eef1f6'
+          background: '#eef1f6',
+          padding: '4px'
         }"
-        height="600"
-        v-loading="loading"
         border
+        height="680"
+        :cell-style="{ padding: '2px' }"
+        v-loading="loading"
       >
         <el-table-column
           type="selection"
@@ -68,7 +85,7 @@
         <el-table-column
           prop="username"
           label="用户昵称"
-          width="100"
+          width="150"
           edit="false"
           align="center"
         >
@@ -117,6 +134,24 @@
               </el-option>
             </el-select>
             <span v-else>{{ scope.row.roleType.value }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="fullName"
+          label="全称"
+          width="300"
+          align="center"
+          edit="false"
+        >
+          <template slot-scope="scope">
+            <el-input
+              v-if="scope.row.fullName.edit"
+              ref="'fullName'"
+              v-model="scope.row.fullName.value"
+              @blur="scope.row.fullName.edit = false"
+            >
+            </el-input>
+            <span v-else>{{ scope.row.fullName.value }}</span>
           </template>
         </el-table-column>
         <el-table-column
@@ -196,6 +231,7 @@
           prop="address"
           label="详细地址"
           align="center"
+          width="650"
           edit="false"
         >
           <template slot-scope="scope">
@@ -231,7 +267,7 @@
           prop="mobile"
           label="电话"
           edit="false"
-          width="120"
+          width="220"
           align="center"
         >
           <template slot-scope="scope">
@@ -245,7 +281,18 @@
             <span v-else>{{ scope.row.mobile.value }}</span>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="操作" width="260">
+        <el-table-column
+          prop="createUser"
+          label="创建账号"
+          edit="false"
+          align="center"
+          width="100"
+        >
+          <template slot-scope="scope">
+            <span>{{ scope.row.createUser.value }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column align="center" label="操作" width="160">
           <template slot-scope="scope">
             <el-button
               v-if="scope.row.isSet"
@@ -274,6 +321,7 @@
         :limit="limit"
         :small="true"
         @handleCurrentChange="handleCurrentChange"
+        style="padding:10px 0"
       />
       <my-dialog
         :centerDialogVisible="centerDialogVisible"
@@ -337,7 +385,7 @@ export default {
       cities: [],
       provinces: [],
       currentPage: 1,
-      limit: 9,
+      limit: 18,
       total: 0,
       centerDialogVisible: 0,
       headerText: '重置密码',
@@ -373,25 +421,7 @@ export default {
         res => {
           if (res.status === 200) {
             this.loading = false
-
-            this.tableData = []
-            const vdata = res.data.object.list
-            for (let i = 0; i < vdata.length; i++) {
-              this.tableData.push({
-                username: vdata[i].username,
-                address: vdata[i].address,
-                account: vdata[i].account,
-                roleType: vdata[i].roleType,
-                province: vdata[i].province,
-                city: vdata[i].city,
-                mobile: vdata[i].mobile,
-                contact: vdata[i].contact,
-                id: vdata[i].id,
-                roleId: vdata[i].roleId,
-                isSet: false,
-                resBtn: true
-              })
-            }
+            this.tableData = res.data.object.list
             this.formatData()
             this.getDataList(res.data.object.total)
           } else {
@@ -452,26 +482,34 @@ export default {
         console.log(filter.province[0])
         if (filter.province[0] === undefined) {
           this.cities = []
+          this.cityGroup = []
         } else {
           this.getBeforeData()
           this.provinces.filter(item => {
             if (item.name === filter.province[0]) {
               this.cities = item.cities
+              this.cityGroup = []
+              for (let index = 0; index < item.cities.length; index++) {
+                this.cityGroup.push({
+                  text: item.cities[index].name,
+                  value: item.cities[index].name
+                })
+              }
             }
           })
         }
         this.options.cityTag = ''
-        this.$refs.filterTable.clearFilter()
         this.options.proTag =
           filter.province[0] === undefined ? '' : filter.province[0]
+        // this.$refs.filterTable.clearFilter()
       } else if (filter.city) {
         console.log(filter.city[0])
         this.options.cityTag =
           filter.city[0] === undefined ? '' : filter.city[0]
       }
-      this.init(this.options)
+      this.init()
     },
-    init(options) {
+    init() {
       this.valueData(
         this.currentPage,
         this.limit,
@@ -481,23 +519,7 @@ export default {
         this.options.cityTag,
         this.options.typeTag
       ).then(res => {
-        this.tableData = []
-        const vdata = res.data.object.list
-        for (let i = 0; i < vdata.length; i++) {
-          this.tableData.push({
-            username: vdata[i].username,
-            address: vdata[i].address,
-            account: vdata[i].account,
-            roleType: vdata[i].roleType,
-            province: vdata[i].province,
-            city: vdata[i].city,
-            mobile: vdata[i].mobile,
-            contact: vdata[i].contact,
-            id: vdata[i].id,
-            roleId: vdata[i].roleId,
-            isSet: false
-          })
-        }
+        this.tableData = res.data.object.list
         this.formatData()
         this.getDataList(res.data.object.total)
       })
@@ -507,19 +529,25 @@ export default {
       console.log(row, column)
 
       if (this.e_show) {
-        row.isSet = true
-        for (let i = 0; i < this.tableData.length; i++) {
-          if (this.tableData[i].id !== row.id) {
-            for (const key in this.tableData[i]) {
-              // this.tableData[i][key].edit = false
-              if (key !== 'id' && key !== 'isSet' && key !== 'roleId') {
-                this.tableData[i][key].edit = false
-              } else {
-                this.tableData[i].isSet = false
+        if (!this.edit) {
+          row.isSet = true
+          for (let i = 0; i < this.tableData.length; i++) {
+            if (this.tableData[i].id !== row.id) {
+              for (const key in this.tableData[i]) {
+                // this.tableData[i][key].edit = false
+                if (key !== 'id' && key !== 'isSet' && key !== 'roleId') {
+                  this.tableData[i][key].edit = false
+                } else {
+                  this.tableData[i].isSet = false
+                }
               }
             }
           }
+          if (row[column.property]) {
+            row[column.property].edit = true
+          }
         }
+
         this.provinces = provinceCity.provinces
 
         if (row[column.property].type === 'city') {
@@ -537,23 +565,17 @@ export default {
                 value: res.data.object.roleList[i].roleId
               })
             }
-            console.log(this.roleGroups)
           })
         }
-        if (row[column.property]) {
-          row[column.property].edit = true
-        }
+        // for (const key in row) {
+        //   if (row[key].edit) {
+        //     row[key].edit = false
+        //   }
+        // }
       }
     },
     changeCell(value, item, index, type) {
       console.log(value, item, index, type)
-
-      for (let i = 0; i < this.provinces.length; i++) {
-        if (value === this.provinces[i].name) {
-          this.tableData[index].city.value = this.provinces[i].cities[0].name
-        }
-      }
-
       if (type === 'province') {
         for (let i = 0; i < this.provinces.length; i++) {
           if (this.provinces[i].name === value) {
@@ -563,7 +585,6 @@ export default {
       } else if (type === 'roleType') {
         const roles = this.roleGroups.filter(item => item.label === value)
         console.log(roles)
-
         this.nowRoleId = roles[0].value
       }
     },
@@ -594,7 +615,7 @@ export default {
         this.provinces = provinceCity.provinces
         const ids = this.tableData[this.tableData.length - 1].id + 1
         this.tableData.unshift({
-          account: { value: '', edit: true },
+          account: { value: '', edit: false },
           username: { value: '', edit: true },
           address: { value: '', edit: true },
           contact: { value: '', edit: true },
@@ -602,7 +623,9 @@ export default {
           province: { value: '', edit: true },
           city: { value: '', edit: true },
           roleType: { value: '', edit: true },
+          fullName: { value: '', edit: true },
           id: ids,
+          createUser: { value: '', edit: false },
           isSet: true,
           resBtn: false
         })
@@ -638,9 +661,7 @@ export default {
     },
     // 保存提交
     handleSave(index, row) {
-      console.log(row)
-      console.log(this.nowRoleId)
-
+      this.loading = true
       const a = {}
       for (const key in row) {
         if (key !== 'isSet') {
@@ -663,7 +684,7 @@ export default {
         nowload = 'user/insert'
       }
       for (const key in a) {
-        if (key !== 'account') {
+        if (key !== 'account' && key !== 'fullName' && key !== 'createUser') {
           if (a[key] === '') {
             this.errorVisible = true
           }
@@ -686,6 +707,7 @@ export default {
           }
         })
       } else {
+        this.loading = false
         this.infoTitle = '所有内容不能为空'
       }
     },
@@ -698,35 +720,7 @@ export default {
       return row.id
     },
     searchEnterFun() {
-      this.valueData(
-        this.currentPage,
-        this.limit,
-        '/user/listData',
-        this.search,
-        '',
-        '',
-        ''
-      ).then(res => {
-        this.tableData = []
-        const vdata = res.data.object.list
-        for (let i = 0; i < vdata.length; i++) {
-          this.tableData.push({
-            username: vdata[i].username,
-            address: vdata[i].address,
-            account: vdata[i].account,
-            roleType: vdata[i].roleType,
-            province: vdata[i].province,
-            city: vdata[i].city,
-            mobile: vdata[i].mobile,
-            contact: vdata[i].contact,
-            id: vdata[i].id,
-            roleId: vdata[i].roleId,
-            isSet: false
-          })
-        }
-        this.formatData()
-        this.getDataList(res.data.object.total)
-      })
+      this.init()
     },
     clearSearch() {
       this.makeData()
@@ -743,9 +737,8 @@ export default {
     },
     getBeforeData() {
       this.searchData('user/getSearchData').then(res => {
-        // this.provinces = res.data.object.provinces
         console.log(res)
-
+        this.provinces = res.data.object.provinces
         this.proviceGroup = []
         for (let index = 0; index < res.data.object.provinces.length; index++) {
           this.proviceGroup.push({
@@ -783,6 +776,8 @@ export default {
           this.e_show = true
         } else if (item.rightName === '查询') {
           this.s_show = true
+        } else if (item.rightName === '导出') {
+          this.e_show = true
         }
       })
     },
@@ -792,6 +787,54 @@ export default {
     },
     handleClose(done) {
       this.errorVisible = false
+    },
+    exportClientInfoExcel() {
+      const that = this
+      const loading = that.$loading({
+        lock: true,
+        text: '正在导出,请稍后',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+      const ids = []
+      for (let i = 0; i < this.tableDataSelections.length; i++) {
+        ids.push(this.tableDataSelections[i].id)
+      }
+
+      that
+        .exportCompanyExcel({ uids: ids.join(',') }, '/user/export')
+        .then(response => {
+          if (response.status === 200) {
+            loading.close()
+            that.$refs.filterTable.clearSelection()
+            that.downloadFile(response.data, '账号数据导出')
+          }
+        })
+    },
+    exportAllExcel() {
+      const that = this
+      const loading = that.$loading({
+        lock: true,
+        text: '正在导出,请稍后',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+      that
+        .exportCompanyExcel(
+          {
+            city: that.options.cityTag,
+            province: that.options.proTag,
+            roleType: that.options.typeTag,
+            value: that.search
+          },
+          '/user/exportInAll'
+        )
+        .then(response => {
+          if (response.status === 200) {
+            loading.close()
+            that.downloadFile(response.data, '账号数据导出')
+          }
+        })
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
@@ -813,11 +856,8 @@ export default {
 </script>
 <style scope>
 .container {
-  margin: 40px 60px;
-  width: 93%;
-  background-color: #fff;
+  width: 97%;
 }
-
 .el-table-filter {
   max-height: 400px;
   overflow: auto;
@@ -843,7 +883,4 @@ export default {
   -webkit-transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
   transition: border-color 0.2s cubic-bezier(0.645, 0.045, 0.355, 1);
 }
-/* .el-table__row {
-  height: 60px !important;
-} */
 </style>
