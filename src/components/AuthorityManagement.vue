@@ -165,6 +165,7 @@
         :total="total"
         :limit="limit"
         :small="true"
+        :numberShow="numberShow"
         @handleCurrentChange="handleCurrentChange"
         @handleSizeChange="handleSizeChange"
         style="margin:15px 50px;"
@@ -238,6 +239,7 @@ export default {
       currentPage: 1,
       limit: 10,
       total: 0,
+      numberShow: false,
       dialogVisibleClassify: false, // 弹窗是否显示
       options: '',
       showTitle: '新增用户角色',
@@ -700,7 +702,7 @@ export default {
   background-color: #2a426e;
   margin-left: 120px;
   text-align: center;
-  padding-top: 33px;
+  padding: 33px 0;
   width: 600px;
   max-height: 760px;
   overflow-y: auto;

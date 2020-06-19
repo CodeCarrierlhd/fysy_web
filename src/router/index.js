@@ -181,7 +181,7 @@ const routes = [
     component: resolve => require(['../views/Login.vue'], resolve)
   },
   {
-    path: '/down/:packType',
+    path: '/down',
     name: 'Down',
     component: resolve => require(['../views/DownFile.vue'], resolve)
   }

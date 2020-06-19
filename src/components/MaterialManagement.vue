@@ -55,16 +55,18 @@
       >
         <el-table-column
           type="selection"
-          width="100"
+          width="60"
           align="center"
           :reserve-selection="true"
         ></el-table-column>
+        <el-table-column type="index" width="60" align="center" label="序号">
+        </el-table-column>
         <el-table-column
           prop="materialCode"
           label="产品编号"
           edit="false"
           align="center"
-          width="180"
+          width="120"
         >
         </el-table-column>
         <el-table-column
@@ -72,7 +74,7 @@
           label="产品类别"
           edit="false"
           align="center"
-          width="180"
+          width="120"
           :filter-multiple="false"
           :filters="materialTypeNameGroup"
           :filter-method="filterTag"
@@ -83,7 +85,7 @@
         <el-table-column
           prop="materialModel"
           label="产品型号"
-          width="180"
+          width="120"
           edit="false"
           align="center"
         >
@@ -93,7 +95,7 @@
           prop="spec"
           label="规格 "
           align="center"
-          width="160"
+          width="60"
           edit="false"
         >
         </el-table-column>
@@ -132,7 +134,7 @@
             <el-checkbox v-model="scope.row.isCheck" disabled></el-checkbox>
           </template>
         </el-table-column> -->
-        <el-table-column prop="status" align="center" label="状态" width="85">
+        <el-table-column prop="status" align="center" label="状态" width="100">
           <template slot-scope="scope">
             <el-checkbox v-model="scope.row.isCheck" disabled></el-checkbox>
           </template>
@@ -141,7 +143,7 @@
           prop="marketDate"
           label="上市日期"
           align="center"
-          width="180"
+          width="120"
         >
         </el-table-column>
         <el-table-column align="center" label="操作" width="180">
@@ -166,6 +168,7 @@
         :total="total"
         :limit="limit"
         :small="true"
+        :numberSize="numberSize"
         @handleCurrentChange="handleCurrentChange"
         style="padding:10px 0"
       />
@@ -373,6 +376,7 @@ export default {
       currentPage: 1,
       limit: 10,
       total: 0,
+      numberSize: 0,
       isCheck: true,
       s_show: false,
       a_show: false,
@@ -448,6 +452,7 @@ export default {
     },
     selectionChangeHandle(selections) {
       console.log(selections)
+      this.numberSize = selections.length
       this.tableDataSelections = []
       for (let i = 0; i < selections.length; i++) {
         this.tableDataSelections.push(selections[i].id)
@@ -549,7 +554,30 @@ export default {
       return row.id
     },
     searchEnterFun() {
-      this.makeData()
+      this.searchAll(
+        1,
+        this.limit,
+        '/material/listData',
+        '&value=',
+        this.search,
+        '&materialType=',
+        this.materialType,
+        '&producerId=',
+        this.producerId,
+        ''
+      ).then(res => {
+        if (res.status === 200) {
+          this.loading = false
+          this.tableData = res.data.object.list
+          this.getDataList(res.data.object.total)
+          this.getStatu()
+        } else {
+          this.$message({
+            message: res.data.msg,
+            type: 'warning'
+          })
+        }
+      })
     },
     initBtn() {
       const btnArr = JSON.parse(this.$route.query.btnRight)
@@ -759,10 +787,6 @@ export default {
 }
 </script>
 <style>
-.el-table__header .el-table-column--selection .cell .el-checkbox:after {
-  content: '全选';
-  font-size: 15px;
-}
 .avatar-uploader .el-upload {
   border: 1px dashed #d9d9d9;
   border-radius: 6px;

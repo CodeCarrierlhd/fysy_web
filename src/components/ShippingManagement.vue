@@ -90,57 +90,66 @@
           >
             <el-table-column
               type="selection"
-              width="100"
+              width="60"
+              fixed
               align="center"
               :reserve-selection="selectStatu"
             ></el-table-column>
             <el-table-column
+              type="index"
+              width="60"
+              fixed
+              align="center"
+              label="序号"
+            >
+            </el-table-column>
+            <el-table-column
               prop="materialType"
               label="产品类别"
               align="center"
-              width="100"
+              width="120"
             >
             </el-table-column>
             <el-table-column
               prop="materialCode"
               label="产品编号"
               align="center"
-              width="200"
+              width="120"
             >
             </el-table-column>
             <el-table-column
               prop="materialModel"
               label="产品型号"
               align="center"
-              width="150"
+              width="120"
             >
             </el-table-column>
             <el-table-column
               prop="productNo"
               label="序列号 "
               align="center"
-              width="200"
+              width="240"
             >
             </el-table-column>
             <el-table-column
               prop="batchNo"
               label="产品批号 "
               align="center"
-              width="200"
+              width="240"
             >
             </el-table-column>
             <el-table-column
               prop="spec"
               label="规格 "
               align="center"
-              width="80"
+              width="60"
             >
             </el-table-column>
             <el-table-column
               prop="produceDate"
               label="生产日期 "
               align="center"
-              width="140"
+              width="120"
             >
             </el-table-column>
 
@@ -148,27 +157,34 @@
               prop="expiryDate"
               label="失效日期"
               align="center"
-              width="140"
+              width="120"
             >
             </el-table-column>
             <el-table-column
               prop="cartonCode"
               label="箱码"
               align="center"
-              width="200"
+              width="240"
             >
             </el-table-column>
             <el-table-column
               prop="activateCode"
               label="激活码"
               align="center"
-              width="200"
+              width="240"
+            ></el-table-column>
+            <el-table-column
+              prop="instockTime"
+              label="入库时间"
+              align="center"
+              width="240"
+              v-if="!a_statu"
             ></el-table-column>
             <el-table-column
               prop="producer"
               label="生产厂家"
               align="center"
-              width="350"
+              width="300"
             >
             </el-table-column>
             <el-table-column
@@ -176,34 +192,48 @@
               prop="opUser"
               label="操作账户"
               align="center"
-              width="100"
+              width="240"
+            ></el-table-column>
+            <el-table-column
+              v-if="a_statu"
+              prop="opTime"
+              label="操作时间"
+              align="center"
+              width="240"
             ></el-table-column>
             <el-table-column
               v-if="a_statu"
               prop="receiver"
               label="接收账户"
               align="center"
-              width="100"
+              width="240"
             ></el-table-column>
             <el-table-column
               v-if="wait_pro"
               prop="receiver"
               label="收货人"
               align="center"
-              width="150"
+              width="300"
             >
             </el-table-column>
+            <el-table-column
+              v-if="wait_pro"
+              prop="opTime"
+              label="操作时间"
+              align="center"
+              width="240"
+            ></el-table-column>
             <el-table-column
               v-if="wait_pro"
               prop="productStatus"
               label="状态"
               align="center"
-              width="150"
+              width="120"
             ></el-table-column>
             <el-table-column
               label="操作"
               align="center"
-              width="250"
+              width="240"
               v-if="wait_pro"
             >
               <template slot-scope="scope">
@@ -219,11 +249,12 @@
                 <span v-else>------</span>
               </template>
             </el-table-column>
+
             <el-table-column
               prop="productStatus"
               label="状态"
               align="center"
-              width="150"
+              width="120"
               v-if="a_statu"
             ></el-table-column>
             <!-- <el-table-column label="取消关联" align="center">
@@ -236,6 +267,7 @@
             :total="total"
             :limit="limit"
             :small="true"
+            :numberSize="numberSize"
             @handleCurrentChange="handleCurrentChange"
           />
         </div>
@@ -284,29 +316,38 @@
       >
         <el-table-column
           type="selection"
-          width="100"
+          width="60"
+          fixed
           align="center"
           :reserve-selection="selectStatu"
         ></el-table-column>
         <el-table-column
+          type="index"
+          width="60"
+          align="center"
+          label="序号"
+          fixed
+        >
+        </el-table-column>
+        <el-table-column
           prop="materialType"
           label="产品类别"
           align="center"
-          width="100"
+          width="120"
         >
         </el-table-column>
         <el-table-column
           prop="materialCode"
           label="产品编号"
           align="center"
-          width="180"
+          width="120"
         >
         </el-table-column>
         <el-table-column
           prop="materialModel"
           label="产品型号"
           align="center"
-          width="150"
+          width="120"
           :filter-multiple="false"
           column-key="materialModel"
           :filters="materialModelGroup"
@@ -317,23 +358,23 @@
           prop="productNo"
           label="序列号 "
           align="center"
-          width="200"
+          width="240"
         >
         </el-table-column>
         <el-table-column
           prop="batchNo"
           label="产品批号 "
           align="center"
-          width="200"
+          width="240"
         >
         </el-table-column>
-        <el-table-column prop="spec" label="规格 " align="center" width="80">
+        <el-table-column prop="spec" label="规格 " align="center" width="60">
         </el-table-column>
         <el-table-column
           prop="produceDate"
           label="生产日期 "
           align="center"
-          width="160"
+          width="120"
         >
         </el-table-column>
 
@@ -341,27 +382,33 @@
           prop="expiryDate"
           label="失效日期"
           align="center"
-          width="160"
+          width="120"
         >
         </el-table-column>
         <el-table-column
           prop="cartonCode"
           label="箱码"
           align="center"
-          width="200"
+          width="240"
         >
         </el-table-column>
         <el-table-column
           prop="activateCode"
           label="激活码"
           align="center"
-          width="200"
+          width="240"
+        ></el-table-column>
+        <el-table-column
+          prop="instockTime"
+          label="入库时间"
+          align="center"
+          width="240"
         ></el-table-column>
         <el-table-column
           prop="producer"
           label="生产厂家"
           align="center"
-          width="350"
+          width="300"
         >
         </el-table-column>
       </el-table>
@@ -370,6 +417,7 @@
         :total="total1"
         :limit="limit1"
         :small="true"
+        :numberSize="numberSize1"
         @handleCurrentChange="handleCurrentChange1"
       />
     </el-dialog>
@@ -505,6 +553,8 @@ export default {
       currentPage1: 1,
       limit1: 100,
       total1: 0,
+      numberSize: 0,
+      numberSize1: 0,
       materialModelGroup: [],
       p_statuGroup: [
         { text: '已拒绝', value: '已拒绝' },
@@ -591,6 +641,7 @@ export default {
       })
     },
     selectionChangeHandle(selection) {
+      this.numberSize = selection.length
       this.tableDataSelections = []
       // this.btnShow = false
       for (let i = 0; i < selection.length; i++) {
@@ -608,6 +659,7 @@ export default {
     },
     selectionChangeHandle1(selection) {
       this.tableDataSelections1 = []
+      this.numberSize1 = selection.length
       for (let i = 0; i < selection.length; i++) {
         this.tableDataSelections1.push(selection[i].opId)
       }
@@ -636,9 +688,8 @@ export default {
       this.loading = true
       this.search = ''
       if (this.key_index === '3') {
-        console.log(this.uid)
         this.changeTab('3', this.uid)
-      } else if (this.key_index === '4') {
+      } else if (this.key_index === '0') {
         console.log(this.uid)
 
         this.changeTab('0', '')
@@ -667,10 +718,12 @@ export default {
     handleCurrentChange1(val) {
       this.currentPage1 = val
       this.loading1 = true
+
       this.initData1()
     },
     handleClick(tab, event) {
       this.loading = true
+      this.numberSize = 0
       this.middleSelection = []
       this.search = ''
       this.btnStatu = true
@@ -718,6 +771,7 @@ export default {
     fnFilterChangeInit(filter) {
       console.log(filter)
       this.loading1 = true
+      this.numberSize1 = 0
       this.searchAll(
         this.currentPage1,
         this.limit1,
@@ -886,11 +940,12 @@ export default {
     },
     searchEnterFun() {
       console.log(this.middleSelection)
+      this.numberSize = 0
       let a = 0
       if (this.key_index === '3') {
         a = 3
         this.searchAll(
-          this.currentPage,
+          1,
           this.limit,
           '/deliver/listData',
           '&materialId=',
@@ -905,10 +960,10 @@ export default {
           this.tableData = res.data.object.list
           this.getDataList(res.data.object.total)
         })
-      } else if (this.key_index === '4') {
+      } else if (this.key_index === '0') {
         a = 0
         this.searchAll(
-          this.currentPage,
+          1,
           this.limit,
           '/deliver/listData',
           '&materialId=',
@@ -926,7 +981,7 @@ export default {
       } else {
         a = 2
         this.searchAll(
-          this.currentPage,
+          1,
           this.limit,
           '/inventory/listData',
           '&materialId=',
@@ -940,7 +995,6 @@ export default {
           '&pageType=',
           a
         ).then(res => {
-          console.log(a)
           this.loading = false
           this.tableData = res.data.object.list
           this.getDataList(res.data.object.total)
@@ -976,6 +1030,7 @@ export default {
         '&pageType=',
         '1'
       ).then(res => {
+        this.numberSize1 = res.data.object.list.length
         this.newTableData = res.data.object.list
         this.getDataList1(res.data.object.total)
       })

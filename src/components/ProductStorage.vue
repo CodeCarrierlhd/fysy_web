@@ -79,29 +79,38 @@
           >
             <el-table-column
               type="selection"
-              width="100"
+              width="60"
+              fixed
               align="center"
               :reserve-selection="true"
             ></el-table-column>
             <el-table-column
+              type="index"
+              width="60"
+              fixed
+              align="center"
+              label="序号"
+            >
+            </el-table-column>
+            <el-table-column
               prop="materialType"
               label="产品类别"
               align="center"
-              width="100"
+              width="120"
             >
             </el-table-column>
             <el-table-column
               prop="materialCode"
               label="产品编号"
               align="center"
-              width="180"
+              width="120"
             >
             </el-table-column>
             <el-table-column
               prop="materialModel"
               label="产品型号"
               align="center"
-              width="150"
+              width="120"
               :filter-multiple="false"
               :filters="materialModelGroup"
               :filter-method="filterTag"
@@ -113,28 +122,28 @@
               prop="productNo"
               label="序列号 "
               align="center"
-              width="200"
+              width="240"
             >
             </el-table-column>
             <el-table-column
               prop="batchNo"
               label="产品批号 "
               align="center"
-              width="200"
+              width="240"
             >
             </el-table-column>
             <el-table-column
               prop="spec"
               label="规格 "
               align="center"
-              width="80"
+              width="60"
             >
             </el-table-column>
             <el-table-column
               prop="produceDate"
               label="生产日期 "
               align="center"
-              width="160"
+              width="180"
             >
             </el-table-column>
 
@@ -142,41 +151,41 @@
               prop="expiryDate"
               label="失效日期"
               align="center"
-              width="160"
+              width="180"
             >
             </el-table-column>
             <el-table-column
               prop="cartonCode"
               label="箱码"
               align="center"
-              width="200"
+              width="240"
             >
             </el-table-column>
             <el-table-column
               prop="activateCode"
               label="激活码"
               align="center"
-              width="200"
+              width="240"
             ></el-table-column>
             <el-table-column
               prop="opUser"
               label="退货人"
               align="center"
-              width="200"
+              width="300"
               v-if="mark"
             ></el-table-column>
             <el-table-column
               prop="opUser"
               label="操作账户"
               align="center"
-              width="100"
+              width="300"
               v-else
             ></el-table-column>
             <el-table-column
               prop="returnReason"
               label="退货原因"
               align="center"
-              width="200"
+              width="300"
               v-if="mark"
             ></el-table-column>
 
@@ -184,26 +193,23 @@
               prop="receiver"
               label="接收账户"
               align="center"
-              width="100"
+              width="300"
               v-else
             ></el-table-column>
             <el-table-column
               prop="opTime"
               label="操作时间"
               align="center"
-              width="100"
+              width="240"
             >
             </el-table-column>
             <el-table-column
               prop="producer"
               label="生产厂家"
               align="center"
-              width="150"
+              width="300"
             >
             </el-table-column>
-            <!-- <el-table-column label="取消关联" align="center">
-              <span class="loseContro">解绑</span>
-            </el-table-column> -->
           </el-table>
 
           <pagination
@@ -211,8 +217,8 @@
             :total="total"
             :limit="limit"
             :small="true"
+            :numberSize="numberSize"
             @handleCurrentChange="handleCurrentChange"
-            style="padding:10px 0"
           />
         </div>
       </el-tab-pane>
@@ -234,6 +240,7 @@ export default {
       currentPage: 1,
       limit: 100,
       total: 0,
+      numberSize: 0,
       materialModelGroup: [],
       tableData: [],
       search: '',
@@ -294,7 +301,7 @@ export default {
     },
     selectionChangeHandle(selection) {
       console.log(selection)
-
+      this.numberSize = selection.length
       this.tableDataSelections = []
       for (let i = 0; i < selection.length; i++) {
         this.tableDataSelections.push(selection[i].opId)
@@ -320,6 +327,7 @@ export default {
       this.initData()
     },
     handleClick(tab, event) {
+      this.numberSize = 0
       this.loading = true
       if (tab.index === '1') {
         this.key_index = '1'
@@ -415,9 +423,27 @@ export default {
       })
     },
     searchEnterFun() {
-      console.log(111)
-
-      this.initData()
+      this.codeData(
+        1,
+        this.limit,
+        '/stock/listData',
+        this.search,
+        this.key_index,
+        '',
+        ''
+      ).then(res => {
+        console.log(res.data.object)
+        if (res.status === 200) {
+          this.loading = false
+          this.tableData = res.data.object.list
+          this.getDataList(res.data.object.total)
+        } else {
+          this.$message({
+            message: res.data.msg,
+            type: 'warning'
+          })
+        }
+      })
     },
     exportClientInfoExcel() {
       const ids = this.tableDataSelections.join(',')

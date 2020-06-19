@@ -50,4 +50,16 @@ body,
 .el-dialog__header {
   padding-bottom: 10px;
 }
+.rowStyle {
+  background-color: #f5f7fa !important;
+  color: #000;
+}
+
+/* .el-table__body tr:hover > td {
+  background-color: red !important;
+} */
+/* .el-table__header .el-table-column--selection .cell .el-checkbox:after {
+  content: '全选';
+  font-size: 15px;
+} */
 </style>

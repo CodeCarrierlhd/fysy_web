@@ -384,7 +384,7 @@ export default {
         },
         tooltip: {
           trigger: 'axis',
-          formatter: '{b}:{c}人'
+          formatter: '{b}:{c}'
         },
         toolbox: {
           show: true,
@@ -485,7 +485,7 @@ export default {
         ],
         series: [
           {
-            name: '直接访问',
+            name: '销售量',
             type: 'bar',
             barWidth: '60%',
             data: yData

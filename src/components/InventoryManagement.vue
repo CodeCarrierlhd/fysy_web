@@ -78,29 +78,38 @@
       >
         <el-table-column
           type="selection"
-          width="100"
+          width="60"
           align="center"
+          fixed
           :reserve-selection="true"
         ></el-table-column>
+        <el-table-column
+          type="index"
+          width="60"
+          align="center"
+          label="序号"
+          fixed
+        >
+        </el-table-column>
         <el-table-column
           prop="materialType"
           label="产品类别"
           align="center"
-          width="100"
+          width="120"
         >
         </el-table-column>
         <el-table-column
           prop="materialCode"
           label="产品编号"
           align="center"
-          width="200"
+          width="120"
         >
         </el-table-column>
         <el-table-column
           prop="materialModel"
           label="产品型号"
           align="center"
-          width="150"
+          width="120"
           :filter-multiple="false"
           :filters="materialModelGroup"
           :filter-method="filterTag"
@@ -112,23 +121,23 @@
           prop="productNo"
           label="序列号 "
           align="center"
-          width="200"
+          width="240"
         >
         </el-table-column>
         <el-table-column
           prop="batchNo"
           label="产品批号 "
           align="center"
-          width="200"
+          width="240"
         >
         </el-table-column>
-        <el-table-column prop="spec" label="规格 " align="center" width="80">
+        <el-table-column prop="spec" label="规格 " align="center" width="60">
         </el-table-column>
         <el-table-column
           prop="produceDate"
           label="生产日期 "
           align="center"
-          width="160"
+          width="120"
         >
         </el-table-column>
 
@@ -136,30 +145,37 @@
           prop="expiryDate"
           label="失效日期"
           align="center"
-          width="160"
+          width="120"
         >
         </el-table-column>
         <el-table-column
           prop="cartonCode"
           label="箱码"
           align="center"
-          width="200"
+          width="240"
         >
         </el-table-column>
         <el-table-column
           prop="activateCode"
           label="激活码"
           align="center"
-          width="200"
+          width="240"
+        ></el-table-column>
+
+        <el-table-column
+          prop="instockTime"
+          label="入库时间"
+          align="center"
+          width="240"
         ></el-table-column>
         <el-table-column
           prop="producer"
           label="生产厂家"
           align="center"
-          width="350"
+          width="300"
         >
         </el-table-column>
-        <el-table-column label="操作" align="center" v-if="b_show">
+        <el-table-column label="操作" align="center" v-if="b_show" width="120">
           <template slot-scope="scope">
             <span class="loseContro" @click="loseContro(scope.row)">拆解</span>
           </template>
@@ -171,6 +187,7 @@
         :total="total"
         :limit="limit"
         :small="true"
+        :numberSize="numberSize"
         @handleCurrentChange="handleCurrentChange"
       />
       <el-dialog
@@ -205,6 +222,7 @@ export default {
       currentPage: 1,
       limit: 100,
       total: 0,
+      numberSize: 0,
       materialModelGroup: [],
       tableData: [],
       search: '',
@@ -219,7 +237,8 @@ export default {
       s_show: false,
       b_show: false,
       e_show: false,
-      loading: true
+      loading: true,
+      currentRow: null
     }
   },
   // 监听属性 类似于data概念
@@ -244,6 +263,8 @@ export default {
         '&pageType=',
         '1'
       ).then(res => {
+        console.log(res)
+
         if (res.status === 200) {
           this.loading = false
           this.tableData = res.data.object.list
@@ -256,8 +277,9 @@ export default {
         }
       })
     },
-    selectionChangeHandle(selection, row) {
+    selectionChangeHandle(selection) {
       console.log(selection)
+      this.numberSize = selection.length
       for (let i = 0; i < selection.length; i++) {
         this.tableDataSelections.push(selection[i].opId)
       }
@@ -269,6 +291,7 @@ export default {
         this.btnStatu = true
       }
     },
+
     // table column 的方法，改写这个方法
     filterTag(value, row, column) {
       return true
@@ -337,7 +360,32 @@ export default {
     },
     searchEnterFun() {
       this.loading = true
-      this.initData()
+      this.searchAll(
+        1,
+        this.limit,
+        '/inventory/listData',
+        '&materialId=',
+        '',
+        '&selectedOpIds=',
+        '',
+        '&uid=',
+        this.a_acount,
+        '&value=',
+        this.search,
+        '&pageType=',
+        '1'
+      ).then(res => {
+        if (res.status === 200) {
+          this.loading = false
+          this.tableData = res.data.object.list
+          this.getDataList(res.data.object.total)
+        } else {
+          this.$message({
+            message: res.data.msg,
+            type: 'warning'
+          })
+        }
+      })
     },
     getType() {
       this.getSums('/material/listAboutSelf').then(res => {

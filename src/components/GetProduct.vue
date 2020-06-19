@@ -65,22 +65,31 @@
           >
             <el-table-column
               type="selection"
-              width="100"
+              width="60"
               align="center"
+              fixed
               :reserve-selection="true"
             ></el-table-column>
+            <el-table-column
+              type="index"
+              width="60"
+              fixed
+              align="center"
+              label="序号"
+            >
+            </el-table-column>
             <el-table-column
               prop="materialType"
               label="产品类别"
               align="center"
-              width="100"
+              width="120"
             >
             </el-table-column>
             <el-table-column
               prop="materialModel"
               label="产品型号"
               align="center"
-              width="150"
+              width="120"
               :filter-multiple="false"
               :filters="materialModelGroup"
               :filter-method="filterTag"
@@ -92,28 +101,28 @@
               prop="productNo"
               label="序列号 "
               align="center"
-              width="200"
+              width="240"
             >
             </el-table-column>
             <el-table-column
               prop="batchNo"
               label="产品批号 "
               align="center"
-              width="200"
+              width="240"
             >
             </el-table-column>
             <el-table-column
               prop="spec"
               label="规格 "
               align="center"
-              width="80"
+              width="60"
             >
             </el-table-column>
             <el-table-column
               prop="produceDate"
               label="生产日期 "
               align="center"
-              width="140"
+              width="120"
             >
             </el-table-column>
 
@@ -121,7 +130,7 @@
               prop="expiryDate"
               label="失效日期"
               align="center"
-              width="140"
+              width="120"
             >
             </el-table-column>
             <el-table-column
@@ -129,7 +138,7 @@
               prop="user"
               label="使用人 "
               align="center"
-              width="80"
+              width="300"
             >
             </el-table-column>
             <el-table-column
@@ -137,7 +146,7 @@
               prop="sex"
               label="性别 "
               align="center"
-              width="80"
+              width="60"
             >
             </el-table-column>
             <el-table-column
@@ -145,7 +154,7 @@
               prop="age"
               label="年龄 "
               align="center"
-              width="80"
+              width="60"
             >
             </el-table-column>
             <el-table-column
@@ -153,7 +162,7 @@
               prop="hospitalName"
               label="手术机构 "
               align="center"
-              width="220"
+              width="300"
             >
             </el-table-column>
             <el-table-column
@@ -161,7 +170,7 @@
               prop="hospitalAddress"
               label="机构地址 "
               align="center"
-              width="300"
+              width="420"
             >
             </el-table-column>
             <el-table-column
@@ -169,7 +178,7 @@
               prop="appointmentDate"
               label="预约日期 "
               align="center"
-              width="200"
+              width="240"
             >
             </el-table-column>
             <el-table-column
@@ -177,7 +186,7 @@
               prop="cartonCode"
               label="箱码"
               align="center"
-              width="200"
+              width="240"
             >
             </el-table-column>
             <el-table-column
@@ -185,14 +194,14 @@
               prop="activateCode"
               label="激活码"
               align="center"
-              width="200"
+              width="240"
             ></el-table-column>
             <el-table-column
               v-if="!unsed"
               prop="lastSigner"
               label="签收单位"
               align="center"
-              width="150"
+              width="300"
             >
             </el-table-column>
             <el-table-column
@@ -208,7 +217,7 @@
               prop="price"
               label="单价"
               align="center"
-              width="100"
+              width="60"
             >
               <template slot-scope="scope">
                 <span>{{
@@ -221,7 +230,7 @@
               prop="activateStatus"
               label="激活状态"
               align="center"
-              width="300"
+              width="100"
             >
             </el-table-column>
             <el-table-column
@@ -229,14 +238,14 @@
               prop="activateTime"
               label="激活日期"
               align="center"
-              width="200"
+              width="180"
             >
             </el-table-column>
             <el-table-column
               prop="productId"
               label="操作"
               align="center"
-              width="150"
+              width="120"
               v-if="r_show"
             >
               <template slot-scope="scope">
@@ -252,6 +261,7 @@
             :total="total"
             :limit="limit"
             :small="true"
+            :numberSize="numberSize"
             @handleCurrentChange="handleCurrentChange"
             style="margin:15px 50px;"
           />
@@ -312,6 +322,7 @@ export default {
       currentPage: 1,
       limit: 100,
       total: 0,
+      numberSize: 0,
       materialModelGroup: [],
       tableDataSelections: [],
       tableData: [],
@@ -376,6 +387,7 @@ export default {
     },
     selectionChangeHandle(selection) {
       this.tableDataSelections = []
+      this.numberSize = selection.length
       // this.btnShow = false
       for (let i = 0; i < selection.length; i++) {
         this.tableDataSelections.push(selection[i].productId)

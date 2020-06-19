@@ -66,17 +66,26 @@
         v-loading="loading"
       >
         <el-table-column
+          fixed
           type="selection"
-          width="100"
+          width="60"
           align="center"
           :reserve-selection="true"
         ></el-table-column>
+        <el-table-column
+          type="index"
+          width="60"
+          align="center"
+          label="序号"
+          fixed
+        >
+        </el-table-column>
         <el-table-column
           prop="account"
           label="登录账号"
           edit="false"
           align="center"
-          width="100"
+          width="120"
         >
           <template slot-scope="scope">
             <span>{{ scope.row.account.value }}</span>
@@ -85,7 +94,7 @@
         <el-table-column
           prop="username"
           label="用户昵称"
-          width="150"
+          width="120"
           edit="false"
           align="center"
         >
@@ -106,7 +115,7 @@
           label="角色类型"
           edit="false"
           align="center"
-          width="160"
+          width="120"
           :filter-multiple="false"
           column-key="roleType"
           :filters="roleTypeGroup"
@@ -139,8 +148,8 @@
         <el-table-column
           prop="fullName"
           label="全称"
-          width="300"
           align="center"
+          width="400"
           edit="false"
         >
           <template slot-scope="scope">
@@ -231,7 +240,7 @@
           prop="address"
           label="详细地址"
           align="center"
-          width="650"
+          width="600"
           edit="false"
         >
           <template slot-scope="scope">
@@ -267,7 +276,7 @@
           prop="mobile"
           label="电话"
           edit="false"
-          width="220"
+          width="120"
           align="center"
         >
           <template slot-scope="scope">
@@ -286,13 +295,13 @@
           label="创建账号"
           edit="false"
           align="center"
-          width="100"
+          width="120"
         >
           <template slot-scope="scope">
             <span>{{ scope.row.createUser.value }}</span>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="操作" width="160">
+        <el-table-column align="center" label="操作" width="180">
           <template slot-scope="scope">
             <el-button
               v-if="scope.row.isSet"
@@ -320,6 +329,7 @@
         :total="total"
         :limit="limit"
         :small="true"
+        :numberSize="numberSize"
         @handleCurrentChange="handleCurrentChange"
         style="padding:10px 0"
       />
@@ -387,6 +397,7 @@ export default {
       currentPage: 1,
       limit: 18,
       total: 0,
+      numberSize: 0,
       centerDialogVisible: 0,
       headerText: '重置密码',
       textName: '确定重置密码，密码将变为初始密码',
@@ -455,6 +466,7 @@ export default {
     },
     selectionChangeHandle(val) {
       console.log(val)
+      this.numberSize = val.length
       this.tableDataSelections = val
       if (val.length > 0) {
         this.defaultColr = 'primary'
@@ -526,7 +538,7 @@ export default {
     },
     // 单元格双击事件
     celledit(row, column, cell, event) {
-      console.log(row, column)
+      // console.log(row, column)0
 
       if (this.e_show) {
         if (!this.edit) {
@@ -539,6 +551,20 @@ export default {
                   this.tableData[i][key].edit = false
                 } else {
                   this.tableData[i].isSet = false
+                }
+              }
+            }
+          }
+          if (row[column.property]) {
+            row[column.property].edit = true
+          }
+        } else {
+          for (let i = 0; i < this.tableData.length; i++) {
+            if (this.tableData[i].id !== row.id) {
+              for (const key in this.tableData[i]) {
+                // this.tableData[i][key].edit = false
+                if (key !== 'id' && key !== 'isSet' && key !== 'roleId') {
+                  this.tableData[i][key].edit = false
                 }
               }
             }
@@ -720,7 +746,19 @@ export default {
       return row.id
     },
     searchEnterFun() {
-      this.init()
+      this.valueData(
+        1,
+        this.limit,
+        '/user/listData',
+        this.search,
+        '',
+        '',
+        ''
+      ).then(res => {
+        this.tableData = res.data.object.list
+        this.formatData()
+        this.getDataList(res.data.object.total)
+      })
     },
     clearSearch() {
       this.makeData()
@@ -857,6 +895,7 @@ export default {
 <style scope>
 .container {
   width: 97%;
+  overflow-y: hidden;
 }
 .el-table-filter {
   max-height: 400px;

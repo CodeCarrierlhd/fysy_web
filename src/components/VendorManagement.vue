@@ -52,10 +52,12 @@
       >
         <el-table-column
           type="selection"
-          width="100"
+          width="60"
           align="center"
           :reserve-selection="true"
         ></el-table-column>
+        <el-table-column type="index" width="60" align="center" label="序号">
+        </el-table-column>
         <el-table-column
           prop="producerCode"
           label="生产商编号"
@@ -77,7 +79,7 @@
         <el-table-column
           prop="producerName"
           label="生产商名称"
-          width="240"
+          width="300"
           edit="false"
           align="center"
         >
@@ -98,7 +100,7 @@
           label="省份"
           edit="false"
           align="center"
-          width="160"
+          width="120"
           :filter-multiple="false"
           column-key="province"
           :filters="proviceGroup"
@@ -134,7 +136,7 @@
           label="城市"
           edit="false"
           align="center"
-          width="160"
+          width="120"
           :filter-multiple="false"
           column-key="city"
           :filters="cityGroup"
@@ -187,7 +189,7 @@
           prop="contact"
           label="联系人"
           edit="false"
-          width="160"
+          width="120"
           align="center"
         >
           <template slot-scope="scope">
@@ -205,7 +207,7 @@
           prop="mobile"
           label="电话"
           edit="false"
-          width="180"
+          width="120"
           align="center"
         >
           <template slot-scope="scope">
@@ -219,7 +221,7 @@
             <span v-else>{{ scope.row.mobile.value }}</span>
           </template>
         </el-table-column>
-        <el-table-column align="center" label="操作" width="160">
+        <el-table-column align="center" label="操作" width="180">
           <template slot-scope="scope">
             <el-button
               v-if="scope.row.isSet"
@@ -241,6 +243,7 @@
         :total="total"
         :limit="limit"
         :small="true"
+        :numberSize="numberSize"
         @handleCurrentChange="handleCurrentChange"
         @handleSizeChange="handleSizeChange"
         style="padding:10px 0"
@@ -299,6 +302,7 @@ export default {
       currentPage: 1,
       limit: 10,
       total: 0,
+      numberSize: 0,
       s_show: false,
       a_show: false,
       d_show: false,
@@ -385,6 +389,7 @@ export default {
       console.log(selection)
 
       this.tableDataSelections = []
+      this.numberSize = selection.length
       // this.btnShow = false
       for (let i = 0; i < selection.length; i++) {
         this.tableDataSelections.push(selection[i].id)
@@ -646,7 +651,7 @@ export default {
     },
     searchEnterFun() {
       this.valueData(
-        this.currentPage,
+        1,
         this.limit,
         '/producer/listData',
         this.search,

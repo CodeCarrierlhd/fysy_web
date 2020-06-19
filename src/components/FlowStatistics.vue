@@ -199,7 +199,7 @@ export default {
           ) {
             barData.push({
               year: res.data.object.histogram.histogram_x[n],
-              sales: res.data.object.histogram.histogram_y[n]
+              number: res.data.object.histogram.histogram_y[n]
             })
           }
           // { year: '1951 年', sales: 38 },
@@ -264,7 +264,7 @@ export default {
           ) {
             barData.push({
               year: res.data.object.histogram.histogram_x[n],
-              sales: res.data.object.histogram.histogram_y[n]
+              number: res.data.object.histogram.histogram_y[n]
             })
           }
           // { year: '1951 年', sales: 38 },
@@ -317,7 +317,7 @@ export default {
       this.barChar.clear()
       this.barChar.changeData(data)
 
-      this.barChar.scale('sales', {
+      this.barChar.scale('number', {
         nice: true
       })
 
@@ -326,7 +326,7 @@ export default {
       })
       this.barChar.interaction('active-region')
 
-      this.barChar.interval().position('year*sales')
+      this.barChar.interval().position('year*number')
 
       this.barChar.render()
     },
@@ -530,7 +530,7 @@ export default {
           ) {
             barData.push({
               year: res.data.object.histogram.histogram_x[n],
-              sales: res.data.object.histogram.histogram_y[n]
+              number: res.data.object.histogram.histogram_y[n]
             })
           }
           this.initLine(lineData)

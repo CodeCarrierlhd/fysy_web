@@ -1,16 +1,24 @@
 <!-- 分页组件 -->
 <template>
-  <div class="pagination">
-    <el-pagination
-      background
-      @current-change="handleCurrentChange"
-      layout="total,prev, pager, next, jumper"
-      :current-page.sync="currentPage"
-      :page-size="limit"
-      :total="total"
-      :small="small"
-    >
-    </el-pagination>
+  <div class="pageComp">
+    <div>
+      <p style="line-height: 46px;font-size: 13px;" v-if="numberShow">
+        已选中
+        <span class="numberSize">{{ numberSize }}</span> 条
+      </p>
+    </div>
+    <div class="pagination">
+      <el-pagination
+        background
+        @current-change="handleCurrentChange"
+        layout="total,prev, pager, next, jumper"
+        :current-page.sync="currentPage"
+        :page-size="limit"
+        :total="total"
+        :small="small"
+      >
+      </el-pagination>
+    </div>
   </div>
 </template>
 
@@ -37,6 +45,10 @@ export default {
       required: false,
       default: 0
     },
+    numberSize: {
+      required: false,
+      default: 0
+    },
     limit: {
       required: false,
       default: 10
@@ -45,6 +57,11 @@ export default {
       required: false,
       type: Boolean,
       default: false
+    },
+    numberShow: {
+      required: false,
+      type: Boolean,
+      default: true
     }
   },
   // 监听属性 类似于data概念
@@ -85,8 +102,18 @@ export default {
 }
 </script>
 <style scope>
+.pageComp {
+  display: flex;
+  justify-content: space-between;
+}
 .pagination {
   text-align: right;
   padding: 10px 0;
+}
+.numberSize {
+  padding: 0 5px;
+  color: #409eff;
+  font-size: 16px;
+  font-weight: 500;
 }
 </style>
